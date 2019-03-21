@@ -206,4 +206,12 @@ public class MainBW extends Application {
         return retImage;
     }
 
+    public void changePixel(int[][] image, int x, int y, int color){
+        image[x][y] = color;
+    }
+
+    public int getPixel(int[][] image, int x, int y){
+        return image[x][y];
+    }
+
 }

@@ -380,8 +380,14 @@ public class MainColor extends Application {
             if (h<0.0) h = h + 360.0;
         }
         return new double[]{h,s,v};
+    }
+    public void changePixel(int[][][] image, int x, int y, int[] color){
+        image[x][y][0] = color[0];
+        image[x][y][1] = color[1];
+        image[x][y][2] = color[2];
+    }
 
-
-
+    public int[] getPixel(int[][][] image, int x, int y){
+        return new int[]{ image[x][y][0],image[x][y][1],image[x][y][2]};
     }
 }
