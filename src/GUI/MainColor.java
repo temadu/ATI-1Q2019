@@ -11,10 +11,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.util.Scanner;
 
 public class MainColor extends Application {
@@ -46,6 +43,9 @@ public class MainColor extends Application {
         Image circleImage = matrixToColorImage(drawCircle(inputImage, 100, 100, 50, new int[]{ 255,128,0 }));
         Image rectImage = matrixToColorImage(drawRectangle(inputImage, 50, 100, 200, 200,  new int[]{ 0,255,128 }));
         Image gradientImage = matrixToColorImage(generateColorGradient(256,100));
+
+        savePPM("images/savecolor.pgm",drawCircle(inputImage, 100, 100, 50, new int[]{ 255,128,0 }), 255);
+
 
 
         //Reading color from the loaded image
@@ -119,9 +119,32 @@ public class MainColor extends Application {
         return data2D;
     }
 
-    public void savePGM(String filePath, int[][] image, int scale){
+    public void savePPM(String filePath, int[][][] image, int scale){
+        try {
 
+            OutputStream w = new FileOutputStream(filePath);
+            int height = image.length;
+            int width = image[0].length;
+
+            String header = "P6\n" + image[0].length + " " + image.length + "\n" + scale + "\n";
+            byte[] headerBytes = header.getBytes();
+
+            for (int i = 0; i < headerBytes.length; i++) {
+                w.write(headerBytes[i]);
+            }
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    for(int rgb = 0; rgb < 3; rgb++){
+                        w.write((byte) image[row][col][rgb]);
+                    }
+                }
+            }
+            w.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
 
     public int[][][] drawCircle( int[][][] image, float cx, float cy, float radius, int[] color){
         int[][][] retImage =  new int[image.length][image[0].length][3];

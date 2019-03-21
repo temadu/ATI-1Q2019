@@ -1,9 +1,11 @@
 package GUI;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -33,6 +35,12 @@ public class MainBW extends Application {
 
         }
 
+//        int[][] circle = drawCircle(new int[512][512], 512/2, 512/2, 50, 255);
+//        savePGM("images/circle.pgm",circle,255);
+//        int[][] square = drawRectangle(new int[512][512], 200, 200, 400, 400,255);
+//        savePGM("images/square.pgm",square,255);
+
+
         Image originalImage = matrixToBWImage(inputImage);
         Image circleImage = matrixToBWImage(drawCircle(inputImage, 100, 100, 50, (int) 255));
         Image rectImage = matrixToBWImage(drawRectangle(inputImage, 50, 100, 200, 200, (int) 128));
@@ -41,10 +49,23 @@ public class MainBW extends Application {
         //Reading color from the loaded image
 //        PixelReader pixelReader = image.getPixelReader();
 //        Color color = pixelReader.getColor(x, y);
+        savePGM("images/save.pgm",drawCircle(inputImage, 100, 100, 50, (int) 255), 255);
 
 
         HBox rootBox = new HBox();
-        rootBox.getChildren().add(new ImageView(originalImage));
+        ImageView v = new ImageView(originalImage);
+        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent e) {
+                int x = (int) e.getX();
+                int y = (int) e.getY();
+                System.out.println("X: " + e.getX() + ", Y: " + e.getY() + ", color: " + inputImage[y][x]);
+            }
+        };
+        //Registering the event filter
+        v.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
+
+        rootBox.getChildren().add(v);
         rootBox.getChildren().add(new ImageView(circleImage));
         rootBox.getChildren().add(new ImageView(rectImage));
         rootBox.getChildren().add(new ImageView(gradientImage));
@@ -108,7 +129,27 @@ public class MainBW extends Application {
     }
 
     public void savePGM(String filePath, int[][] image, int scale){
+        try {
 
+            OutputStream w = new FileOutputStream(filePath);
+            int height = image.length;
+            int width = image[0].length;
+
+            String header = "P5\n" + image[0].length + " " + image.length + "\n" + scale + "\n";
+            byte[] headerBytes = header.getBytes();
+
+            for (int i = 0; i < headerBytes.length; i++) {
+                w.write(headerBytes[i]);
+            }
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    w.write((byte) image[row][col]);
+                }
+            }
+            w.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public int[][] drawCircle( int[][] circle, float cx, float cy, float radius, int color){
