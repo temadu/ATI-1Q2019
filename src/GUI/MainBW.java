@@ -54,13 +54,10 @@ public class MainBW extends Application {
 
         HBox rootBox = new HBox();
         ImageView v = new ImageView(originalImage);
-        EventHandler<MouseEvent> eventHandler = new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent e) {
-                int x = (int) e.getX();
-                int y = (int) e.getY();
-                System.out.println("X: " + e.getX() + ", Y: " + e.getY() + ", color: " + inputImage[y][x]);
-            }
+        EventHandler<MouseEvent> eventHandler = e -> {
+            int x = (int) e.getX();
+            int y = (int) e.getY();
+            System.out.println("X: " + e.getX() + ", Y: " + e.getY() + ", color: " + inputImage[y][x]);
         };
         //Registering the event filter
         v.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);

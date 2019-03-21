@@ -8,6 +8,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -35,14 +36,24 @@ public class MainColor extends Application {
             return;
         }
 
-        System.out.println(RGBtoHSV(new int[]{212,169,106})[0]);
-        System.out.println(RGBtoHSV(new int[]{212,169,106})[1]);
-        System.out.println(RGBtoHSV(new int[]{212,169,106})[2]);
+//        System.out.println(RGBtoHSV(new int[]{212,169,106})[0]);
+//        System.out.println(RGBtoHSV(new int[]{212,169,106})[1]);
+//        System.out.println(RGBtoHSV(new int[]{212,169,106})[2]);
 
-        Image originalImage = matrixToColorImage(inputImage);
-        Image circleImage = matrixToColorImage(drawCircle(inputImage, 100, 100, 50, new int[]{ 255,128,0 }));
-        Image rectImage = matrixToColorImage(drawRectangle(inputImage, 50, 100, 200, 200,  new int[]{ 0,255,128 }));
-        Image gradientImage = matrixToColorImage(generateColorGradient(256,100));
+        Image originalImage = matrixToColorImage(inputImage, true, true, true);
+        Image originalImageGB = matrixToColorImage(inputImage, false, true, true);
+        Image originalImageRB = matrixToColorImage(inputImage, true, false, true);
+        Image originalImageRG = matrixToColorImage(inputImage, true, true, false);
+        Image originalImageR = matrixToColorImage(inputImage, true, false, false);
+        Image originalImageG = matrixToColorImage(inputImage, false, true, false);
+        Image originalImageB = matrixToColorImage(inputImage, false, false, true);
+        Image hueImage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage), false, false, true);
+        Image valImage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage), false, true, false);
+        Image satImaage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage), true, false, false);
+
+        Image circleImage = matrixToColorImage(drawCircle(inputImage, 100, 100, 50, new int[]{ 255,128,0 }), true, true, true);
+        Image rectImage = matrixToColorImage(drawRectangle(inputImage, 50, 100, 200, 200,  new int[]{ 0,255,128 }), true, true, true);
+        Image gradientImage = matrixToColorImage(generateColorGradient(256,100), true, true, true);
 
         savePPM("images/savecolor.pgm",drawCircle(inputImage, 100, 100, 50, new int[]{ 255,128,0 }), 255);
 
@@ -55,12 +66,27 @@ public class MainColor extends Application {
 
         HBox rootBox = new HBox();
         rootBox.getChildren().add(new ImageView(originalImage));
-        rootBox.getChildren().add(new ImageView(circleImage));
-        rootBox.getChildren().add(new ImageView(rectImage));
-        rootBox.getChildren().add(new ImageView(gradientImage));
+        rootBox.getChildren().add(new ImageView(hueImage));
+        rootBox.getChildren().add(new ImageView(satImaage));
+
+        HBox box2 = new HBox();
+        box2.getChildren().add(new ImageView(valImage));
+//        box2.getChildren().add(new ImageView(originalImageG));
+//        box2.getChildren().add(new ImageView(originalImageR));
+
+//        HBox box3 = new HBox();
+//        box3.getChildren().add(new ImageView(originalImageB));
+//        rootBox.getChildren().add(new ImageView(circleImage));
+//        rootBox.getChildren().add(new ImageView(rectImage));
+//        rootBox.getChildren().add(new ImageView(gradientImage));
+
+        VBox vBox = new VBox();
+        vBox.getChildren().add(rootBox);
+        vBox.getChildren().add(box2);
+//        vBox.getChildren().add(box3);
 
         //Creating a Group object
-        Group root = new Group(rootBox);
+        Group root = new Group(vBox);
 
         //Creating a scene object
         Scene scene = new Scene(root, 1024, 512);
@@ -187,7 +213,7 @@ public class MainColor extends Application {
         return retImage;
     }
 
-    public Image matrixToColorImage(int[][][] imageMatrix){
+    public Image matrixToColorImage(int[][][] imageMatrix, boolean red, boolean green, boolean blue){
         int width = imageMatrix[0].length;
         int height = imageMatrix.length;
 
@@ -196,11 +222,40 @@ public class MainColor extends Application {
 
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                writer.setColor(x, y, Color.rgb(imageMatrix[y][x][0], imageMatrix[y][x][1], imageMatrix[y][x][2]));
+                writer.setColor(x, y, Color.rgb(red ? imageMatrix[y][x][0] : 0, green ? imageMatrix[y][x][1] : 0, blue ? imageMatrix[y][x][2] : 0));
             }
         }
         return wImage;
     }
+
+    public Image hsvMatrixToColor (double[][][] imageMatrix, boolean hue, boolean saturation, boolean value){
+        int width = imageMatrix[0].length;
+        int height = imageMatrix.length;
+
+        WritableImage wImage = new WritableImage(width, height);
+        PixelWriter writer = wImage.getPixelWriter();
+
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                int color = 0;
+                if(hue) {
+                    if (imageMatrix[y][x][0] == -1) {
+                        color = 255;
+                    } else {
+                        color = (int) ((imageMatrix[y][x][0]/360) * 255);
+                    }
+                } else if (saturation) {
+                    color = (int) (imageMatrix[y][x][1] * 255);
+                } else if (value) {
+                    color = (int) (imageMatrix[y][x][2] * 255);
+                }
+                writer.setColor(x, y, Color.rgb(color, color, color));
+            }
+        }
+        return wImage;
+    }
+
+
 
     public int[][][] generateColorGradient(int length, int height){
         int[][][] retImage =  new int[height][length][3];
@@ -261,6 +316,40 @@ public class MainColor extends Application {
             }
         }
         return retImage;
+    }
+
+    public double[][][] RGBtoHSVmatrix (int[][][] rgbImage) {
+        int height = rgbImage.length;
+        int width = rgbImage[0].length;
+        double[][][] hsvImage = new double[height][width][3];
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                hsvImage[row][col] = RGBtoHSV(rgbImage[row][col]);
+            }
+        }
+        return hsvImage;
+    }
+
+
+    public int[] HSVtoRGB(double[] color) {
+        double c = color[2] * color[1];
+        double x = c * (1.0 - Math.abs(Math.floorMod( (int)color[0] / 60, 2) - 1.0));
+        double m = color[2] - c;
+        if (color[0] >= 0.0 && color[0] < 60.0) {
+            return new int[]{(int) (c + m), (int) (x + m), (int) m};
+        } else if (color[0] >= 60.0 && color[0] < 120.0) {
+            return new int[]{(int) (x + m), (int) (c + m), (int) m};
+        } else if (color[0] >= 120.0 && color[0] < 180.0) {
+            return new int[]{(int) m, (int) (c + m), (int) (x + m)};
+        } else if (color[0] >= 180.0 && color[0] < 240.0) {
+            return new int[]{(int) m, (int) (x + m), (int) (c + m)};
+        } else if (color[0] >= 240.0 && color[0] < 300.0) {
+            return new int[]{(int) (x + m), (int) m, (int) (c + m)};
+        } else if (color[0] >= 300.0 && color[0] < 360.0) {
+            return new int[]{(int) (c + m), (int) m, (int) (x + m)};
+        } else {
+            return new int[]{(int) m, (int) m, (int) m};
+        }
     }
 
     public double[] RGBtoHSV(int[] color){
