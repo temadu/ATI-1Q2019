@@ -16,6 +16,9 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import models.ImageColor;
+import models.ImageInt;
+import tp1.Functions;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -61,22 +64,28 @@ public class Main extends Application {
         openItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Portable Gray Map Files", "*.pgm")
-                    ,new FileChooser.ExtensionFilter("Portable PixMap Files", "*.ppm")
+                    new FileChooser.ExtensionFilter("Portable PixMap Files", "*.ppm")
+                    ,new FileChooser.ExtensionFilter("Portable Gray Map Files", "*.pgm")
                     ,new FileChooser.ExtensionFilter("Raw Files", "*.raw")
             );
             fileChooser.setInitialDirectory(new File("./images"));
             File file = fileChooser.showOpenDialog(stage);
 
-            int[][] openedImage;
+            ImageColor openedImage;
+            ImageColor openedImage2;
             try {
-                openedImage = this.parsePGM(file.getPath());
+                openedImage = new ImageColor(file.getPath());
+                openedImage2 = new ImageColor(new File("./images/duck.ppm").getPath());
             } catch (IOException e1) {
                 e1.printStackTrace();
                 return;
             }
-
-            this.box.getChildren().add(new ImageView(this.matrixToBWImage(openedImage)));
+            Functions f = new Functions(openedImage);
+            ImageColor sum = f.rangeCompressor();
+            HBox h = new HBox();
+            h.getChildren().add(new ImageView(openedImage.matrixToColorImage(true, true, true)));
+            h.getChildren().add(new ImageView(sum.matrixToColorImage(true, true, true)));
+            this.box.getChildren().add(h);
 
         });
         MenuItem exit = new MenuItem("Exit");
@@ -149,6 +158,8 @@ public class Main extends Application {
         }
         return wImage;
     }
+
+
 
 
 }
