@@ -6,5 +6,4 @@ import java.io.IOException;
 
 public interface ImageInt {
     void parse(String filePath) throws IOException;
-    Image matrixToColorImage(boolean red, boolean green, boolean blue);
 }

@@ -17,11 +17,13 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
+import models.ImageGrey;
 import models.ImageInt;
 import tp1.Functions;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -71,20 +73,22 @@ public class Main extends Application {
             fileChooser.setInitialDirectory(new File("./images"));
             File file = fileChooser.showOpenDialog(stage);
 
-            ImageColor openedImage;
-            ImageColor openedImage2;
+//            ImageColor openedImage;
+            ImageGrey openedImage2;
             try {
-                openedImage = new ImageColor(file.getPath());
-                openedImage2 = new ImageColor(new File("./images/duck.ppm").getPath());
+//                openedImage = new ImageColor(file.getPath());
+                openedImage2 = new ImageGrey(file.getPath());
             } catch (IOException e1) {
                 e1.printStackTrace();
                 return;
             }
-            Functions f = new Functions(openedImage);
-            ImageColor sum = f.rangeCompressor();
+            Functions f = new Functions(openedImage2);
+//            ImageColor sum = f.negative();
+//            ImageGrey sum = f.greyHistogram();
+            System.out.println(Arrays.toString(f.greyHistogram()));
             HBox h = new HBox();
-            h.getChildren().add(new ImageView(openedImage.matrixToColorImage(true, true, true)));
-            h.getChildren().add(new ImageView(sum.matrixToColorImage(true, true, true)));
+            h.getChildren().add(new ImageView(openedImage2.matrixToGreyImage()));
+//            h.getChildren().add(new ImageView(sum.matrixToColorImage(true, true, true)));
             this.box.getChildren().add(h);
 
         });
@@ -102,62 +106,8 @@ public class Main extends Application {
 
         return menuBar;
     }
-    public int[][] parsePGM(String filePath) throws IOException {
 
-        //Parse header
-        FileInputStream fileInputStream = new FileInputStream(filePath);
-        Scanner scan = new Scanner(fileInputStream);
 
-        // Parse the magic number
-        String magicNum = scan.nextLine();
-        System.out.println(magicNum);
-        // Discard the comment lines
-//        scan.nextLine();
-        // Read pic width, height and max value
-        int picWidth = scan.nextInt();
-        int picHeight = scan.nextInt();
-        int maxvalue = scan.nextInt();
-
-        fileInputStream.close();
-
-        // Now parse the file as binary data
-        fileInputStream = new FileInputStream(filePath);
-        DataInputStream dis = new DataInputStream(fileInputStream);
-
-        // look for 4 lines (i.e.: the header) and discard them
-        int numnewlines = 3;
-        while (numnewlines > 0) {
-            char c;
-            do {
-                c = (char)(dis.readUnsignedByte());
-            } while (c != '\n');
-            numnewlines--;
-        }
-
-        // read the image data
-        int[][] data2D = new int[picHeight][picWidth];
-        for (int row = 0; row < picHeight; row++) {
-            for (int col = 0; col < picWidth; col++) {
-                data2D[row][col] = dis.readUnsignedByte();
-            }
-        }
-        return data2D;
-    }
-
-    public Image matrixToBWImage(int[][] imageMatrix){
-        int width = imageMatrix[0].length;
-        int height = imageMatrix.length;
-
-        WritableImage wImage = new WritableImage(width, height);
-        PixelWriter writer = wImage.getPixelWriter();
-
-        for(int y = 0; y < height; y++) {
-            for(int x = 0; x < width; x++) {
-                writer.setColor(x, y, Color.grayRgb(imageMatrix[y][x]));
-            }
-        }
-        return wImage;
-    }
 
 
 

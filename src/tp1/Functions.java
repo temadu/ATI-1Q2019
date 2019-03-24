@@ -1,13 +1,19 @@
 package tp1;
 
 import models.ImageColor;
+import models.ImageGrey;
 import models.ImageInt;
 
 public class Functions {
     public ImageColor image;
+    public ImageGrey imageGrey;
 
     public Functions(ImageColor image) {
         this.image = image;
+    }
+
+    public Functions(ImageGrey image) {
+        this.imageGrey = image;
     }
 
     public ImageColor imageSum(int[][][] addend) {
@@ -32,7 +38,7 @@ public class Functions {
                     sum[i][j][0] = (int) (sum[i][j][0] * 255 / maxPixel);
                     sum[i][j][1] = (int) (sum[i][j][1] * 255 / maxPixel);
                     sum[i][j][2] = (int) (sum[i][j][2] * 255 / maxPixel);
-                    maxColor = Math.max(maxColor, Math.max(image.getImage()[i][j][0], Math.max(image.getImage()[i][j][1], image.getImage()[i][j][2])));
+                    maxColor = Math.max(maxColor, Math.max(sum[i][j][0], Math.max(sum[i][j][1], sum[i][j][2])));
                 }
             }
         }
@@ -48,7 +54,7 @@ public class Functions {
                 sub[i][j][0] = Math.max(0, image.getImage()[i][j][0] - substract[i][j][0]);
                 sub[i][j][1] = Math.max(0, image.getImage()[i][j][1] - substract[i][j][1]);
                 sub[i][j][2] = Math.max(0, image.getImage()[i][j][2] - substract[i][j][2]);
-                maxColor = Math.max(maxColor, Math.max(image.getImage()[i][j][0], Math.max(image.getImage()[i][j][1], image.getImage()[i][j][2])));
+                maxColor = Math.max(maxColor, Math.max(sub[i][j][0], Math.max(sub[i][j][1], sub[i][j][2])));
             }
         }
         return new ImageColor(sub, maxColor, image.getHeight(), image.getWidth());
@@ -62,7 +68,7 @@ public class Functions {
                 prod[i][j][0] = (int) Math.min(255.0, (image.getImage()[i][j][0] * multiplier));
                 prod[i][j][1] = (int) Math.min(255.0, (image.getImage()[i][j][1] * multiplier));
                 prod[i][j][2] = (int) Math.min(255.0, (image.getImage()[i][j][2] * multiplier));
-                maxColor = Math.max(maxColor, Math.max(image.getImage()[i][j][0], Math.max(image.getImage()[i][j][1], image.getImage()[i][j][2])));
+                maxColor = Math.max(maxColor, Math.max(prod[i][j][0], Math.max(prod[i][j][1], prod[i][j][2])));
             }
         }
         return new ImageColor(prod, maxColor, image.getHeight(), image.getWidth());
@@ -77,10 +83,49 @@ public class Functions {
                 res[i][j][0] = (int) (multiplier * Math.log(1 + image.getImage()[i][j][0]));
                 res[i][j][1] = (int) (multiplier * Math.log(1 + image.getImage()[i][j][1]));
                 res[i][j][2] = (int) (multiplier * Math.log(1 + image.getImage()[i][j][2]));
-                maxColor = Math.max(maxColor, Math.max(image.getImage()[i][j][0], Math.max(image.getImage()[i][j][1], image.getImage()[i][j][2])));
+                maxColor = Math.max(maxColor, Math.max(res[i][j][0], Math.max(res[i][j][1], res[i][j][2])));
             }
         }
         return new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
     }
 
+    public ImageColor gammaFunction(double gamma) {
+        int[][][] res = new int[image.getHeight()][image.getWidth()][3];
+        double multiplier = Math.pow(255.0, 1 - gamma);
+        int maxColor = 0;
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                res[i][j][0] = (int) (multiplier * Math.pow(image.getImage()[i][j][0], gamma));
+                res[i][j][1] = (int) (multiplier * Math.pow(image.getImage()[i][j][1], gamma));
+                res[i][j][2] = (int) (multiplier * Math.pow(image.getImage()[i][j][2], gamma));
+                maxColor = Math.max(maxColor, Math.max(res[i][j][0], Math.max(res[i][j][1], res[i][j][2])));
+            }
+        }
+        return new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
+    }
+
+    public ImageColor negative() {
+        int[][][] res = new int[image.getHeight()][image.getWidth()][3];
+        int maxColor = 0;
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                res[i][j][0] = 255 - image.getImage()[i][j][0];
+                res[i][j][1] = 255 - image.getImage()[i][j][1];
+                res[i][j][2] = 255 - image.getImage()[i][j][2];
+                maxColor = Math.max(maxColor, Math.max(res[i][j][0], Math.max(res[i][j][1], res[i][j][2])));
+            }
+        }
+        return new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
+    }
+
+
+    public int[] greyHistogram() {
+        int[] hist = new int[256];
+        for (int i = 0; i < imageGrey.getHeight(); i++) {
+            for (int j = 0; j < imageGrey.getWidth(); j++) {
+                hist[imageGrey.getImage()[i][j]]++;
+            }
+        }
+        return hist;
+    }
 }
