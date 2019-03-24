@@ -1,8 +1,13 @@
 package models;
 
+import javafx.event.ActionEvent;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.paint.Color;
 
 import java.io.DataInputStream;
@@ -17,6 +22,7 @@ public class ImageColor implements ImageInt{
     private int width;
 
     private WritableImage renderer;
+    private ImageView view;
 
     public ImageColor(String filePath) throws IOException{
         maxColor = 0;
@@ -30,6 +36,7 @@ public class ImageColor implements ImageInt{
         this.width = width;
         this.renderer = new WritableImage(width, height);
         this.updateRenderer();
+        this.view = new ImageView(this.renderer);
     }
 
     public void parse(String filePath) throws IOException {
@@ -116,5 +123,6 @@ public class ImageColor implements ImageInt{
     }
 
     public WritableImage getRenderer() { return renderer; }
+    public ImageView getView() { return view; }
 
 }

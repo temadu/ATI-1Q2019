@@ -50,14 +50,14 @@ public class IOManager {
         return new ImageGrey(data2D, maxvalue, picHeight, picWidth);
     }
 
-    public static void savePGM(String filePath, int[][] image, int scale){
+    public static void savePGM(String filePath, ImageGrey image){
         try {
-
+            int[][] rawImage = image.getImage();
             OutputStream w = new FileOutputStream(filePath);
-            int height = image.length;
-            int width = image[0].length;
+            int height = image.getHeight();
+            int width = image.getWidth();
 
-            String header = "P5\n" + image[0].length + " " + image.length + "\n" + scale + "\n";
+            String header = "P6\n" + width + " " + height + "\n" + image.getMaxColor() + "\n";
             byte[] headerBytes = header.getBytes();
 
             for (int i = 0; i < headerBytes.length; i++) {
@@ -65,7 +65,7 @@ public class IOManager {
             }
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
-                    w.write((byte) image[row][col]);
+                    w.write((byte) rawImage[row][col]);
                 }
             }
             w.close();
@@ -118,14 +118,15 @@ public class IOManager {
         return new ImageColor(data2D, maxvalue, picHeight, picWidth);
     }
 
-    public static void savePPM(String filePath, int[][][] image, int scale){
+    public static void savePPM(String filePath, ImageColor image){
         try {
 
+            int[][][] rawImage = image.getImage();
             OutputStream w = new FileOutputStream(filePath);
-            int height = image.length;
-            int width = image[0].length;
+            int height = image.getHeight();
+            int width = image.getWidth();
 
-            String header = "P6\n" + image[0].length + " " + image.length + "\n" + scale + "\n";
+            String header = "P6\n" + width + " " + height + "\n" + image.getMaxColor() + "\n";
             byte[] headerBytes = header.getBytes();
 
             for (int i = 0; i < headerBytes.length; i++) {
@@ -134,7 +135,7 @@ public class IOManager {
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
                     for(int rgb = 0; rgb < 3; rgb++){
-                        w.write((byte) image[row][col][rgb]);
+                        w.write((byte) rawImage[row][col][rgb]);
                     }
                 }
             }

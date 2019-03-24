@@ -51,7 +51,7 @@ public class MainBW extends Application {
         //Reading color from the loaded image
 //        PixelReader pixelReader = image.getPixelReader();
 //        Color color = pixelReader.getColor(x, y);
-        IOManager.savePGM("images/save.pgm",drawCircle(inputImage.getImage(), 100, 100, 50, (int) 255), 255);
+//        IOManager.savePGM("images/save.pgm",drawCircle(inputImage.getImage(), 100, 100, 50, (int) 255), 255);
 
 
         HBox rootBox = new HBox();

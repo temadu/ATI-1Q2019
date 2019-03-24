@@ -57,7 +57,7 @@ public class MainColor extends Application {
         Image rectImage = matrixToColorImage(drawRectangle(inputImage.getImage(), 50, 100, 200, 200,  new int[]{ 0,255,128 }), true, true, true);
         Image gradientImage = matrixToColorImage(generateColorGradient(256,100), true, true, true);
 
-        IOManager.savePPM("images/savecolor.pgm",drawCircle(inputImage.getImage(), 100, 100, 50, new int[]{ 255,128,0 }), 255);
+//        IOManager.savePPM("images/savecolor.pgm",drawCircle(inputImage.getImage(), 100, 100, 50, new int[]{ 255,128,0 }), 255);
 
 
 

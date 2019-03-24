@@ -50,7 +50,7 @@ public class Main extends Application {
         VBox root = new VBox();
         root.getChildren().addAll(generateMenuBar(stage), s1);
 
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(root, 512,512);
 
         stage.setTitle("ATI 1Q2019");
 
@@ -64,7 +64,10 @@ public class Main extends Application {
     private MenuBar generateMenuBar(Stage stage){
         final Menu fileMenu = new Menu("File");
         MenuItem openItem = new MenuItem("Open...");
-        openItem.setOnAction(e -> openImage());
+        openItem.setOnAction(e -> {
+            this.openImage();
+//            this.testZone();
+        });
 
         MenuItem exit = new MenuItem("Exit");
         exit.setOnAction(e-> stage.close());
@@ -72,15 +75,12 @@ public class Main extends Application {
         fileMenu.getItems().addAll(openItem,exit);
 
 
-        final Menu optionsMenu = new Menu("Transform");
-        final Menu helpMenu = new Menu("Help");
-
         MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu, optionsMenu, helpMenu);
+        menuBar.getMenus().addAll(fileMenu);
 
         return menuBar;
     }
-    private void openImage(){
+    private void testZone(){
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./images"));
         fileChooser.getExtensionFilters().addAll(
@@ -116,14 +116,53 @@ public class Main extends Application {
                 Histogram.createHistogram(labels,histogramData)
         );
 
-
-//            WritableImage wim = this.matrixToBWImage(openedImage);
-//            this.imageView.setImage(wim);
-//
-//            imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseEvent -> {
-//                wim.getPixelWriter().setColor((int) mouseEvent.getX(), (int) mouseEvent.getY(),Color.rgb(128,128,128));
-//            });
     }
+
+    private void openImage(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("./images"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw")
+        );
+        File file = fileChooser.showOpenDialog(stage);
+
+        String extension = file.getName();
+
+        int i = extension.lastIndexOf('.');
+        if (i > 0) {
+            extension = extension.substring(i+1);
+        }
+
+        if(extension.toLowerCase().equals("ppm")){
+            ImageColor openedImage;
+            try {
+                openedImage = IOManager.loadPPM(file.getPath());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            Window w = new Window();
+            w.addRow(openedImage.getView());
+            w.addColorImageContextMenu(openedImage);
+            this.stage.close();
+        }else if(extension.toLowerCase().equals("pgm")){
+            ImageGrey openedImage;
+            try {
+                openedImage = IOManager.loadPGM(file.getPath());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            Window w = new Window();
+            w.addRow(openedImage.getView());
+            w.addGreyImageContextMenu(openedImage);
+            this.stage.close();
+        }
+
+
+    }
+
+
 
     private void addRow(Node... nodes){
         HBox h = new HBox();

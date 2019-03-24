@@ -1,6 +1,7 @@
 package models;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
@@ -17,6 +18,7 @@ public class ImageGrey implements ImageInt{
     private int width;
 
     private WritableImage renderer;
+    private ImageView view;
 
     public ImageGrey(String filePath) throws IOException{
         maxColor = 0;
@@ -30,6 +32,7 @@ public class ImageGrey implements ImageInt{
         this.width = width;
         this.renderer = new WritableImage(width, height);
         this.updateRenderer();
+        this.view = new ImageView(this.renderer);
     }
 
     public void parse(String filePath) throws IOException {
@@ -112,6 +115,7 @@ public class ImageGrey implements ImageInt{
     }
 
     public WritableImage getRenderer() { return renderer; }
+    public ImageView getView() { return view; }
 
 
 }
