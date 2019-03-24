@@ -3,11 +3,9 @@ package GUI;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -34,20 +32,25 @@ public class Main extends Application {
 
     public Stage stage;
     public VBox box;
+    public List<HBox> rows;
     public ImageView imageView;
-    public List<ImageColor> images = new ArrayList<>();
 
     @Override
     public void start(Stage stage) throws FileNotFoundException {
         //Creating a Group object
         this.stage = stage;
+        this.rows = new ArrayList<>();
         this.box = new VBox();
-        this.imageView = new ImageView();
 
-        box.getChildren().addAll(generateMenuBar(stage), imageView);
+        ScrollPane s1 = new ScrollPane();
+//        s1.setPrefSize(512, 512);
+        s1.setFitToHeight(true);
+        s1.setContent(box);
 
-        Scene scene = new Scene(box, 512, 512);
+        VBox root = new VBox();
+        root.getChildren().addAll(generateMenuBar(stage), s1);
 
+        Scene scene = new Scene(root);
 
         stage.setTitle("ATI 1Q2019");
 
@@ -61,32 +64,57 @@ public class Main extends Application {
     private MenuBar generateMenuBar(Stage stage){
         final Menu fileMenu = new Menu("File");
         MenuItem openItem = new MenuItem("Open...");
-        openItem.setOnAction(e -> {
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw")
-            );
-            fileChooser.setInitialDirectory(new File("./images"));
-            File file = fileChooser.showOpenDialog(stage);
+        openItem.setOnAction(e -> openImage());
+
+        MenuItem exit = new MenuItem("Exit");
+        exit.setOnAction(e-> stage.close());
+
+        fileMenu.getItems().addAll(openItem,exit);
+
+
+        final Menu optionsMenu = new Menu("Transform");
+        final Menu helpMenu = new Menu("Help");
+
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().addAll(fileMenu, optionsMenu, helpMenu);
+
+        return menuBar;
+    }
+    private void openImage(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("./images"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw")
+        );
+        File file = fileChooser.showOpenDialog(stage);
 
 //            ImageColor openedImage;
-            ImageGrey openedImage2;
-            try {
+        ImageGrey openedImage2;
+        try {
 //                openedImage = IOManager.loadPPM(file.getPath());
 //                openedImage2 = IOManager.loadPPM("./images/duck.ppm");
-                openedImage2 = IOManager.loadPGM(file.getPath());
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                return;
-            }
-            Functions f = new Functions(openedImage2);
+            openedImage2 = IOManager.loadPGM(file.getPath());
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            return;
+        }
+        Functions f = new Functions(openedImage2);
 //            ImageColor sum = f.negative();
 //            ImageGrey sum = f.greyHistogram();
-            System.out.println(Arrays.toString(f.greyHistogram()));
-            HBox h = new HBox();
-            h.getChildren().add(new ImageView(openedImage2.matrixToGreyImage()));
-//            h.getChildren().add(new ImageView(sum.matrixToColorImage(true, true, true)));
-            this.box.getChildren().add(h);
+//            System.out.println(Arrays.toString(f.greyHistogram()));
+
+        // CREATE HISTOGRAM
+        int[] histogramData = f.greyHistogram();
+        String[] labels = new String[256];
+        for (int i = 0; i < 256; i++) {
+            labels[i] = String.valueOf(i);
+        }
+
+        this.addRow(
+                new ImageView(openedImage2.matrixToGreyImage()),
+//                new ImageView(sum.matrixToColorImage(true, true, true)),
+                Histogram.createHistogram(labels,histogramData)
+        );
 
 
 //            WritableImage wim = this.matrixToBWImage(openedImage);
@@ -95,26 +123,15 @@ public class Main extends Application {
 //            imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseEvent -> {
 //                wim.getPixelWriter().setColor((int) mouseEvent.getX(), (int) mouseEvent.getY(),Color.rgb(128,128,128));
 //            });
-
-        });
-        MenuItem exit = new MenuItem("Exit");
-        exit.setOnAction(e-> stage.close());
-
-        fileMenu.getItems().addAll(openItem,exit);
-
-
-        final Menu optionsMenu = new Menu("Options");
-        final Menu helpMenu = new Menu("Help");
-
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu, optionsMenu, helpMenu);
-
-        return menuBar;
     }
 
-    private void updateWindowSize(){
-
+    private void addRow(Node... nodes){
+        HBox h = new HBox();
+        h.getChildren().addAll(nodes);
+        rows.add(h);
+        this.box.getChildren().add(h);
     }
+
 
 
 

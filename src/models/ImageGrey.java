@@ -28,7 +28,8 @@ public class ImageGrey implements ImageInt{
         this.maxColor = maxColor;
         this.height = height;
         this.width = width;
-        this.renderer = new WritableImage(width, height);;
+        this.renderer = new WritableImage(width, height);
+        this.updateRenderer();
     }
 
     public void parse(String filePath) throws IOException {
