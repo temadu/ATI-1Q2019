@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class ImageGrey implements ImageInt{
@@ -16,6 +17,8 @@ public class ImageGrey implements ImageInt{
     private int maxColor;
     private int height;
     private int width;
+    private double mean;
+    private double sigma;
 
     private WritableImage renderer;
     private ImageView view;
@@ -69,11 +72,16 @@ public class ImageGrey implements ImageInt{
 
         // read the image data
         image = new int[height][width];
+        int sum = 0;
+        int sumsq = 0;
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 image[row][col] = dis.readUnsignedByte();
+                maxColor = Math.max(maxColor, image[row][col]);
+                sum += image[row][col];
             }
         }
+        this.mean = (double) sum / (double) (height * width);
     }
 
     public Image matrixToGreyImage(){
@@ -88,6 +96,11 @@ public class ImageGrey implements ImageInt{
         return wImage;
     }
 
+    public void calcStd() {
+        double sumsq = 0;
+        sumsq = Arrays.stream(image).flatMapToInt(Arrays::stream).reduce(0, (ac, n) -> ac + (int) Math.pow(n - mean, 2));
+        this.sigma = Math.sqrt(sumsq / (double) (height * width));
+    }
 
     public int[][] getImage() {
         return image;
@@ -117,5 +130,11 @@ public class ImageGrey implements ImageInt{
     public WritableImage getRenderer() { return renderer; }
     public ImageView getView() { return view; }
 
+    public double getMean() {
+        return mean;
+    }
 
+    public double getSigma() {
+        return sigma;
+    }
 }

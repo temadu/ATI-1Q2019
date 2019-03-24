@@ -4,6 +4,8 @@ import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
 
+import java.util.Arrays;
+
 public class Functions {
     public ImageColor image;
     public ImageGrey imageGrey;
@@ -121,11 +123,26 @@ public class Functions {
 
     public int[] greyHistogram() {
         int[] hist = new int[256];
+        Arrays.stream(imageGrey.getImage()).flatMapToInt(Arrays::stream).forEach(e -> hist[e]++);
+        return hist;
+    }
+
+    public ImageGrey greyContrast(double sigmaMult) {
+        imageGrey.calcStd();
+        int r1 = Math.max(0, (int) (imageGrey.getMean() - imageGrey.getSigma() * sigmaMult));
+        int r2 = Math.max(0, (int) (imageGrey.getMean() + imageGrey.getSigma() * sigmaMult));
+        int [][] res = new int[imageGrey.getHeight()][imageGrey.getWidth()];
         for (int i = 0; i < imageGrey.getHeight(); i++) {
             for (int j = 0; j < imageGrey.getWidth(); j++) {
-                hist[imageGrey.getImage()[i][j]]++;
+                if(imageGrey.getImage()[i][j] < r1) {
+                    res[i][j] = 0;
+                } else if(imageGrey.getImage()[i][j] < r2) {
+                    res[i][j] = (imageGrey.getImage()[i][j] - r1) * (255 / (r2 - r1));
+                } else {
+                    res[i][j] = 255;
+                }
             }
         }
-        return hist;
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
     }
 }
