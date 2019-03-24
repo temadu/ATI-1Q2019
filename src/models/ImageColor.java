@@ -16,6 +16,8 @@ public class ImageColor implements ImageInt{
     private int height;
     private int width;
 
+    private WritableImage renderer;
+
     public ImageColor(String filePath) throws IOException{
         maxColor = 0;
         parse(filePath);
@@ -26,6 +28,7 @@ public class ImageColor implements ImageInt{
         this.maxColor = maxColor;
         this.height = height;
         this.width = width;
+        this.renderer = new WritableImage(width, height);;
     }
 
     public void parse(String filePath) throws IOException {
@@ -102,5 +105,15 @@ public class ImageColor implements ImageInt{
         return width;
     }
 
+    public void updateRenderer(){
+        PixelWriter writer = this.renderer.getPixelWriter();
+        for(int y = 0; y < height; y++) {
+            for(int x = 0; x < width; x++) {
+                writer.setColor(x, y, Color.rgb(image[y][x][0], image[y][x][1], image[y][x][2]));
+            }
+        }
+    }
+
+    public WritableImage getRenderer() { return renderer; }
 
 }

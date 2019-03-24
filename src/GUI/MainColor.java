@@ -11,6 +11,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import models.ImageColor;
+import utils.IOManager;
 
 import java.io.*;
 import java.util.Scanner;
@@ -28,9 +30,9 @@ public class MainColor extends Application {
 
     private void testPPM(Stage stage){
         String filePath = "images/lena.ppm";
-        int[][][] inputImage;
+        ImageColor inputImage;
         try {
-            inputImage = this.parsePPM(filePath);
+            inputImage = IOManager.loadPPM(filePath);
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -40,22 +42,22 @@ public class MainColor extends Application {
 //        System.out.println(RGBtoHSV(new int[]{212,169,106})[1]);
 //        System.out.println(RGBtoHSV(new int[]{212,169,106})[2]);
 
-        Image originalImage = matrixToColorImage(inputImage, true, true, true);
-        Image originalImageGB = matrixToColorImage(inputImage, false, true, true);
-        Image originalImageRB = matrixToColorImage(inputImage, true, false, true);
-        Image originalImageRG = matrixToColorImage(inputImage, true, true, false);
-        Image originalImageR = matrixToColorImage(inputImage, true, false, false);
-        Image originalImageG = matrixToColorImage(inputImage, false, true, false);
-        Image originalImageB = matrixToColorImage(inputImage, false, false, true);
-        Image hueImage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage), false, false, true);
-        Image valImage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage), false, true, false);
-        Image satImaage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage), true, false, false);
+        Image originalImage = matrixToColorImage(inputImage.getImage(), true, true, true);
+        Image originalImageGB = matrixToColorImage(inputImage.getImage(), false, true, true);
+        Image originalImageRB = matrixToColorImage(inputImage.getImage(), true, false, true);
+        Image originalImageRG = matrixToColorImage(inputImage.getImage(), true, true, false);
+        Image originalImageR = matrixToColorImage(inputImage.getImage(), true, false, false);
+        Image originalImageG = matrixToColorImage(inputImage.getImage(), false, true, false);
+        Image originalImageB = matrixToColorImage(inputImage.getImage(), false, false, true);
+        Image hueImage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage.getImage()), false, false, true);
+        Image valImage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage.getImage()), false, true, false);
+        Image satImaage = hsvMatrixToColor(RGBtoHSVmatrix(inputImage.getImage()), true, false, false);
 
-        Image circleImage = matrixToColorImage(drawCircle(inputImage, 100, 100, 50, new int[]{ 255,128,0 }), true, true, true);
-        Image rectImage = matrixToColorImage(drawRectangle(inputImage, 50, 100, 200, 200,  new int[]{ 0,255,128 }), true, true, true);
+        Image circleImage = matrixToColorImage(drawCircle(inputImage.getImage(), 100, 100, 50, new int[]{ 255,128,0 }), true, true, true);
+        Image rectImage = matrixToColorImage(drawRectangle(inputImage.getImage(), 50, 100, 200, 200,  new int[]{ 0,255,128 }), true, true, true);
         Image gradientImage = matrixToColorImage(generateColorGradient(256,100), true, true, true);
 
-        savePPM("images/savecolor.pgm",drawCircle(inputImage, 100, 100, 50, new int[]{ 255,128,0 }), 255);
+        IOManager.savePPM("images/savecolor.pgm",drawCircle(inputImage.getImage(), 100, 100, 50, new int[]{ 255,128,0 }), 255);
 
 
 
@@ -99,76 +101,6 @@ public class MainColor extends Application {
 
         //Displaying the contents of the stage
         stage.show();
-    }
-
-    public int[][][] parsePPM(String filePath) throws IOException {
-
-        //Parse header
-        FileInputStream fileInputStream = new FileInputStream(filePath);
-        Scanner scan = new Scanner(fileInputStream);
-
-        // Parse the magic number
-        String magicNum = scan.nextLine();
-        System.out.println(magicNum);
-        // Discard the comment lines
-//        scan.nextLine();
-        // Read pic width, height and max value
-        int picWidth = scan.nextInt();
-        int picHeight = scan.nextInt();
-        int maxvalue = scan.nextInt();
-
-        fileInputStream.close();
-
-        // Now parse the file as binary data
-        fileInputStream = new FileInputStream(filePath);
-        DataInputStream dis = new DataInputStream(fileInputStream);
-
-        // look for 4 lines (i.e.: the header) and discard them
-        int numnewlines = 3;
-        while (numnewlines > 0) {
-            char c;
-            do {
-                c = (char)(dis.readUnsignedByte());
-            } while (c != '\n');
-            numnewlines--;
-        }
-
-        // read the image data
-        int[][][] data2D = new int[picHeight][picWidth][3];
-        for (int row = 0; row < picHeight; row++) {
-            for (int col = 0; col < picWidth; col++) {
-                data2D[row][col][0] = dis.readUnsignedByte();
-                data2D[row][col][1] = dis.readUnsignedByte();
-                data2D[row][col][2] = dis.readUnsignedByte();
-            }
-        }
-        return data2D;
-    }
-
-    public void savePPM(String filePath, int[][][] image, int scale){
-        try {
-
-            OutputStream w = new FileOutputStream(filePath);
-            int height = image.length;
-            int width = image[0].length;
-
-            String header = "P6\n" + image[0].length + " " + image.length + "\n" + scale + "\n";
-            byte[] headerBytes = header.getBytes();
-
-            for (int i = 0; i < headerBytes.length; i++) {
-                w.write(headerBytes[i]);
-            }
-            for (int row = 0; row < height; row++) {
-                for (int col = 0; col < width; col++) {
-                    for(int rgb = 0; rgb < 3; rgb++){
-                        w.write((byte) image[row][col][rgb]);
-                    }
-                }
-            }
-            w.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
 

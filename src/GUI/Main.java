@@ -1,6 +1,7 @@
 package GUI;
 
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -11,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -20,6 +22,7 @@ import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
 import tp1.Functions;
+import utils.IOManager;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -29,18 +32,19 @@ import java.util.Scanner;
 
 public class Main extends Application {
 
+    public Stage stage;
     public VBox box;
-    public List<Image> images = new ArrayList<>();
+    public ImageView imageView;
+    public List<ImageColor> images = new ArrayList<>();
 
     @Override
     public void start(Stage stage) throws FileNotFoundException {
         //Creating a Group object
+        this.stage = stage;
+        this.box = new VBox();
+        this.imageView = new ImageView();
 
-        box = new VBox();
-        MenuBar menu = generateMenuBar(stage);
-
-        box.getChildren().add(menu);
-//        Group root = new Group(box);
+        box.getChildren().addAll(generateMenuBar(stage), imageView);
 
         Scene scene = new Scene(box, 512, 512);
 
@@ -48,13 +52,7 @@ public class Main extends Application {
         stage.setTitle("ATI 1Q2019");
 
         stage.setScene(scene);
-//        stage.setFullScreen(true);
-        stage.setMaximized(true);
         stage.show();
-//        Stage secondStage = new Stage();
-//        secondStage.setScene(new Scene(new HBox(4, new Label("Second window"))));
-//        secondStage.show();
-
     }
     public static void main(String args[]) {
         launch(args);
@@ -66,9 +64,7 @@ public class Main extends Application {
         openItem.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Portable PixMap Files", "*.ppm")
-                    ,new FileChooser.ExtensionFilter("Portable Gray Map Files", "*.pgm")
-                    ,new FileChooser.ExtensionFilter("Raw Files", "*.raw")
+                    new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw")
             );
             fileChooser.setInitialDirectory(new File("./images"));
             File file = fileChooser.showOpenDialog(stage);
@@ -76,8 +72,9 @@ public class Main extends Application {
 //            ImageColor openedImage;
             ImageGrey openedImage2;
             try {
-//                openedImage = new ImageColor(file.getPath());
-                openedImage2 = new ImageGrey(file.getPath());
+//                openedImage = IOManager.loadPPM(file.getPath());
+//                openedImage2 = IOManager.loadPPM("./images/duck.ppm");
+                openedImage2 = IOManager.loadPGM(file.getPath());
             } catch (IOException e1) {
                 e1.printStackTrace();
                 return;
@@ -91,12 +88,20 @@ public class Main extends Application {
 //            h.getChildren().add(new ImageView(sum.matrixToColorImage(true, true, true)));
             this.box.getChildren().add(h);
 
+
+//            WritableImage wim = this.matrixToBWImage(openedImage);
+//            this.imageView.setImage(wim);
+//
+//            imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseEvent -> {
+//                wim.getPixelWriter().setColor((int) mouseEvent.getX(), (int) mouseEvent.getY(),Color.rgb(128,128,128));
+//            });
+
         });
         MenuItem exit = new MenuItem("Exit");
-        exit.setOnAction(e->{
-            stage.close();
-        });
+        exit.setOnAction(e-> stage.close());
+
         fileMenu.getItems().addAll(openItem,exit);
+
 
         final Menu optionsMenu = new Menu("Options");
         final Menu helpMenu = new Menu("Help");
@@ -107,8 +112,9 @@ public class Main extends Application {
         return menuBar;
     }
 
+    private void updateWindowSize(){
 
-
+    }
 
 
 

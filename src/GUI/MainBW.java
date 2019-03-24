@@ -9,6 +9,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import models.ImageGrey;
+import utils.IOManager;
 
 import java.io.*;
 import java.util.Scanner;
@@ -26,9 +28,9 @@ public class MainBW extends Application {
 
     private void testPGM(Stage stage){
         String filePath = "images/TEST.PGM";
-        int[][] inputImage;
+        ImageGrey inputImage;
         try {
-            inputImage = this.parsePGM(filePath);
+            inputImage = IOManager.loadPGM(filePath);
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -41,26 +43,26 @@ public class MainBW extends Application {
 //        savePGM("images/square.pgm",square,255);
 
 
-        Image originalImage = matrixToBWImage(inputImage);
-        Image circleImage = matrixToBWImage(drawCircle(inputImage, 100, 100, 50, (int) 255));
-        Image rectImage = matrixToBWImage(drawRectangle(inputImage, 50, 100, 200, 200, (int) 128));
+        Image originalImage = matrixToBWImage(inputImage.getImage());
+        Image circleImage = matrixToBWImage(drawCircle(inputImage.getImage(), 100, 100, 50, (int) 255));
+        Image rectImage = matrixToBWImage(drawRectangle(inputImage.getImage(), 50, 100, 200, 200, (int) 128));
         Image gradientImage = matrixToBWImage(generateBWGradient(256,100));
 
         //Reading color from the loaded image
 //        PixelReader pixelReader = image.getPixelReader();
 //        Color color = pixelReader.getColor(x, y);
-        savePGM("images/save.pgm",drawCircle(inputImage, 100, 100, 50, (int) 255), 255);
+        IOManager.savePGM("images/save.pgm",drawCircle(inputImage.getImage(), 100, 100, 50, (int) 255), 255);
 
 
         HBox rootBox = new HBox();
         ImageView v = new ImageView(originalImage);
-        EventHandler<MouseEvent> eventHandler = e -> {
-            int x = (int) e.getX();
-            int y = (int) e.getY();
-            System.out.println("X: " + e.getX() + ", Y: " + e.getY() + ", color: " + inputImage[y][x]);
-        };
-        //Registering the event filter
-        v.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
+//        EventHandler<MouseEvent> eventHandler = e -> {
+//            int x = (int) e.getX();
+//            int y = (int) e.getY();
+//            System.out.println("X: " + e.getX() + ", Y: " + e.getY() + ", color: " + inputImage[y][x]);
+//        };
+//        //Registering the event filter
+//        v.addEventFilter(MouseEvent.MOUSE_CLICKED, eventHandler);
 
         rootBox.getChildren().add(v);
         rootBox.getChildren().add(new ImageView(circleImage));
@@ -81,72 +83,6 @@ public class MainBW extends Application {
 
         //Displaying the contents of the stage
         stage.show();
-    }
-
-    public int[][] parsePGM(String filePath) throws IOException {
-
-        //Parse header
-        FileInputStream fileInputStream = new FileInputStream(filePath);
-        Scanner scan = new Scanner(fileInputStream);
-
-        // Parse the magic number
-        String magicNum = scan.nextLine();
-        System.out.println(magicNum);
-        // Discard the comment lines
-//        scan.nextLine();
-        // Read pic width, height and max value
-        int picWidth = scan.nextInt();
-        int picHeight = scan.nextInt();
-        int maxvalue = scan.nextInt();
-
-        fileInputStream.close();
-
-        // Now parse the file as binary data
-        fileInputStream = new FileInputStream(filePath);
-        DataInputStream dis = new DataInputStream(fileInputStream);
-
-        // look for 4 lines (i.e.: the header) and discard them
-        int numnewlines = 3;
-        while (numnewlines > 0) {
-            char c;
-            do {
-                c = (char)(dis.readUnsignedByte());
-            } while (c != '\n');
-            numnewlines--;
-        }
-
-        // read the image data
-        int[][] data2D = new int[picHeight][picWidth];
-        for (int row = 0; row < picHeight; row++) {
-            for (int col = 0; col < picWidth; col++) {
-                data2D[row][col] = dis.readUnsignedByte();
-            }
-        }
-        return data2D;
-    }
-
-    public void savePGM(String filePath, int[][] image, int scale){
-        try {
-
-            OutputStream w = new FileOutputStream(filePath);
-            int height = image.length;
-            int width = image[0].length;
-
-            String header = "P5\n" + image[0].length + " " + image.length + "\n" + scale + "\n";
-            byte[] headerBytes = header.getBytes();
-
-            for (int i = 0; i < headerBytes.length; i++) {
-                w.write(headerBytes[i]);
-            }
-            for (int row = 0; row < height; row++) {
-                for (int col = 0; col < width; col++) {
-                    w.write((byte) image[row][col]);
-                }
-            }
-            w.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     public int[][] drawCircle( int[][] circle, float cx, float cy, float radius, int color){
