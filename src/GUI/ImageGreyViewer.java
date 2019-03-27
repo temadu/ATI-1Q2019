@@ -26,7 +26,9 @@ public class ImageGreyViewer extends ImageViewer {
         final Menu transformMenu = new Menu("Transform");
         MenuItem suma = new MenuItem("Sum");
         suma.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
-        transformMenu.getItems().addAll(suma);
+        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
+        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
+        transformMenu.getItems().addAll(suma,histogramEqualization);
 
         this.mainMenu.getMenus().addAll(transformMenu);
     }

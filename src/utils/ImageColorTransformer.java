@@ -191,12 +191,15 @@ public class ImageColorTransformer {
 
 
     }
-    public static void multiplyImage(ImageGrey original){
+    public void multiplyImage(ImageGrey original){
 
     }
-    public static void dynamicRangeCompression(ImageGrey original){
-
+    public void dynamicRangeCompression(ImageColor originalImage){
+        new ImageColorViewer(new Functions(originalImage).rangeCompressor());
     }
 
+    public void negative(ImageColor originalImage){
+        new ImageColorViewer(new Functions(originalImage).negative());
+    }
 
 }

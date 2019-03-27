@@ -110,5 +110,9 @@ public class ImageGreyTransformer {
 
     }
 
+    public void histogramEqualization(ImageGrey originalImage){
+        new ImageGreyViewer(new Functions(originalImage).histogramEqualization());
+    }
+
 
 }
