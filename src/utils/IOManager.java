@@ -41,7 +41,7 @@ public class IOManager {
         }
 
         // read the image data
-        int[][] data2D = new int[picHeight][picWidth];
+        Integer[][] data2D = new Integer[picHeight][picWidth];
         for (int row = 0; row < picHeight; row++) {
             for (int col = 0; col < picWidth; col++) {
                 data2D[row][col] = dis.readUnsignedByte();
@@ -52,7 +52,7 @@ public class IOManager {
 
     public static void savePGM(String filePath, ImageGrey image){
         try {
-            int[][] rawImage = image.getImage();
+            Integer[][] rawImage = image.getImage();
             OutputStream w = new FileOutputStream(filePath);
             int height = image.getHeight();
             int width = image.getWidth();
@@ -65,7 +65,7 @@ public class IOManager {
             }
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
-                    w.write((byte) rawImage[row][col]);
+                    w.write(rawImage[row][col].byteValue());
                 }
             }
             w.close();

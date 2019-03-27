@@ -5,6 +5,7 @@ import models.ImageGrey;
 import models.ImageInt;
 
 import java.util.Arrays;
+import java.util.stream.IntStream;
 
 public class Functions {
     public ImageColor image;
@@ -121,17 +122,28 @@ public class Functions {
     }
 
 
-    public int[] greyHistogram() {
-        int[] hist = new int[256];
-        Arrays.stream(imageGrey.getImage()).flatMapToInt(Arrays::stream).forEach(e -> hist[e]++);
-        return hist;
+    public double[] greyHistogram() {
+        double[] hist = new double[256];
+        Arrays.stream(imageGrey.getImage()).forEach(a -> Arrays.stream(a).forEach(e -> hist[e]++));
+        return Arrays.stream(hist).map(h -> h / (imageGrey.getHeight() * imageGrey.getWidth())).toArray();
+    }
+
+    public ImageGrey histogramEqualization() {
+        double[] g = greyHistogram();
+        double[] cum = new double[256];
+        cum[0] = g[0];
+        IntStream.range(1, cum.length).forEach(i -> cum[i] = (cum[i - 1] + g[i]));
+        Arrays.setAll(cum, i -> cum[i] * 255.0);
+
+        Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a -> Arrays.stream(a).map(p -> (int) Math.floor(cum[p])).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
     }
 
     public ImageGrey greyContrast(double sigmaMult) {
         imageGrey.calcStd();
         int r1 = Math.max(0, (int) (imageGrey.getMean() - imageGrey.getSigma() * sigmaMult));
         int r2 = Math.max(0, (int) (imageGrey.getMean() + imageGrey.getSigma() * sigmaMult));
-        int [][] res = new int[imageGrey.getHeight()][imageGrey.getWidth()];
+        Integer [][] res = new Integer[imageGrey.getHeight()][imageGrey.getWidth()];
         for (int i = 0; i < imageGrey.getHeight(); i++) {
             for (int j = 0; j < imageGrey.getWidth(); j++) {
                 if(imageGrey.getImage()[i][j] < r1) {
@@ -145,4 +157,6 @@ public class Functions {
         }
         return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
     }
+
+
 }

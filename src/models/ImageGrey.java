@@ -1,5 +1,6 @@
 package models;
 
+import javafx.scene.chart.XYChart;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -13,12 +14,13 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class ImageGrey implements ImageInt{
-    private int[][] image;
+    private Integer[][] image;
     private int maxColor;
     private int height;
     private int width;
     private double mean;
     private double sigma;
+    private XYChart.Series greySeries;
 
     private WritableImage renderer;
     private ImageView view;
@@ -28,7 +30,7 @@ public class ImageGrey implements ImageInt{
         parse(filePath);
     }
 
-    public ImageGrey(int[][] image, int maxColor, int height, int width){
+    public ImageGrey(Integer[][] image, int maxColor, int height, int width){
         this.image = image;
         this.maxColor = maxColor;
         this.height = height;
@@ -71,7 +73,7 @@ public class ImageGrey implements ImageInt{
         }
 
         // read the image data
-        image = new int[height][width];
+        image = new Integer[height][width];
         int sum = 0;
         int sumsq = 0;
         for (int row = 0; row < height; row++) {
@@ -98,11 +100,11 @@ public class ImageGrey implements ImageInt{
 
     public void calcStd() {
         double sumsq = 0;
-        sumsq = Arrays.stream(image).flatMapToInt(Arrays::stream).reduce(0, (ac, n) -> ac + (int) Math.pow(n - mean, 2));
+        sumsq = Arrays.stream(image).map(a -> Arrays.stream(a).reduce(0, (ac, n) -> ac + (int) Math.pow(n - mean, 2))).reduce(0, (ac, n) -> ac + n);
         this.sigma = Math.sqrt(sumsq / (double) (height * width));
     }
 
-    public int[][] getImage() {
+    public Integer[][] getImage() {
         return image;
     }
 

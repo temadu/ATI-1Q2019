@@ -65,8 +65,8 @@ public class Main extends Application {
         final Menu fileMenu = new Menu("File");
         MenuItem openItem = new MenuItem("Open...");
         openItem.setOnAction(e -> {
-            this.openImage();
-//            this.testZone();
+//            this.openImage();
+            this.testZone();
         });
 
         MenuItem exit = new MenuItem("Exit");
@@ -104,7 +104,16 @@ public class Main extends Application {
 //            System.out.println(Arrays.toString(f.greyHistogram()));
 
         // CREATE HISTOGRAM
-        int[] histogramData = f.greyHistogram();
+        ImageGrey sum = f.histogramEqualization();
+        Functions f2 = new Functions(sum);
+        ImageGrey sum2 = f2.histogramEqualization();
+        Functions f3 = new Functions(sum2);
+
+        double[] histogramData2 = f2.greyHistogram();
+        double[] histogramData3 = f3.greyHistogram();
+
+
+        double[] histogramData = f.greyHistogram();
         String[] labels = new String[256];
         for (int i = 0; i < 256; i++) {
             labels[i] = String.valueOf(i);
@@ -112,8 +121,15 @@ public class Main extends Application {
 
         this.addRow(
                 new ImageView(openedImage2.matrixToGreyImage()),
-//                new ImageView(sum.matrixToColorImage(true, true, true)),
                 Histogram.createHistogram(labels,histogramData)
+        );
+        this.addRow(
+                new ImageView(sum.matrixToGreyImage()),
+                Histogram.createHistogram(labels,histogramData2)
+        );
+        this.addRow(
+                new ImageView(sum2.matrixToGreyImage()),
+                Histogram.createHistogram(labels,histogramData3)
         );
 
     }
