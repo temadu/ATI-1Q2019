@@ -25,13 +25,24 @@ public class ImageGreyViewer extends ImageViewer {
     private void addGreyMenuBars(){
         final Menu transformMenu = new Menu("Transform");
         MenuItem suma = new MenuItem("Sum");
-        suma.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
+        MenuItem contrast = new MenuItem("Contrast Improvement");
+        MenuItem threshold = new MenuItem("Thresholding");
+        MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
+        MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
+        MenuItem expNoise = new MenuItem("Add Exponential Noise");
+        suma.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
         histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
-        transformMenu.getItems().addAll(suma,histogramEqualization);
+        contrast.setOnAction(e -> new ImageGreyTransformer().greyContrast(this.image, 1)); //el 1 deberia ser un slider
+        threshold.setOnAction(e -> new ImageGreyTransformer().threshold(this.image, 128));
+        gaussNoise.setOnAction(e -> new ImageGreyTransformer().addGaussianNoise(this.image, 0.2, 10));
+        rayleighNoise.setOnAction(e -> new ImageGreyTransformer().addRayleighNoise(this.image, 0.2, 2));
+        expNoise.setOnAction(e -> new ImageGreyTransformer().addExponentialNoise(this.image, 0.2, 1));
+//        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
+//        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
+
+        transformMenu.getItems().addAll(suma,histogramEqualization,contrast, threshold,gaussNoise,rayleighNoise,expNoise);
 
         this.mainMenu.getMenus().addAll(transformMenu);
     }
-
-
 }

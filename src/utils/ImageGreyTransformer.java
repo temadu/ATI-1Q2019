@@ -106,12 +106,29 @@ public class ImageGreyTransformer {
     public static void multiplyImage(ImageGrey original){
 
     }
-    public static void dynamicRangeCompression(ImageGrey original){
-
-    }
 
     public void histogramEqualization(ImageGrey originalImage){
         new ImageGreyViewer(new Functions(originalImage).histogramEqualization());
+    }
+
+    public void threshold(ImageGrey originalImage, int threshold){
+        new ImageGreyViewer(new Functions(originalImage).thresholdization(threshold));
+    }
+
+    public void greyContrast(ImageGrey originalImage, double sigma){
+        new ImageGreyViewer(new Functions(originalImage).greyContrast(sigma));
+    }
+
+    public void addGaussianNoise(ImageGrey originalImage, double density, double sigma){
+        new ImageGreyViewer(new Functions(originalImage).addGaussianNoise(density, sigma));
+    }
+
+    public void addRayleighNoise(ImageGrey originalImage, double density, double psi){
+        new ImageGreyViewer(new Functions(originalImage).addRayleighNoise(density, psi));
+    }
+
+    public void addExponentialNoise(ImageGrey originalImage, double density, double lambda){
+        new ImageGreyViewer(new Functions(originalImage).addExponentialNoise(density, lambda));
     }
 
 
