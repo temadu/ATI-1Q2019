@@ -29,11 +29,15 @@ public class ImageColorViewer extends ImageViewer{
         sum.setOnAction(e -> new ImageColorTransformer().sumImages(this.image));
         MenuItem substract = new MenuItem("Substract");
         substract.setOnAction(e -> new ImageColorTransformer().substractImages(this.image));
+        MenuItem multiply = new MenuItem("Multiply by scalar");
+        multiply.setOnAction(e -> new ImageColorTransformer().multiplyImage(this.image));
+        MenuItem gamma = new MenuItem("Apply gamma function");
+        gamma.setOnAction(e -> new ImageColorTransformer().gammaFunction(this.image));
         MenuItem rangeCompressor = new MenuItem("Range Compressor");
         rangeCompressor.setOnAction(e -> new ImageColorTransformer().dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
         negative.setOnAction(e -> new ImageColorTransformer().negative(this.image));
-        transformMenu.getItems().addAll(sum,substract,rangeCompressor, negative);
+        transformMenu.getItems().addAll(sum,substract, multiply, gamma, rangeCompressor, negative);
 
         this.mainMenu.getMenus().addAll(transformMenu);
     }
