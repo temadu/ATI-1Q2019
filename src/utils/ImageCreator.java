@@ -69,7 +69,7 @@ public class ImageCreator {
             int rectWidth = Integer.parseInt(rectWidthField.getText());
             int rectHeight = Integer.parseInt(rectHeightField.getText());
 
-            int[][] square = drawRectangle(new int[height][width],
+            Integer[][] square = drawRectangle(new int[height][width],
                     (width/2) - (rectWidth/2), (height/2) - (rectHeight/2),
                     (width/2) + (rectWidth/2), (height/2) + (rectHeight/2),255);
             ImageGrey img = new ImageGrey(square, 255, width, height);
@@ -84,8 +84,8 @@ public class ImageCreator {
         stage.setScene(scene);
 
         stage.setTitle("Create Square");
-
         stage.show();
+
     }
 
     public static void createCircle(){
@@ -127,7 +127,7 @@ public class ImageCreator {
             int height = Integer.parseInt(heightField.getText());
             float radius = Float.parseFloat(radiusField.getText());
 
-            int[][] circle = drawCircle(new int[height][width],
+            Integer[][] circle = drawCircle(new int[height][width],
                     width/2, height/2, radius, 255);
             ImageGrey img = new ImageGrey(circle, 255, width, height);
 
@@ -146,8 +146,8 @@ public class ImageCreator {
     }
 
 
-    public static int[][] drawCircle( int[][] circle, float cx, float cy, float radius, int color){
-        int[][] retCircle =  new int[circle.length][circle[0].length];
+    public static Integer[][] drawCircle( int[][] circle, float cx, float cy, float radius, int color){
+        Integer[][] retCircle =  new Integer[circle.length][circle[0].length];
         for(int row = 0; row < circle.length; row++) {
             for(int col = 0; col < circle[0].length; col++) {
                 double d = Math.sqrt((cy-row)*(cy-row)+(cx-col)*(cx-col));
@@ -161,8 +161,8 @@ public class ImageCreator {
         return retCircle;
     }
 
-    public static int[][] drawRectangle( int[][] image, int x1, int y1, int x2, int y2, int color){
-        int[][] retImage =  new int[image.length][image[0].length];
+    public static Integer[][] drawRectangle( int[][] image, int x1, int y1, int x2, int y2, int color){
+        Integer[][] retImage =  new Integer[image.length][image[0].length];
         int minX = Math.min(x1,x2);
         int maxX = Math.max(x1,x2);
         int minY = Math.min(y1,y2);

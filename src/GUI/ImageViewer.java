@@ -14,38 +14,36 @@ import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
 import utils.IOManager;
-import utils.ImageCreator;
 import utils.ImageColorTransformer;
+import utils.ImageCreator;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Window {
-
+public abstract class ImageViewer {
     public Stage stage;
     public VBox box;
-    public List<HBox> rows;
+    public MenuBar mainMenu;
 
-    public Window() {
+    public ImageViewer() {
         this.stage = new Stage();
-        this.rows = new ArrayList<>();
         this.box = new VBox();
 
-        ScrollPane s1 = new ScrollPane();
-        s1.setFitToHeight(true);
-        s1.setContent(box);
+//        ScrollPane s1 = new ScrollPane();
+//        s1.setFitToHeight(true);
+//        s1.setContent(box);
 
         VBox root = new VBox();
-        root.getChildren().addAll(generateMenuBar(stage), s1);
+        this.mainMenu = generateMenuBar(stage);
+        root.getChildren().addAll(mainMenu, box);
 
         Scene scene = new Scene(root);
 
         stage.setTitle("ATI 1Q2019");
 
         stage.setScene(scene);
-        stage.show();
     }
 
     private MenuBar generateMenuBar(Stage stage){
@@ -66,14 +64,8 @@ public class Window {
         generateCircle.setOnAction(e-> ImageCreator.createCircle());
         generateMenu.getItems().addAll(generateSquare,generateCircle);
 
-
-        final Menu transformMenu = new Menu("Transform");
-        MenuItem suma = new MenuItem("Sum");
-        transformMenu.getItems().addAll(suma);
-
-
         MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu, generateMenu, transformMenu);
+        menuBar.getMenus().addAll(fileMenu, generateMenu);
 
         return menuBar;
     }
@@ -100,8 +92,7 @@ public class Window {
                 e1.printStackTrace();
                 return;
             }
-            addColorImageContextMenu(openedImage);
-            new Window().addRow(openedImage.getView());
+            new ImageColorViewer(openedImage);
         }else if(extension.toLowerCase().equals("pgm")){
             ImageGrey openedImage;
             try {
@@ -110,8 +101,7 @@ public class Window {
                 e1.printStackTrace();
                 return;
             }
-            addGreyImageContextMenu(openedImage);
-            new Window().addRow(openedImage.getView());
+            new ImageGreyViewer(openedImage);
         }
 
 
@@ -122,13 +112,6 @@ public class Window {
 //            imageView.addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseEvent -> {
 //                wim.getPixelWriter().setColor((int) mouseEvent.getX(), (int) mouseEvent.getY(),Color.rgb(128,128,128));
 //            });
-    }
-
-    public void addRow(Node... nodes){
-        HBox h = new HBox();
-        h.getChildren().addAll(nodes);
-        rows.add(h);
-        this.box.getChildren().add(h);
     }
 
     public void addColorImageContextMenu(ImageColor image){
@@ -160,7 +143,7 @@ public class Window {
         );
     }
 
-    private void saveImage(ImageInt image){
+    protected void saveImage(ImageInt image){
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./images"));
         fileChooser.getExtensionFilters().addAll(
@@ -174,6 +157,4 @@ public class Window {
             IOManager.savePGM(file.getPath(), (ImageGrey) image);
         }
     }
-
-
 }

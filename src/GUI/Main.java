@@ -66,8 +66,8 @@ public class Main extends Application {
         final Menu fileMenu = new Menu("File");
         MenuItem openItem = new MenuItem("Open...");
         openItem.setOnAction(e -> {
-//            this.openImage();
-            this.testZone();
+            this.openImage();
+//            this.testZone();
         });
 
         MenuItem exit = new MenuItem("Exit");
@@ -169,9 +169,7 @@ public class Main extends Application {
                 e1.printStackTrace();
                 return;
             }
-            Window w = new Window();
-            w.addRow(openedImage.getView());
-            w.addColorImageContextMenu(openedImage);
+            new ImageColorViewer(openedImage);
             this.stage.close();
         }else if(extension.toLowerCase().equals("pgm")){
             ImageGrey openedImage;
@@ -181,9 +179,7 @@ public class Main extends Application {
                 e1.printStackTrace();
                 return;
             }
-            Window w = new Window();
-            w.addRow(openedImage.getView());
-            w.addGreyImageContextMenu(openedImage);
+            new ImageGreyViewer(openedImage);
             this.stage.close();
         }
 

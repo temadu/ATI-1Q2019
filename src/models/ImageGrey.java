@@ -39,6 +39,9 @@ public class ImageGrey implements ImageInt{
         this.updateRenderer();
         this.view = new ImageView(this.renderer);
     }
+    public ImageGrey(){
+
+    }
 
     public void parse(String filePath) throws IOException {
 
@@ -84,6 +87,9 @@ public class ImageGrey implements ImageInt{
             }
         }
         this.mean = (double) sum / (double) (height * width);
+        this.renderer = new WritableImage(width, height);
+        this.view = new ImageView(this.renderer);
+
     }
 
     public Image matrixToGreyImage(){
