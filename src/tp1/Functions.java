@@ -158,5 +158,8 @@ public class Functions {
         return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
     }
 
-
+    public ImageGrey thresholdization(int threshold) {
+        Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a -> Arrays.stream(a).map(p -> p > threshold ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
+    }
 }

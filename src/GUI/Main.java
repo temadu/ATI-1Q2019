@@ -100,37 +100,34 @@ public class Main extends Application {
         }
         Functions f = new Functions(openedImage2);
 //            ImageColor sum = f.negative();
-//            ImageGrey sum = f.greyHistogram();
+            ImageGrey sum = f.thresholdization(100);
 //            System.out.println(Arrays.toString(f.greyHistogram()));
 
         // CREATE HISTOGRAM
-        ImageGrey sum = f.histogramEqualization();
-        Functions f2 = new Functions(sum);
-        ImageGrey sum2 = f2.histogramEqualization();
-        Functions f3 = new Functions(sum2);
-
-        double[] histogramData2 = f2.greyHistogram();
-        double[] histogramData3 = f3.greyHistogram();
-
-
-        double[] histogramData = f.greyHistogram();
-        String[] labels = new String[256];
-        for (int i = 0; i < 256; i++) {
-            labels[i] = String.valueOf(i);
-        }
+//        ImageGrey sum = f.histogramEqualization();
+//        Functions f2 = new Functions(sum);
+//        ImageGrey sum2 = f2.histogramEqualization();
+//        Functions f3 = new Functions(sum2);
+//
+//        double[] histogramData2 = f2.greyHistogram();
+//        double[] histogramData3 = f3.greyHistogram();
+//
+//
+//        double[] histogramData = f.greyHistogram();
+//        String[] labels = new String[256];
+//        for (int i = 0; i < 256; i++) {
+//            labels[i] = String.valueOf(i);
+//        }
 
         this.addRow(
-                new ImageView(openedImage2.matrixToGreyImage()),
-                Histogram.createHistogram(labels,histogramData)
+                new ImageView(openedImage2.matrixToGreyImage())
+//                Histogram.createHistogram(labels,histogramData)
         );
         this.addRow(
-                new ImageView(sum.matrixToGreyImage()),
-                Histogram.createHistogram(labels,histogramData2)
+                new ImageView(sum.matrixToGreyImage())
+//                Histogram.createHistogram(labels,histogramData2)
         );
-        this.addRow(
-                new ImageView(sum2.matrixToGreyImage()),
-                Histogram.createHistogram(labels,histogramData3)
-        );
+
 
     }
 
