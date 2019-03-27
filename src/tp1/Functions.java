@@ -169,7 +169,7 @@ public class Functions {
         Random r = new Random();
         Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a-> Arrays.stream(a).map(p -> {
             double rnd = rgg.nextRandom();
-            if(r.nextDouble() < density) {
+            if(r.nextDouble() > density) {
                 return p;
             }
             if(p + rnd > 255) {
@@ -178,6 +178,44 @@ public class Functions {
                 return 0;
             } else {
                 return (int) Math.floor(p + rnd);
+            }
+        }).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
+    }
+
+    public ImageGrey addRayleighNoise(double density, double psi) {
+        RandomRayleighGenerator rrg = new RandomRayleighGenerator(psi);
+        Random r = new Random();
+        Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a-> Arrays.stream(a).map(p -> {
+            double rnd = rrg.nextRandom();
+            if(r.nextDouble() > density) {
+                return p;
+            }
+            if(p * rnd > 255) {
+                return 255;
+            } else if (p * rnd < 0) {
+                return 0;
+            } else {
+                return (int) Math.floor(p * rnd);
+            }
+        }).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
+    }
+
+    public ImageGrey addExponentialNoise(double density, double lamda) {
+        RandomExpGenerator reg = new RandomExpGenerator(lamda);
+        Random r = new Random();
+        Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a-> Arrays.stream(a).map(p -> {
+            double rnd = reg.nextRandom();
+            if(r.nextDouble() > density) {
+                return p;
+            }
+            if(p * rnd > 255) {
+                return 255;
+            } else if (p * rnd < 0) {
+                return 0;
+            } else {
+                return (int) Math.floor(p * rnd);
             }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
         return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());

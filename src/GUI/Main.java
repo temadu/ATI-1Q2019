@@ -115,7 +115,7 @@ public class Main extends Application {
         }
         Functions f = new Functions(openedImage2);
 //            ImageColor sum = f.negative();
-            ImageGrey sum = f.addGaussianNoise(0.5, 25);
+            ImageGrey sum = f.addExponentialNoise(1, 2);
 //            System.out.println(Arrays.toString(f.greyHistogram()));
 
         // CREATE HISTOGRAM
