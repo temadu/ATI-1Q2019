@@ -4,6 +4,7 @@ import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.stream.IntStream;
@@ -219,5 +220,119 @@ public class Functions {
             }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
         return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
+    }
+
+    public ImageGrey addSaltAndPepper(double density) {
+        Random r = new Random();
+        Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a-> Arrays.stream(a).map(p -> {
+            if(r.nextDouble() < density) {
+                return 0;
+            } else if (r.nextDouble() > 1 - density) {
+                return 255;
+            } else {
+                return p;
+            }
+        }).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
+    }
+
+    public ImageGrey meanFilter(int n) {
+        double[][] w = new double[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                w[i][j] = 1.0/(double)(n*n);
+            }
+        }
+        return filter(w, false);
+    }
+
+    public ImageGrey medianFilter(int n) {
+        double[][] w = new double[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                w[i][j] = 1;
+            }
+        }
+        return filter(w, true);
+    }
+
+    public ImageGrey weightedMedianFilter(int n) {
+        double[][] w = new double[n][n];
+        int half = (int) Math.floor(n/2);
+        for (int i = 0; i < half + 1; i++) {
+            for (int j = 0; j < half + 1; j++) {
+                w[i][j] = 1 + i + j;
+                w[n - i - 1][n - j - 1] = 1 + i + j;
+                w[i][n - j - 1] = 1 + i + j;
+                w[n - i - 1][j] = 1 + i + j;
+            }
+        }
+        return filter(w, true);
+    }
+
+    public ImageGrey gaussFilter(int n, double sigma) {
+        double[][] w = new double[n][n];
+        int half = (int) Math.floor(n/2);
+        double pre = 1/(2 * Math.PI * sigma * sigma);
+        double total = 0;
+        for (int i = -half; i < n - half; i++) {
+            for (int j = -half; j < n - half; j++) {
+                w[i + half][j + half] = pre * Math.exp(-(double)(i*i + j*j)/(sigma*sigma));
+                total += w[i + half][j + half];
+            }
+        }
+        for (int i = -half; i < n - half; i++) {
+            for (int j = -half; j < n - half; j++) {
+                w[i + half][j + half] *= (1.0/total);
+            }
+        }
+        return filter(w, false);
+    }
+
+    private ImageGrey filter(double[][] w, boolean median) {
+        int n = w.length;
+        int half = (int) Math.floor(n/2);
+
+        Integer[][] res = new Integer[imageGrey.getHeight()][imageGrey.getWidth()];
+        for (int i = half; i < imageGrey.getHeight() - half; i++) {
+            for (int j = half; j < imageGrey.getHeight() - half; j++) {
+                double sum = 0;
+                ArrayList<Integer> med = null;
+                if(median)
+                    med = new ArrayList<>();
+                for (int k = -half; k < n - half; k++) {
+                    for (int l = -half; l < n - half; l++) {
+                        if(median){
+                            for (int m = 0; m < w[k + half][l + half]; m++) {
+                                med.add(imageGrey.getImage()[i + k][j + l]);
+                            }
+                        } else {
+                            sum += imageGrey.getImage()[i + k][j + l] * w[k + half][l + half];
+                        }
+                    }
+                }
+                if(median) {
+                    med.sort(Integer::compareTo);
+                    res[i][j] = med.get(med.size()/2);
+                } else {
+                    res[i][j] = (int) sum;
+                }
+
+            }
+            for (int j = 0; j < half; j++) {
+                res[i][j] = imageGrey.getImage()[i][j];
+                res[i][imageGrey.getWidth() - j - 1] = imageGrey.getImage()[i][imageGrey.getWidth() - j - 1];
+            }
+        }
+        for(int i = 0; i < imageGrey.getWidth(); i++) {
+            for (int j = 0; j < half; j++) {
+                res[j][i] = imageGrey.getImage()[j][i];
+                res[imageGrey.getHeight() - j - 1][i] = imageGrey.getImage()[imageGrey.getHeight() - j - 1][i];
+
+            }
+        }
+
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
+
     }
 }
