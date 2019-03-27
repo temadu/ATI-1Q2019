@@ -15,6 +15,8 @@ import models.ImageGrey;
 import models.ImageInt;
 import tp1.Functions;
 import utils.IOManager;
+import utils.ImageCreator;
+import utils.ImageTransformer;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,11 +60,22 @@ public class Window {
         fileMenu.getItems().addAll(openItem,exit);
 
 
-        final Menu optionsMenu = new Menu("Transform");
-        final Menu helpMenu = new Menu("Help");
+        final Menu generateMenu = new Menu("Generate");
+        MenuItem generateSquare = new MenuItem("Square");
+        generateSquare.setOnAction(e -> ImageCreator.createSquare());
+        MenuItem generateCircle = new MenuItem("Circle");
+        generateCircle.setOnAction(e-> ImageCreator.createCircle());
+        generateMenu.getItems().addAll(generateSquare,generateCircle);
+
+
+        final Menu transformMenu = new Menu("Transform");
+        MenuItem suma = new MenuItem("Sum");
+        suma.setOnAction(e -> ImageTransformer.sumImages());
+        transformMenu.getItems().addAll(suma);
+
 
         MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu, optionsMenu, helpMenu);
+        menuBar.getMenus().addAll(fileMenu, generateMenu, transformMenu);
 
         return menuBar;
     }
@@ -113,14 +126,14 @@ public class Window {
 //            });
     }
 
-    protected void addRow(Node... nodes){
+    public void addRow(Node... nodes){
         HBox h = new HBox();
         h.getChildren().addAll(nodes);
         rows.add(h);
         this.box.getChildren().add(h);
     }
 
-    protected void addColorImageContextMenu(ImageColor image){
+    public void addColorImageContextMenu(ImageColor image){
         ImageView view = image.getView();
         ContextMenu contextMenu = new ContextMenu();
 
@@ -135,7 +148,7 @@ public class Window {
         System.out.println("Paso");
     }
 
-    protected void addGreyImageContextMenu(ImageGrey image){
+    public void addGreyImageContextMenu(ImageGrey image){
         ImageView view = image.getView();
         ContextMenu contextMenu = new ContextMenu();
 
@@ -163,5 +176,6 @@ public class Window {
             IOManager.savePGM(file.getPath(), (ImageGrey) image);
         }
     }
+
 
 }

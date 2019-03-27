@@ -21,6 +21,7 @@ import models.ImageGrey;
 import models.ImageInt;
 import tp1.Functions;
 import utils.IOManager;
+import utils.ImageCreator;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -74,9 +75,23 @@ public class Main extends Application {
 
         fileMenu.getItems().addAll(openItem,exit);
 
+        final Menu generateMenu = new Menu("Generate");
+        MenuItem generateSquare = new MenuItem("Square");
+        generateSquare.setOnAction(e -> {
+            ImageCreator.createSquare();
+            this.stage.close();
+        });
+
+        MenuItem generateCircle = new MenuItem("Circle");
+        generateCircle.setOnAction(e-> {
+            ImageCreator.createCircle();
+            this.stage.close();
+        });
+        generateMenu.getItems().addAll(generateSquare,generateCircle);
+
 
         MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().addAll(fileMenu);
+        menuBar.getMenus().addAll(fileMenu, generateMenu);
 
         return menuBar;
     }
