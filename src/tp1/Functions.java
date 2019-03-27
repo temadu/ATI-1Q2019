@@ -5,6 +5,7 @@ import models.ImageGrey;
 import models.ImageInt;
 
 import java.util.Arrays;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 public class Functions {
@@ -160,6 +161,25 @@ public class Functions {
 
     public ImageGrey thresholdization(int threshold) {
         Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a -> Arrays.stream(a).map(p -> p > threshold ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
+    }
+
+    public ImageGrey addGaussianNoise(double density, double std) {
+        RandomGaussianGenerator rgg = new RandomGaussianGenerator(0, std);
+        Random r = new Random();
+        Integer[][] res = Arrays.stream(imageGrey.getImage()).map(a-> Arrays.stream(a).map(p -> {
+            double rnd = rgg.nextRandom();
+            if(r.nextDouble() < density) {
+                return p;
+            }
+            if(p + rnd > 255) {
+                return 255;
+            } else if (p + rnd < 0) {
+                return 0;
+            } else {
+                return (int) Math.floor(p + rnd);
+            }
+        }).toArray(Integer[]::new)).toArray(Integer[][]::new);
         return new ImageGrey(res, imageGrey.getMaxColor(), imageGrey.getHeight(), imageGrey.getWidth());
     }
 }

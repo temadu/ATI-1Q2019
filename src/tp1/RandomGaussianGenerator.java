@@ -20,6 +20,6 @@ public class RandomGaussianGenerator implements RandomGenerators {
             x1 = r1.nextDouble();
         } while(x1 == 0); //evitar log 0 -> undefined
 
-        return Math.sqrt(-2 * Math.log(x1)) * Math.cos(r2.nextDouble() * 2 * Math.PI);
+        return Math.sqrt(-2 * Math.log(x1)) * Math.cos(r2.nextDouble() * 2 * Math.PI) * std + mean;
     }
 }
