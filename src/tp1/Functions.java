@@ -270,6 +270,20 @@ public class Functions {
         return filter(w, true);
     }
 
+    public ImageGrey laplacianFilter(int n) {
+        double[][] w = new double[n][n];
+        int half = (int) Math.floor(n/2);
+//        double pre = 1/(Math.PI * Math.pow(sigma, 4));
+//        double total = 0;
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                w[i][j] = -1.0/(double)(n*n);
+            }
+        }
+        w[half][half] = 1.0-(1.0/(double)(n*n));
+        return filter(w, false);
+    }
+
     public ImageGrey gaussFilter(int n, double sigma) {
         double[][] w = new double[n][n];
         int half = (int) Math.floor(n/2);
@@ -307,7 +321,7 @@ public class Functions {
                                 med.add(imageGrey.getImage()[i + k][j + l]);
                             }
                         } else {
-                            sum += imageGrey.getImage()[i + k][j + l] * w[k + half][l + half];
+                            sum += (double) imageGrey.getImage()[i + k][j + l] * w[k + half][l + half];
                         }
                     }
                 }
@@ -315,7 +329,7 @@ public class Functions {
                     med.sort(Integer::compareTo);
                     res[i][j] = med.get(med.size()/2);
                 } else {
-                    res[i][j] = (int) sum;
+                    res[i][j] = (int) sum < 0 ? 0 : (int) sum;
                 }
 
             }
