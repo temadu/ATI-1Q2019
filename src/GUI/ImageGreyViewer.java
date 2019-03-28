@@ -33,10 +33,10 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem expNoise = new MenuItem("Add Exponential Noise");
         suma.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
         histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
-        contrast.setOnAction(e -> new ImageGreyTransformer().greyContrast(this.image, 1)); //el 1 deberia ser un slider
-        threshold.setOnAction(e -> new ImageGreyTransformer().threshold(this.image, 128));
-        gaussNoise.setOnAction(e -> new ImageGreyTransformer().addGaussianNoise(this.image, 0.2, 10));
-        rayleighNoise.setOnAction(e -> new ImageGreyTransformer().addRayleighNoise(this.image, 0.2, 2));
+        contrast.setOnAction(e -> new ImageGreyTransformer().greyContrast(this.image)); //el 1 deberia ser un slider
+        threshold.setOnAction(e -> new ImageGreyTransformer().threshold(this.image));
+        gaussNoise.setOnAction(e -> new ImageGreyTransformer().addGaussianNoise(this.image));
+        rayleighNoise.setOnAction(e -> new ImageGreyTransformer().addRayleighNoise(this.image));
         expNoise.setOnAction(e -> new ImageGreyTransformer().addExponentialNoise(this.image, 0.2, 1));
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));

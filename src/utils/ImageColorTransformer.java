@@ -244,7 +244,7 @@ public class ImageColorTransformer {
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(outputBtn);
-        grid.add(hbBtn, 2, 3);
+        grid.add(hbBtn, 1, 4);
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
@@ -317,7 +317,7 @@ public class ImageColorTransformer {
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(outputBtn);
-        grid.add(hbBtn, 2, 3);
+        grid.add(hbBtn, 1, 4);
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
