@@ -1,14 +1,24 @@
 package GUI;
 
+import javafx.event.ActionEvent;
 import javafx.scene.chart.BarChart;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import models.ImageColor;
 import models.ImageGrey;
+import models.ImageInt;
 import tp1.Functions;
+import utils.IOManager;
 import utils.ImageColorTransformer;
 import utils.ImageGreyTransformer;
+
+import java.io.File;
 
 public class ImageGreyViewer extends ImageViewer {
 
@@ -17,7 +27,7 @@ public class ImageGreyViewer extends ImageViewer {
     public ImageGreyViewer(ImageGrey image) {
         super();
         this.image = image;
-        this.addGreyImageContextMenu(image);
+//        this.addGreyImageContextMenu(image);
         this.stage.setHeight(image.getHeight() + 80);
         this.stage.setWidth(this.image.getWidth() + 20);
         this.box.getChildren().add(image.getView());
@@ -26,6 +36,10 @@ public class ImageGreyViewer extends ImageViewer {
     }
 
     private void addGreyMenuBars(){
+        MenuItem save = new MenuItem("Save image");
+        save.setOnAction(event -> this.saveImage());
+        mainMenu.getMenus().get(0).getItems().add(1, save);
+
         final Menu transformMenu = new Menu("Transform");
         MenuItem suma = new MenuItem("Sum");
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
@@ -82,5 +96,30 @@ public class ImageGreyViewer extends ImageViewer {
 //            this.stage.setHeight(image.getHeight() + 80);
             this.stage.setWidth(this.stage.getWidth() + 500);
         }
+    }
+
+//    public void addGreyImageContextMenu(ImageGrey image){
+//        ImageView view = image.getView();
+//        ContextMenu contextMenu = new ContextMenu();
+//
+//        MenuItem save = new MenuItem("Save");
+//        save.setOnAction((ActionEvent event) -> {
+//            saveImage(image);
+//        });
+//        contextMenu.getItems().addAll(save);
+//        view.setOnContextMenuRequested((ContextMenuEvent event) ->
+//                contextMenu.show(view, event.getScreenX(), event.getScreenY())
+//        );
+//    }
+
+    protected void saveImage(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("./images"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.raw")
+        );
+        File file = fileChooser.showSaveDialog(stage);
+
+        IOManager.savePGM(file.getPath(), image);
     }
 }
