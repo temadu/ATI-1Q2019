@@ -34,6 +34,12 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
         MenuItem expNoise = new MenuItem("Add Exponential Noise");
+        MenuItem saltAndPepper = new MenuItem("Add Salt and Pepper");
+        MenuItem meanFilter = new MenuItem("Add Mean Filter");
+        MenuItem medianFilter = new MenuItem("Add Median Filter");
+        MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
+        MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
+        MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
         suma.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
         histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
         contrast.setOnAction(e -> new ImageGreyTransformer().greyContrast(this.image));
@@ -41,10 +47,17 @@ public class ImageGreyViewer extends ImageViewer {
         gaussNoise.setOnAction(e -> new ImageGreyTransformer().addGaussianNoise(this.image));
         rayleighNoise.setOnAction(e -> new ImageGreyTransformer().addRayleighNoise(this.image));
         expNoise.setOnAction(e -> new ImageGreyTransformer().addExponentialNoise(this.image));
+        saltAndPepper.setOnAction(e -> new ImageGreyTransformer().addSaltAndPepper(this.image));
+        meanFilter.setOnAction(e -> new ImageGreyTransformer().meanFilter(this.image));
+        medianFilter.setOnAction(e -> new ImageGreyTransformer().medianFilter(this.image));
+        weightedMedianFilter.setOnAction(e -> new ImageGreyTransformer().weightedMedianFilter(this.image));
+        laplacianFilter.setOnAction(e -> new ImageGreyTransformer().laplacianFilter(this.image));
+        gaussFilter.setOnAction(e -> new ImageGreyTransformer().gaussFilter(this.image));
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
-        transformMenu.getItems().addAll(suma,histogramEqualization,contrast, threshold,gaussNoise,rayleighNoise,expNoise);
+        transformMenu.getItems().addAll(suma,histogramEqualization,contrast, threshold,gaussNoise,rayleighNoise,expNoise,
+                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
 
 
         final Menu showMenu = new Menu("Show");
