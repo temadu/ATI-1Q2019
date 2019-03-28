@@ -784,7 +784,7 @@ public class ImageGreyTransformer {
 
     public void addSaltAndPepper(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.outputImage = new Functions(this.originalImage).thresholdization(128);
+        this.outputImage = new Functions(this.originalImage).addSaltAndPepper(0);
 
         Stage stage = new Stage();
         stage.setTitle("Apply salt and pepper");
@@ -796,11 +796,11 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Apply salt and pepper");
+        Text scenetitle = new Text("Add salt and pepper noise");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        grid.add(new Label("Gamma:"), 0, 1);
+        grid.add(new Label("Density:"), 0, 1);
         Slider slider = new Slider();
         slider.setMin(0);
         slider.setMax(1);
@@ -815,7 +815,7 @@ public class ImageGreyTransformer {
         grid.add(slider, 1, 1);
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).thresholdization(newValue.intValue());
+            this.outputImage = new Functions(this.originalImage).addSaltAndPepper(newValue.floatValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
         });
 
@@ -868,7 +868,7 @@ public class ImageGreyTransformer {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        grid.add(new Label("Multiplier:"), 0, 1);
+        grid.add(new Label("Mask Size:"), 0, 1);
         TextField multField = new TextField();
         multField.setMaxWidth(60);
         grid.add(multField, 1, 1);
@@ -941,7 +941,7 @@ public class ImageGreyTransformer {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        grid.add(new Label("Multiplier:"), 0, 1);
+        grid.add(new Label("Mask size:"), 0, 1);
         TextField multField = new TextField();
         multField.setMaxWidth(60);
         multField.setText("1");
@@ -1014,7 +1014,7 @@ public class ImageGreyTransformer {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        grid.add(new Label("Multiplier:"), 0, 1);
+        grid.add(new Label("Mask Size:"), 0, 1);
         TextField multField = new TextField();
         multField.setText("1");
         multField.setMaxWidth(60);
@@ -1087,7 +1087,7 @@ public class ImageGreyTransformer {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        grid.add(new Label("Multiplier:"), 0, 1);
+        grid.add(new Label("Mask size:"), 0, 1);
         TextField multField = new TextField();
         multField.setMaxWidth(60);
         multField.setText("1");
@@ -1156,11 +1156,11 @@ public class ImageGreyTransformer {
         grid.setPadding(new Insets(25, 25, 25, 25));
 
 
-        Text scenetitle = new Text("Apply median filter");
+        Text scenetitle = new Text("Apply gaussian filter");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        grid.add(new Label("Multiplier:"), 0, 1);
+        grid.add(new Label("Mask Size:"), 0, 1);
         TextField multField = new TextField();
         multField.setMaxWidth(60);
         multField.setText("1");
@@ -1169,12 +1169,12 @@ public class ImageGreyTransformer {
         grid.add(new Label("Sigma:"), 0, 2);
         Slider sigmaSlider = new Slider();
         sigmaSlider.setMin(0);
-        sigmaSlider.setMax(50);
-        sigmaSlider.setValue(0);
+        sigmaSlider.setMax(10);
+        sigmaSlider.setValue(0.1);
         sigmaSlider.setShowTickLabels(true);
         sigmaSlider.setShowTickMarks(true);
-        sigmaSlider.setMajorTickUnit(25);
-        sigmaSlider.setMinorTickCount(5);
+        sigmaSlider.setMajorTickUnit(5);
+        sigmaSlider.setMinorTickCount(1);
         sigmaSlider.setBlockIncrement(1);
         grid.add(sigmaSlider, 1, 2);
 
@@ -1186,7 +1186,7 @@ public class ImageGreyTransformer {
                 return;
             }
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).addGaussianNoise(multiplier, newValue.doubleValue());
+            this.outputImage = new Functions(this.originalImage).gaussFilter(multiplier, newValue.doubleValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
         multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
