@@ -137,7 +137,10 @@ public class ImageGrey implements ImageInt{
         PixelWriter writer = this.renderer.getPixelWriter();
         for(int y = 0; y < height; y++) {
             for(int x = 0; x < width; x++) {
-                writer.setColor(x, y, Color.grayRgb(image[y][x]));
+                if(image[y][x] == null)
+                    writer.setColor(x, y, Color.grayRgb(0));
+                else
+                    writer.setColor(x, y, Color.grayRgb(image[y][x]));
             }
         }
     }

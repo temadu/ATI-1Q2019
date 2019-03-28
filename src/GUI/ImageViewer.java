@@ -62,7 +62,11 @@ public abstract class ImageViewer {
         generateSquare.setOnAction(e -> ImageCreator.createSquare());
         MenuItem generateCircle = new MenuItem("Circle");
         generateCircle.setOnAction(e-> ImageCreator.createCircle());
-        generateMenu.getItems().addAll(generateSquare,generateCircle);
+        MenuItem generateGreyGradient = new MenuItem("Grey Gradient");
+        generateGreyGradient.setOnAction(e-> ImageCreator.createGreyGradient());
+        MenuItem generateColorGradient = new MenuItem("Color Gradient");
+        generateColorGradient.setOnAction(e-> ImageCreator.createColorGradient());
+        generateMenu.getItems().addAll(generateSquare,generateCircle, generateGreyGradient, generateColorGradient);
 
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(fileMenu, generateMenu);
