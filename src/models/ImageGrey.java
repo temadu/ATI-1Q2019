@@ -38,6 +38,8 @@ public class ImageGrey implements ImageInt{
         this.renderer = new WritableImage(width, height);
         this.updateRenderer();
         this.view = new ImageView(this.renderer);
+        calcMean();
+        calcStd();
     }
     public ImageGrey(){
 
@@ -108,6 +110,11 @@ public class ImageGrey implements ImageInt{
         double sumsq = 0;
         sumsq = Arrays.stream(image).map(a -> Arrays.stream(a).reduce(0, (ac, n) -> ac + (int) Math.pow(n - mean, 2))).reduce(0, (ac, n) -> ac + n);
         this.sigma = Math.sqrt(sumsq / (double) (height * width));
+    }
+
+    public void calcMean() {
+        double sum = Arrays.stream(image).map(a -> Arrays.stream(a).reduce(0, (ac, n) -> ac + n)).reduce(0, (ac, n) -> ac + n);
+        this.mean = sum / (height * width);
     }
 
     public Integer[][] getImage() {

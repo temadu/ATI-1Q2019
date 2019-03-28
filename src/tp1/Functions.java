@@ -193,14 +193,14 @@ public class Functions {
     public ImageGrey greyContrast(double sigmaMult) {
         ((ImageGrey)image).calcStd();
         int r1 = Math.max(0, (int) (((ImageGrey)image).getMean() - ((ImageGrey)image).getSigma() * sigmaMult));
-        int r2 = Math.max(0, (int) (((ImageGrey)image).getMean() + ((ImageGrey)image).getSigma() * sigmaMult));
+        int r2 = Math.min(255, (int) (((ImageGrey)image).getMean() + ((ImageGrey)image).getSigma() * sigmaMult));
         Integer [][] res = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(((ImageGrey)image).getImage()[i][j] < r1) {
                     res[i][j] = 0;
                 } else if(((ImageGrey)image).getImage()[i][j] < r2) {
-                    res[i][j] = (((ImageGrey)image).getImage()[i][j] - r1) * (255 / (r2 - r1));
+                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] - r1) * (255.0 / (r2 - r1)));
                 } else {
                     res[i][j] = 255;
                 }
