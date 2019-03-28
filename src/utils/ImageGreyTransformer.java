@@ -353,13 +353,6 @@ public class ImageGreyTransformer {
         grid.add(scenetitle, 0, 0, 2, 1);
 
         grid.add(new Label("Density:"), 0, 1);
-        TextField densityField = new TextField();
-        densityField.setMaxWidth(60);
-        densityField.setText("0.2");
-        grid.add(densityField, 1, 1);
-
-
-        grid.add(new Label("Density:"), 0, 1);
         Slider densitySlider = new Slider();
         densitySlider.setMin(0);
         densitySlider.setMax(1);
@@ -383,12 +376,12 @@ public class ImageGreyTransformer {
 
         densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).addGaussianNoise(newValue.doubleValue(), psiSlider.getValue());
+            this.outputImage = new Functions(this.originalImage).addRayleighNoise(newValue.doubleValue(), psiSlider.getValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
         psiSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).addGaussianNoise(densitySlider.getValue(), newValue.doubleValue());
+            this.outputImage = new Functions(this.originalImage).addRayleighNoise(densitySlider.getValue(), newValue.doubleValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
 
@@ -465,12 +458,12 @@ public class ImageGreyTransformer {
 
         densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).addGaussianNoise(newValue.doubleValue(), lambdaSlider.getValue());
+            this.outputImage = new Functions(this.originalImage).addExponentialNoise(newValue.doubleValue(), lambdaSlider.getValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
         lambdaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).addGaussianNoise(densitySlider.getValue(), newValue.doubleValue());
+            this.outputImage = new Functions(this.originalImage).addExponentialNoise(densitySlider.getValue(), newValue.doubleValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
 

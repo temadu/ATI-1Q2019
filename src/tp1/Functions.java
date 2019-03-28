@@ -161,12 +161,7 @@ public class Functions {
         if(greyscale){
             greyRes = Arrays.stream(((ImageGrey) image).getImage()).map(a -> Arrays.stream(a).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new);
         } else {
-            res = Arrays.stream(((ImageColor)image).getImage()).map(a -> Arrays.stream(a).map(e -> {
-                int c1 = 255 - e[0];
-                int c2 = 255 - e[1];
-                int c3 = 255 - e[2];
-                return new int[]{c1, c2,c3};
-            }).toArray(Integer[][]::new)).toArray(Integer[][][]::new);
+            res = Arrays.stream(((ImageColor)image).getImage()).map(a -> Arrays.stream(a).map(b -> Arrays.stream(b).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new)).toArray(Integer[][][]::new);
         }
         return greyscale ?  new ImageGrey(greyRes, maxColor, image.getHeight(), image.getWidth())
                 :  new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
