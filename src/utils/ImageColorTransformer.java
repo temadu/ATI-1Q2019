@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
 import models.ImageGrey;
+import models.ImageInt;
 import tp1.Functions;
 
 import java.io.File;
@@ -30,9 +31,9 @@ import java.io.IOException;
 
 public class ImageColorTransformer {
 
-    ImageColor originalImage;
-    ImageColor secondImage;
-    ImageColor outputImage;
+    ImageInt originalImage;
+    ImageInt secondImage;
+    ImageInt outputImage;
 
     public void sumImages(ImageColor originalImage){
         this.originalImage = originalImage;
@@ -67,7 +68,7 @@ public class ImageColorTransformer {
                         this.originalImage.getWidth() == this.secondImage.getWidth()){
                     if(this.outputImage != null)
                         grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(originalImage).imageSum(secondImage.getImage());
+                    this.outputImage = new Functions(originalImage).imageSum(secondImage);
                     grid.add(this.outputImage.getView(),2,3);
 
                 } else{
@@ -96,7 +97,7 @@ public class ImageColorTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageColorViewer(outputImage);
+                new ImageColorViewer((ImageColor)outputImage);
                 stage.close();
             }
 
@@ -146,7 +147,7 @@ public class ImageColorTransformer {
                         this.originalImage.getWidth() == this.secondImage.getWidth()){
                     if(this.outputImage != null)
                         grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(originalImage).imageSub(secondImage.getImage());
+                    this.outputImage = new Functions(originalImage).imageSub(secondImage);
                     grid.add(this.outputImage.getView(),2,3);
 
                 } else{
@@ -175,7 +176,7 @@ public class ImageColorTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageColorViewer(outputImage);
+                new ImageColorViewer((ImageColor)outputImage);
                 stage.close();
             }
 
@@ -247,7 +248,7 @@ public class ImageColorTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageColorViewer(outputImage);
+                new ImageColorViewer((ImageColor)outputImage);
                 stage.close();
             }
 
@@ -264,7 +265,7 @@ public class ImageColorTransformer {
         stage.show();
     }
     public void dynamicRangeCompression(ImageColor originalImage){
-        new ImageColorViewer(new Functions(originalImage).rangeCompressor());
+        new ImageColorViewer((ImageColor)new Functions(originalImage).rangeCompressor());
     }
     public void gammaFunction(ImageColor originalImage){
         this.originalImage = originalImage;
@@ -320,7 +321,7 @@ public class ImageColorTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageColorViewer(outputImage);
+                new ImageColorViewer((ImageColor)outputImage);
                 stage.close();
             }
 
@@ -338,7 +339,7 @@ public class ImageColorTransformer {
     }
 
     public void negative(ImageColor originalImage){
-        new ImageColorViewer(new Functions(originalImage).negative());
+        new ImageColorViewer((ImageColor)new Functions(originalImage).negative());
     }
 
 }

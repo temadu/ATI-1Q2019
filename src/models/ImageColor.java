@@ -1,13 +1,9 @@
 package models;
 
-import javafx.event.ActionEvent;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.paint.Color;
 
 import java.io.DataInputStream;
@@ -16,7 +12,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class ImageColor implements ImageInt{
-    private int[][][] image;
+    private Integer[][][] image;
     private int maxColor;
     private int height;
     private int width;
@@ -29,7 +25,7 @@ public class ImageColor implements ImageInt{
         parse(filePath);
     }
 
-    public ImageColor(int[][][] image, int maxColor, int height, int width){
+    public ImageColor(Integer[][][] image, int maxColor, int height, int width){
         this.image = image;
         this.maxColor = maxColor;
         this.height = height;
@@ -73,7 +69,7 @@ public class ImageColor implements ImageInt{
         }
 
         // read the image data
-        image = new int[height][width][3];
+        image = new Integer[height][width][3];
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 image[row][col][0] = dis.readUnsignedByte();
@@ -97,7 +93,7 @@ public class ImageColor implements ImageInt{
         return wImage;
     }
 
-    public int[][][] getImage() {
+    public Integer[][][] getImage() {
         return image;
     }
 
