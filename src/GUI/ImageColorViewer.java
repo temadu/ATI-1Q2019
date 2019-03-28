@@ -36,6 +36,10 @@ public class ImageColorViewer extends ImageViewer{
         mainMenu.getMenus().get(0).getItems().add(1, save);
 
         final Menu transformMenu = new Menu("Transform");
+        MenuItem painter = new MenuItem("Get and Set Colors");
+        painter.setOnAction(e -> new ImageColorTransformer().painter(this.image));
+        MenuItem cutter = new MenuItem("Cut Image");
+        cutter.setOnAction(e -> new ImageColorTransformer().cutImage(this.image));
         MenuItem sum = new MenuItem("Sum");
         sum.setOnAction(e -> new ImageColorTransformer().sumImages(this.image));
         MenuItem substract = new MenuItem("Substract");
@@ -73,7 +77,7 @@ public class ImageColorViewer extends ImageViewer{
         laplacianFilter.setOnAction(e -> new ImageColorTransformer().laplacianFilter(this.image));
         gaussFilter.setOnAction(e -> new ImageColorTransformer().gaussFilter(this.image));
 
-        transformMenu.getItems().addAll(sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
+        transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
                 gaussNoise, rayleighNoise, expNoise, saltAndPepper,
                 meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
         this.mainMenu.getMenus().addAll(transformMenu);

@@ -155,4 +155,18 @@ public class ImageGrey implements ImageInt{
     public double getSigma() {
         return sigma;
     }
+    public void setPixel(int x, int y, int color){
+        if(x >= 0 && x < width && y >= 0 && y < height
+                && color >= 0 && color < 256){
+            this.image[y][x] = color;
+
+        }
+    }
+    public Integer getPixel(int x, int y, int color){
+        if(x >= 0 && x < width && y >= 0 && y < height
+                && color >= 0 && color < 256){
+            return this.image[y][x];
+        }
+        return null;
+    }
 }

@@ -41,8 +41,8 @@ public class ImageGreyViewer extends ImageViewer {
         mainMenu.getMenus().get(0).getItems().add(1, save);
 
         final Menu transformMenu = new Menu("Transform");
-//        MenuItem cutter = new MenuItem("Cut Image");
-//        cutter.setOnAction(e -> new ImageGreyTransformer().cutImage(this.image));
+        MenuItem cutter = new MenuItem("Cut Image");
+        cutter.setOnAction(e -> new ImageGreyTransformer().cutImage(this.image));
         MenuItem painter = new MenuItem("Get and Set Colors");
         painter.setOnAction(e -> new ImageGreyTransformer().painter(this.image));
         MenuItem sum = new MenuItem("Sum");
@@ -85,7 +85,7 @@ public class ImageGreyViewer extends ImageViewer {
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
-        transformMenu.getItems().addAll( painter,sum, substract, multiply, gamma, rangeCompressor, negative,
+        transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
                 histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
 

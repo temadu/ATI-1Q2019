@@ -2,17 +2,21 @@ package utils;
 
 import GUI.ImageColorViewer;
 import GUI.ImageColorViewer;
+import GUI.ImageGreyViewer;
 import GUI.Window;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -20,11 +24,13 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
 import models.ImageColor;
+import models.ImageGrey;
 import models.ImageInt;
 import tp1.Functions;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ImageColorTransformer {
 
@@ -1142,5 +1148,272 @@ public class ImageColorTransformer {
         stage.setMaximized(true);
 
         stage.show();
+    }
+
+    public void painter(ImageColor originalImage){
+        this.outputImage = new ImageColor(originalImage.getImage(), 255, originalImage.getHeight(), originalImage.getWidth());
+        Region cutRegion = new Region();
+        cutRegion.x1 = 0;
+        cutRegion.y1 = 0;
+        cutRegion.x2 = originalImage.getWidth()-1;
+        cutRegion.y2 = originalImage.getHeight()-1;
+
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Cut image");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Text text = new Text("");
+        grid.add(text, 0, 1, 2, 1);
+
+//        Label firstImageLabel = new Label("First Image:");
+//        firstImageLabel.setAlignment(Pos.CENTER);
+//        grid.add(firstImageLabel, 0, 2);
+//        ImageView input = new ImageView(originalImage.getRenderer());
+//        grid.add(input, 0, 3);
+
+//        TextField redField = new TextField();
+//        redField.setText("" + cutRegion.paintColor[0]);
+//        redField.setMaxWidth(60);
+//        redField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            if (!newValue.matches("\\d*")) {
+//                redField.setText(oldValue);
+//            } else {
+//                int color = 0;
+//                try {
+//                    color = Integer.parseInt(redField.getText());
+//                } catch (NumberFormatException | NullPointerException nfe) {
+//                    return;
+//                }
+//                if(color >= 0 && color <= 255){
+//                    cutRegion.paintColor[0] = color;
+//                }
+//            }
+//        });
+//        TextField greenField = new TextField();
+//        greenField.setText("" + cutRegion.paintColor[1]);
+//        greenField.setMaxWidth(60);
+//        greenField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            if (!newValue.matches("\\d*")) {
+//                greenField.setText(oldValue);
+//            } else {
+//                int color = 0;
+//                try {
+//                    color = Integer.parseInt(greenField.getText());
+//                } catch (NumberFormatException | NullPointerException nfe) {
+//                    return;
+//                }
+//                if(color >= 0 && color <= 255){
+//                    cutRegion.paintColor[1] = color;
+//                }
+//            }
+//        });
+//        TextField blueField = new TextField();
+//        blueField.setText("" + cutRegion.paintColor[2]);
+//        blueField.setMaxWidth(60);
+//        blueField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            if (!newValue.matches("\\d*")) {
+//                blueField.setText(oldValue);
+//            } else {
+//                int color = 0;
+//                try {
+//                    color = Integer.parseInt(blueField.getText());
+//                } catch (NumberFormatException | NullPointerException nfe) {
+//                    return;
+//                }
+//                if(color >= 0 && color <= 255){
+//                    cutRegion.paintColor[2] = color;
+//                }
+//            }
+//        });
+
+        final ColorPicker colorPicker = new ColorPicker();
+        colorPicker.setOnAction(event -> {
+            cutRegion.paintColor[0] = (int) Math.round(colorPicker.getValue().getRed() * 255);
+            cutRegion.paintColor[1] = (int) Math.round(colorPicker.getValue().getGreen() * 255);
+            cutRegion.paintColor[2] = (int) Math.round(colorPicker.getValue().getBlue() * 255);
+        });
+
+        Button paintBtn = new Button("Get Color");
+        grid.add(paintBtn, 0, 2);
+        paintBtn.setOnAction((e) -> {
+            if(cutRegion.painterState == 0){
+                paintBtn.setText("Paint");
+                cutRegion.painterState = 1;
+                grid.add(colorPicker, 1, 2);
+//                grid.add(greenField, 2, 2);
+//                grid.add(blueField, 3, 2);
+            }else{
+                paintBtn.setText("Get Color");
+                cutRegion.painterState = 0;
+                grid.getChildren().remove(colorPicker);
+//                grid.getChildren().remove(greenField);
+//                grid.getChildren().remove(blueField);
+            }
+        });
+
+
+
+        grid.add(new Label("Output Image:"), 0, 3);
+        grid.add(outputImage.getView(), 0, 4);
+
+
+        EventHandler<MouseEvent> mousePress = e -> {
+            cutRegion.x1 = (int) e.getX();
+            cutRegion.y1 = (int) e.getY();
+            if(cutRegion.painterState == 0){
+                text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + Arrays.toString(originalImage.getImage()[cutRegion.y1][cutRegion.x1]));
+            }else{
+                ((ImageColor)outputImage).getImage()[cutRegion.y1][cutRegion.x1] = new Integer[]{cutRegion.paintColor[0],cutRegion.paintColor[1],cutRegion.paintColor[2]};
+                outputImage.updateRenderer();
+            }
+        };
+        EventHandler<MouseEvent> mouseDrag = e -> {
+            cutRegion.x1 = (int) e.getX();
+            cutRegion.y1 = (int) e.getY();
+            if(cutRegion.painterState == 1){
+                ((ImageColor)outputImage).getImage()[cutRegion.y1][cutRegion.x1] = new Integer[]{cutRegion.paintColor[0],cutRegion.paintColor[1],cutRegion.paintColor[2]};
+                outputImage.updateRenderer();
+            }
+        };
+        outputImage.getView().addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
+        outputImage.getView().addEventFilter(MouseEvent.MOUSE_DRAGGED, mouseDrag);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageColorViewer((ImageColor) outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Painter");
+        System.out.println("Paint");
+        stage.show();
+    }
+
+    public void cutImage(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new ImageColor(originalImage.getImage().clone(), 255, originalImage.getHeight(), originalImage.getWidth());
+        Region cutRegion = new Region();
+        cutRegion.x1 = 0;
+        cutRegion.y1 = 0;
+        cutRegion.x2 = originalImage.getWidth()-1;
+        cutRegion.y2 = originalImage.getHeight()-1;
+
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Cut image");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Text text = new Text("");
+        grid.add(text, 0, 1, 2, 1);
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        ImageView input = new ImageView(originalImage.getRenderer());
+
+        grid.add(input, 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(outputImage.getView(), 1, 3);
+
+        EventHandler<MouseEvent> mousePress = e -> {
+            cutRegion.x1 = (int) e.getX();
+            cutRegion.y1 = (int) e.getY();
+//            text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+            System.out.println("X1: " + cutRegion.x1 + ", Y1: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+
+        };
+        EventHandler<MouseEvent> mouseRelease = e -> {
+            cutRegion.x2 = (int) e.getX();
+            cutRegion.y2 = (int) e.getY();
+            grid.getChildren().remove(outputImage.getView());
+            int width = Math.abs(cutRegion.x1-cutRegion.x2+1);
+            int height = Math.abs(cutRegion.y1-cutRegion.y2+1);
+            Integer[][][] cutImage = new Integer[height][width][3];
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    cutImage[i][j] = originalImage.getImage()[i+Math.min(cutRegion.y1,cutRegion.y2)][j+Math.min(cutRegion.x1,cutRegion.x2)];
+                }
+            }
+            System.out.println(cutImage);
+            System.out.println(width);
+            System.out.println(cutImage[0].length);
+            System.out.println(height);
+            System.out.println(cutImage.length);
+            this.outputImage = new ImageColor(cutImage, originalImage.getMaxColor(), height, width);
+            grid.add(outputImage.getView(), 1, 3);
+            System.out.println("X2: " + cutRegion.x2 + ", Y2: " + cutRegion.y2);
+
+
+        };
+        //Registering the event filter
+        input.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
+        input.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseRelease);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageColorViewer((ImageColor)outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Multiply image by scalar");
+        stage.show();
+    }
+
+
+
+    class Region{
+        public int x1;
+        public int y1;
+        public int x2;
+        public int y2;
+        public int painterState = 0;
+        public int[] paintColor = new int[3];
     }
 }

@@ -1245,7 +1245,7 @@ public class ImageGreyTransformer {
 
     public void cutImage(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.outputImage = new ImageGrey(originalImage.getImage(), 255, originalImage.getHeight(), originalImage.getWidth());
+        this.outputImage = new ImageGrey(originalImage.getImage().clone(), 255, originalImage.getHeight(), originalImage.getWidth());
         Region cutRegion = new Region();
         cutRegion.x1 = 0;
         cutRegion.y1 = 0;
@@ -1280,7 +1280,7 @@ public class ImageGreyTransformer {
         EventHandler<MouseEvent> mousePress = e -> {
             cutRegion.x1 = (int) e.getX();
             cutRegion.y1 = (int) e.getY();
-            text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+//            text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
             System.out.println("X1: " + cutRegion.x1 + ", Y1: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
 
         };
@@ -1288,8 +1288,8 @@ public class ImageGreyTransformer {
             cutRegion.x2 = (int) e.getX();
             cutRegion.y2 = (int) e.getY();
             grid.getChildren().remove(outputImage.getView());
-            int width = Math.abs(cutRegion.x1-cutRegion.x2);
-            int height = Math.abs(cutRegion.y1-cutRegion.y2);
+            int width = Math.abs(cutRegion.x1-cutRegion.x2+1);
+            int height = Math.abs(cutRegion.y1-cutRegion.y2+1);
             Integer[][] cutImage = new Integer[height][width];
             for (int i = 0; i < height; i++) {
                 for (int j = 0; j < width; j++) {
@@ -1412,7 +1412,7 @@ public class ImageGreyTransformer {
             if(cutRegion.painterState == 0){
                 text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
             }else{
-                outputImage.getImage()[cutRegion.y1][cutRegion.x1] = cutRegion.paintColor;
+                ((ImageGrey)outputImage).setPixel(cutRegion.x1,cutRegion.y1,cutRegion.paintColor);
                 outputImage.updateRenderer();
             }
         };
@@ -1420,7 +1420,7 @@ public class ImageGreyTransformer {
             cutRegion.x1 = (int) e.getX();
             cutRegion.y1 = (int) e.getY();
             if(cutRegion.painterState == 1){
-                outputImage.getImage()[cutRegion.y1][cutRegion.x1] = cutRegion.paintColor;
+                ((ImageGrey)outputImage).getImage()[cutRegion.y1][cutRegion.x1] = cutRegion.paintColor;
                 outputImage.updateRenderer();
             }
         };
