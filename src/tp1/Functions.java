@@ -15,7 +15,11 @@ public class Functions {
 
     public Functions(ImageInt image) {
         this.image = image;
-        this.greyscale = false;
+        if(image instanceof ImageGrey)
+            this.greyscale = true;
+        else{
+            this.greyscale = false;
+        }
     }
 
 

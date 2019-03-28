@@ -41,7 +41,19 @@ public class ImageGreyViewer extends ImageViewer {
         mainMenu.getMenus().get(0).getItems().add(1, save);
 
         final Menu transformMenu = new Menu("Transform");
-        MenuItem suma = new MenuItem("Sum");
+        MenuItem sum = new MenuItem("Sum");
+        sum.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
+        MenuItem substract = new MenuItem("Substract");
+        substract.setOnAction(e -> new ImageGreyTransformer().substractImages(this.image));
+        MenuItem multiply = new MenuItem("Multiply by scalar");
+        multiply.setOnAction(e -> new ImageGreyTransformer().multiplyImage(this.image));
+        MenuItem gamma = new MenuItem("Apply gamma function");
+        gamma.setOnAction(e -> new ImageGreyTransformer().gammaFunction(this.image));
+        MenuItem rangeCompressor = new MenuItem("Range Compressor");
+        rangeCompressor.setOnAction(e -> new ImageGreyTransformer().dynamicRangeCompression(this.image));
+        MenuItem negative = new MenuItem("Negate");
+        negative.setOnAction(e -> new ImageGreyTransformer().negative(this.image));
+
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
         MenuItem contrast = new MenuItem("Contrast Improvement");
         MenuItem threshold = new MenuItem("Thresholding");
@@ -54,7 +66,6 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
         MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
-        suma.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
         histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
         contrast.setOnAction(e -> new ImageGreyTransformer().greyContrast(this.image));
         threshold.setOnAction(e -> new ImageGreyTransformer().threshold(this.image));
@@ -70,7 +81,8 @@ public class ImageGreyViewer extends ImageViewer {
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
-        transformMenu.getItems().addAll(suma,histogramEqualization,contrast, threshold,gaussNoise,rayleighNoise,expNoise,
+        transformMenu.getItems().addAll(sum, substract, multiply, gamma, rangeCompressor, negative,
+                histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
 
 
