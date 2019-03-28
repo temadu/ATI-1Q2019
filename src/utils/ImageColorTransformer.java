@@ -1,7 +1,7 @@
 package utils;
 
 import GUI.ImageColorViewer;
-import GUI.ImageGreyViewer;
+import GUI.ImageColorViewer;
 import GUI.Window;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -19,7 +19,7 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
-import models.ImageGrey;
+import models.ImageColor;
 import models.ImageInt;
 import tp1.Functions;
 
@@ -813,7 +813,322 @@ public class ImageColorTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                new ImageColorViewer((ImageColor) outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+    public void addGaussianNoise(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(originalImage).addGaussianNoiseColor(0, 0.1);
+
+        Stage stage = new Stage();
+        stage.setTitle("Add gaussian noise");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Add gaussian noise");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Density:"), 0, 1);
+        Slider densitySlider = new Slider();
+        densitySlider.setMin(0);
+        densitySlider.setMax(1);
+        densitySlider.setValue(0);
+        densitySlider.setShowTickLabels(true);
+        densitySlider.setShowTickMarks(true);
+        densitySlider.setMajorTickUnit(0.25);
+        densitySlider.setBlockIncrement(0.05);
+        grid.add(densitySlider, 1, 1);
+
+        grid.add(new Label("Sigma:"), 0, 2);
+        Slider sigmaSlider = new Slider();
+        sigmaSlider.setMin(0);
+        sigmaSlider.setMax(50);
+        sigmaSlider.setValue(0.1);
+        sigmaSlider.setShowTickLabels(true);
+        sigmaSlider.setShowTickMarks(true);
+        sigmaSlider.setMajorTickUnit(25);
+        sigmaSlider.setMinorTickCount(5);
+        sigmaSlider.setBlockIncrement(1);
+        grid.add(sigmaSlider, 1, 2);
+
+        densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoiseColor(newValue.doubleValue(), sigmaSlider.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+        sigmaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoiseColor(densitySlider.getValue(), newValue.doubleValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 3);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
+        grid.add(new Label("Output Image:"), 1, 3);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageColorViewer((ImageColor) outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+    public void addRayleighNoise(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(originalImage).addRayleighNoiseColor(0, 0);
+
+        Stage stage = new Stage();
+        stage.setTitle("Add rayleigh noise");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Add rayleigh noise");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Density:"), 0, 1);
+        Slider densitySlider = new Slider();
+        densitySlider.setMin(0);
+        densitySlider.setMax(1);
+        densitySlider.setValue(0);
+        densitySlider.setShowTickLabels(true);
+        densitySlider.setShowTickMarks(true);
+        densitySlider.setMajorTickUnit(0.25);
+        densitySlider.setBlockIncrement(0.05);
+        grid.add(densitySlider, 1, 1);
+
+        grid.add(new Label("Psi:"), 0, 2);
+        Slider psiSlider = new Slider();
+        psiSlider.setMin(0);
+        psiSlider.setMax(2);
+        psiSlider.setValue(0);
+        psiSlider.setShowTickLabels(true);
+        psiSlider.setShowTickMarks(true);
+        psiSlider.setMajorTickUnit(1);
+        psiSlider.setBlockIncrement(0.05);
+        grid.add(psiSlider, 1, 2);
+
+        densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addRayleighNoiseColor(newValue.doubleValue(), psiSlider.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+        psiSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addRayleighNoiseColor(densitySlider.getValue(), newValue.doubleValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 3);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
+        grid.add(new Label("Output Image:"), 1, 3);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageColorViewer((ImageColor) outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+    public void addExponentialNoise(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(originalImage).addExponentialNoiseColor(0, 0);
+
+        Stage stage = new Stage();
+        stage.setTitle("Add exponential noise");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Add exponential noise");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Density:"), 0, 1);
+        Slider densitySlider = new Slider();
+        densitySlider.setMin(0);
+        densitySlider.setMax(1);
+        densitySlider.setValue(0);
+        densitySlider.setShowTickLabels(true);
+        densitySlider.setShowTickMarks(true);
+        densitySlider.setMajorTickUnit(0.25);
+        densitySlider.setBlockIncrement(0.05);
+        grid.add(densitySlider, 1, 1);
+
+        grid.add(new Label("Lambda:"), 0, 2);
+        Slider lambdaSlider = new Slider();
+        lambdaSlider.setMin(0);
+        lambdaSlider.setMax(4);
+        lambdaSlider.setValue(0);
+        lambdaSlider.setShowTickLabels(true);
+        lambdaSlider.setShowTickMarks(true);
+        lambdaSlider.setMajorTickUnit(2);
+        lambdaSlider.setMinorTickCount(1);
+        lambdaSlider.setBlockIncrement(0.1);
+        grid.add(lambdaSlider, 1, 2);
+
+        densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addExponentialNoiseColor(newValue.doubleValue(), lambdaSlider.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+        lambdaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addExponentialNoiseColor(densitySlider.getValue(), newValue.doubleValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 3);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
+        grid.add(new Label("Output Image:"), 1, 3);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageColorViewer((ImageColor) outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+
+    public void addSaltAndPepper(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).addSaltAndPepperColor(0);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply salt and pepper");
+
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Add salt and pepper noise");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Density:"), 0, 1);
+        Slider slider = new Slider();
+        slider.setMin(0);
+        slider.setMax(1);
+        slider.setValue(0);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(0.25);
+        slider.setBlockIncrement(0.05);
+//        TextField multField = new TextField();
+//        multField.setMaxWidth(60);
+//        grid.add(multField, 1, 1);
+        grid.add(slider, 1, 1);
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addSaltAndPepperColor(newValue.floatValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageColorViewer((ImageColor) outputImage);
                 stage.close();
             }
 

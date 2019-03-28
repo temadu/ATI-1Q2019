@@ -51,11 +51,22 @@ public class ImageColorViewer extends ImageViewer{
         MenuItem threshold = new MenuItem("Thresholding");
         threshold.setOnAction(e -> new ImageColorTransformer().thresholding(this.image));
 
+        MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
+        MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
+        MenuItem expNoise = new MenuItem("Add Exponential Noise");
+        MenuItem saltAndPepper = new MenuItem("Add Salt and Pepper");
+
         MenuItem meanFilter = new MenuItem("Add Mean Filter");
         MenuItem medianFilter = new MenuItem("Add Median Filter");
         MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
         MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
+
+        gaussNoise.setOnAction(e -> new ImageColorTransformer().addGaussianNoise(this.image));
+        rayleighNoise.setOnAction(e -> new ImageColorTransformer().addRayleighNoise(this.image));
+        expNoise.setOnAction(e -> new ImageColorTransformer().addExponentialNoise(this.image));
+        saltAndPepper.setOnAction(e -> new ImageColorTransformer().addSaltAndPepper(this.image));
+
         meanFilter.setOnAction(e -> new ImageColorTransformer().meanFilter(this.image));
         medianFilter.setOnAction(e -> new ImageColorTransformer().medianFilter(this.image));
         weightedMedianFilter.setOnAction(e -> new ImageColorTransformer().weightedMedianFilter(this.image));
@@ -63,6 +74,7 @@ public class ImageColorViewer extends ImageViewer{
         gaussFilter.setOnAction(e -> new ImageColorTransformer().gaussFilter(this.image));
 
         transformMenu.getItems().addAll(sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
+                gaussNoise, rayleighNoise, expNoise, saltAndPepper,
                 meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
         this.mainMenu.getMenus().addAll(transformMenu);
     }

@@ -244,6 +244,58 @@ public class Functions {
         return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
     }
 
+    public ImageColor addGaussianNoiseColor(double density, double std) {
+        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
+        RandomGaussianGenerator rgg = new RandomGaussianGenerator(0, std);
+        Random r = new Random();
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                for (int k = 0; k < 3; k++) {
+                    int p = ((ImageColor)image).getImage()[i][j][k];
+                    double rnd = rgg.nextRandom();
+                    if(r.nextDouble() > density) {
+                        res[i][j][k] = p;
+                    } else {
+                        if(p + rnd > 255) {
+                            res[i][j][k] = 255;
+                        } else if (p + rnd < 0) {
+                            res[i][j][k] = 0;
+                        } else {
+                            res[i][j][k] = (int) Math.floor(p + rnd);
+                        }
+                    }
+                }
+            }
+        }
+        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+    }
+
+    public ImageColor addRayleighNoiseColor(double density, double psi) {
+        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
+        RandomRayleighGenerator rrg = new RandomRayleighGenerator(psi);
+        Random r = new Random();
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                for (int k = 0; k < 3; k++) {
+                    int p = ((ImageColor)image).getImage()[i][j][k];
+                    double rnd = rrg.nextRandom();
+                    if(r.nextDouble() > density) {
+                        res[i][j][k] = p;
+                    } else {
+                        if(p * rnd > 255) {
+                            res[i][j][k] = 255;
+                        } else if (p * rnd < 0) {
+                            res[i][j][k] = 0;
+                        } else {
+                            res[i][j][k] = (int) Math.floor(p * rnd);
+                        }
+                    }
+                }
+            }
+        }
+        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+    }
+
     public ImageGrey addRayleighNoise(double density, double psi) {
         RandomRayleighGenerator rrg = new RandomRayleighGenerator(psi);
         Random r = new Random();
@@ -263,6 +315,31 @@ public class Functions {
         return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
     }
 
+    public ImageColor addExponentialNoiseColor(double density, double lambda) {
+        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
+        RandomExpGenerator reg = new RandomExpGenerator(lambda);
+        Random r = new Random();
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                for (int k = 0; k < 3; k++) {
+                    int p = ((ImageColor)image).getImage()[i][j][k];
+                    double rnd = reg.nextRandom();
+                    if(r.nextDouble() > density) {
+                        res[i][j][k] = p;
+                    } else{
+                        if(p * rnd > 255) {
+                            res[i][j][k] = 255;
+                        } else if (p * rnd < 0) {
+                            res[i][j][k] = 0;
+                        } else {
+                            res[i][j][k] = (int) Math.floor(p * rnd);
+                        }
+                    }
+                }
+            }
+        }
+        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+    }
     public ImageGrey addExponentialNoise(double density, double lamda) {
         RandomExpGenerator reg = new RandomExpGenerator(lamda);
         Random r = new Random();
@@ -282,12 +359,38 @@ public class Functions {
         return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
     }
 
+    public ImageColor addSaltAndPepperColor(double density) {
+        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
+        Random r = new Random();
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                Integer[] p = ((ImageColor)image).getImage()[i][j];
+                double rn = r.nextDouble();
+                if(rn < density) {
+                    res[i][j][0] = 0;
+                    res[i][j][1] = 0;
+                    res[i][j][2] = 0;
+                } else if(rn > 1 - density) {
+                    res[i][j][0] = 255;
+                    res[i][j][1] = 255;
+                    res[i][j][2] = 255;
+                } else {
+                    res[i][j][0] = p[0];
+                    res[i][j][1] = p[1];
+                    res[i][j][2] = p[2];
+                }
+            }
+        }
+        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+    }
+
     public ImageGrey addSaltAndPepper(double density) {
         Random r = new Random();
         Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a-> Arrays.stream(a).map(p -> {
-            if(r.nextDouble() < density) {
+            double rn = r.nextDouble();
+            if(rn < density) {
                 return 0;
-            } else if (r.nextDouble() > 1 - density) {
+            } else if (rn > 1 - density) {
                 return 255;
             } else {
                 return p;
