@@ -64,7 +64,7 @@ public class Functions {
             }
         }
 
-        return greyscale ? new ImageGrey(greySum, maxPixel > 255 ? maxColor : (int) maxPixel, image.getHeight(), image.getWidth())
+        return greyscale ? new ImageGrey(greySum, maxPixel > 255 ? maxColor : (int) maxPixel, 0, image.getHeight(), image.getWidth())
                 : new ImageColor(sum, maxPixel > 255 ? maxColor : (int) maxPixel, image.getHeight(), image.getWidth());
 
 
@@ -73,44 +73,89 @@ public class Functions {
     public ImageInt imageSub(ImageInt substract) {
         Integer[][][] sub = new Integer[image.getHeight()][image.getWidth()][3];
         Integer[][] greySub = new Integer[image.getHeight()][image.getWidth()];
-        int maxColor = 0;
+        double maxColor = 0;
+        double minColor = 255;
+        double maxColorR = 0;
+        double minColorR = 255;
+        double maxColorG = 0;
+        double minColorG = 255;
+        double maxColorB = 0;
+        double minColorB = 255;
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if (greyscale) {
-                    greySub[i][j] = Math.max(0, ((ImageGrey)image).getImage()[i][j] - ((ImageGrey)substract).getImage()[i][j]);
+                    greySub[i][j] = ((ImageGrey)image).getImage()[i][j] - ((ImageGrey)substract).getImage()[i][j];
                     maxColor = Math.max(maxColor, greySub[i][j]);
+                    minColor = Math.min(minColor, greySub[i][j]);
                 } else {
-                    sub[i][j][0] = Math.max(0, ((ImageColor)image).getImage()[i][j][0] - ((ImageColor)substract).getImage()[i][j][0]);
-                    sub[i][j][1] = Math.max(0, ((ImageColor)image).getImage()[i][j][1] - ((ImageColor)substract).getImage()[i][j][1]);
-                    sub[i][j][2] = Math.max(0, ((ImageColor)image).getImage()[i][j][2] - ((ImageColor)substract).getImage()[i][j][2]);
-                    maxColor = Math.max(maxColor, Math.max(sub[i][j][0], Math.max(sub[i][j][1], sub[i][j][2])));
+                    sub[i][j][0] = ((ImageColor)image).getImage()[i][j][0] - ((ImageColor)substract).getImage()[i][j][0];
+                    sub[i][j][1] = ((ImageColor)image).getImage()[i][j][1] - ((ImageColor)substract).getImage()[i][j][1];
+                    sub[i][j][2] = ((ImageColor)image).getImage()[i][j][2] - ((ImageColor)substract).getImage()[i][j][2];
+                    maxColorR = Math.max(maxColorR, sub[i][j][0]);
+                    minColorR = Math.min(minColorR, sub[i][j][0]);
+                    maxColorG = Math.max(maxColorG, sub[i][j][1]);
+                    minColorG = Math.min(minColorG, sub[i][j][1]);
+                    maxColorB = Math.max(maxColorB, sub[i][j][2]);
+                    minColorB = Math.min(minColorB, sub[i][j][2]);
                 }
             }
         }
-        return greyscale ? new ImageGrey(greySub, maxColor, image.getHeight(), image.getWidth())
-                : new ImageColor(sub, maxColor, image.getHeight(), image.getWidth());
+        if(greyscale) {
+            if(maxColor > 255 || minColor < 0) {
+                for (int i = 0; i < image.getHeight(); i++) {
+                    for (int j = 0; j < image.getWidth(); j++) {
+                        greySub[i][j] = (int)(greySub[i][j] * 255/(maxColor - minColor));
+                    }
+                }
+            }
+        } else {
+            if(maxColorR > 255 || minColorR < 0 || maxColorG > 255 || minColorG < 0 || maxColorB > 255 || minColorB < 0) {
+                for (int i = 0; i < image.getHeight(); i++) {
+                    for (int j = 0; j < image.getWidth(); j++) {
+                        sub[i][j][0] = (int)(sub[i][j][0] * 255/(maxColorR - minColorR));
+                        sub[i][j][1] = (int)(sub[i][j][1] * 255/(maxColorG - minColorG));
+                        sub[i][j][2] = (int)(sub[i][j][2] * 255/(maxColorB - minColorB));
+                    }
+                }
+            }
+        }
+        return greyscale ? new ImageGrey(greySub, (int) maxColor, 0, image.getHeight(), image.getWidth())
+                : new ImageColor(sub, (int) maxColor, image.getHeight(), image.getWidth());
     }
 
     public ImageInt imageProd(double multiplier) {
         Integer[][][] prod = new Integer[image.getHeight()][image.getWidth()][3];
         Integer[][] greyProd = new Integer[image.getHeight()][image.getWidth()];
-        int maxColor = 0;
+        double maxColor = 0;
+        double minColor = 255;
+        double maxColorR = 0;
+        double minColorR = 255;
+        double maxColorG = 0;
+        double minColorG = 255;
+        double maxColorB = 0;
+        double minColorB = 255;
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if (greyscale) {
-                    greyProd[i][j] = (int) Math.min(255, ((ImageGrey)image).getImage()[i][j] * multiplier);
+                    greyProd[i][j] = (int) (((ImageGrey)image).getImage()[i][j] * multiplier);
                     maxColor = Math.max(maxColor, greyProd[i][j]);
+                    minColor = Math.min(minColor, greyProd[i][j]);
 
                 } else {
-                    prod[i][j][0] = (int) Math.min(255, ((ImageColor)image).getImage()[i][j][0] * multiplier);
-                    prod[i][j][1] = (int) Math.min(255, ((ImageColor)image).getImage()[i][j][1] * multiplier);
-                    prod[i][j][2] = (int) Math.min(255, ((ImageColor)image).getImage()[i][j][2] * multiplier);
-                    maxColor = Math.max(maxColor, Math.max(prod[i][j][0], Math.max(prod[i][j][1], prod[i][j][2])));
+                    prod[i][j][0] = (int) (((ImageColor)image).getImage()[i][j][0] * multiplier);
+                    prod[i][j][1] = (int) (((ImageColor)image).getImage()[i][j][1] * multiplier);
+                    prod[i][j][2] = (int) (((ImageColor)image).getImage()[i][j][2] * multiplier);
+                    maxColorR = Math.max(maxColorR, prod[i][j][0]);
+                    minColorR = Math.min(minColorR, prod[i][j][0]);
+                    maxColorG = Math.max(maxColorG, prod[i][j][1]);
+                    minColorG = Math.min(minColorG, prod[i][j][1]);
+                    maxColorB = Math.max(maxColorB, prod[i][j][2]);
+                    minColorB = Math.min(minColorB, prod[i][j][2]);
                 }
             }
         }
-        return greyscale ? new ImageGrey(greyProd, maxColor, image.getHeight(), image.getWidth())
-                : new ImageColor(prod, maxColor, image.getHeight(), image.getWidth());
+        return greyscale ? new ImageGrey(greyProd, (int) maxColor, (int) minColor,  image.getHeight(), image.getWidth())
+                : new ImageColor(prod, (int) maxColor, image.getHeight(), image.getWidth());
     }
 
     public ImageInt rangeCompressor() {
@@ -132,7 +177,7 @@ public class Functions {
                 }
             }
         }
-        return greyscale ? new ImageGrey(greyRes, maxColor, image.getHeight(), image.getWidth())
+        return greyscale ? new ImageGrey(greyRes, maxColor, 0, image.getHeight(), image.getWidth())
                 : new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
     }
 
@@ -154,7 +199,7 @@ public class Functions {
                 }
             }
         }
-        return greyscale ? new ImageGrey(greyRes, maxColor, image.getHeight(), image.getWidth())
+        return greyscale ? new ImageGrey(greyRes, maxColor, 0, image.getHeight(), image.getWidth())
                 : new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
     }
 
@@ -167,7 +212,7 @@ public class Functions {
         } else {
             res = Arrays.stream(((ImageColor)image).getImage()).map(a -> Arrays.stream(a).map(b -> Arrays.stream(b).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new)).toArray(Integer[][][]::new);
         }
-        return greyscale ?  new ImageGrey(greyRes, maxColor, image.getHeight(), image.getWidth())
+        return greyscale ?  new ImageGrey(greyRes, maxColor, 0, image.getHeight(), image.getWidth())
                 :  new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
     }
 
@@ -186,7 +231,7 @@ public class Functions {
         Arrays.setAll(cum, i -> cum[i] * 255.0);
 
         Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a -> Arrays.stream(a).map(p -> (int) Math.floor(cum[p])).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
     }
 
     public ImageGrey greyContrast(double sigmaMult) {
@@ -205,12 +250,12 @@ public class Functions {
                 }
             }
         }
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
     }
 
     public ImageGrey thresholdization(int threshold) {
         Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a -> Arrays.stream(a).map(p -> p > threshold ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
     }
 
     public ImageColor thresholdizationColor(int r, int g, int b) {
@@ -241,7 +286,7 @@ public class Functions {
                 return (int) Math.floor(p + rnd);
             }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
     }
 
     public ImageColor addGaussianNoiseColor(double density, double std) {
@@ -312,7 +357,7 @@ public class Functions {
                 return (int) Math.floor(p * rnd);
             }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
     }
 
     public ImageColor addExponentialNoiseColor(double density, double lambda) {
@@ -356,7 +401,7 @@ public class Functions {
                 return (int) Math.floor(p * rnd);
             }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
     }
 
     public ImageColor addSaltAndPepperColor(double density) {
@@ -396,7 +441,7 @@ public class Functions {
                 return p;
             }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
     }
 
     public ImageInt meanFilter(int n) {
@@ -532,7 +577,7 @@ public class Functions {
 
             }
         }
-        return greyscale ? new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth())
+        return greyscale ? new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth())
                 : new ImageColor(res2, image.getMaxColor(), image.getHeight(), image.getWidth());
 
     }

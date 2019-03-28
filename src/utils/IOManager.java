@@ -48,7 +48,7 @@ public class IOManager {
                 data2D[row][col] = dis.readUnsignedByte();
             }
         }
-        return new ImageGrey(data2D, maxvalue, picHeight, picWidth);
+        return new ImageGrey(data2D, maxvalue, 0, picHeight, picWidth);
     }
 
     public static void savePGM(String filePath, ImageGrey image){
@@ -180,7 +180,7 @@ public class IOManager {
                 maxvalue = Math.max(data2D[row][col], maxvalue);
             }
         }
-        return new ImageGrey(data2D, maxvalue, picHeight, picWidth);
+        return new ImageGrey(data2D, maxvalue, 0, picHeight, picWidth);
     }
 
 

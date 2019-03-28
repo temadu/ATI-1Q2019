@@ -1245,7 +1245,7 @@ public class ImageGreyTransformer {
 
     public void cutImage(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.outputImage = new ImageGrey(originalImage.getImage().clone(), 255, originalImage.getHeight(), originalImage.getWidth());
+        this.outputImage = new ImageGrey(originalImage.getImage().clone(), 255, 0, originalImage.getHeight(), originalImage.getWidth());
         Region cutRegion = new Region();
         cutRegion.x1 = 0;
         cutRegion.y1 = 0;
@@ -1301,7 +1301,7 @@ public class ImageGreyTransformer {
             System.out.println(cutImage[0].length);
             System.out.println(height);
             System.out.println(cutImage.length);
-            this.outputImage = new ImageGrey(cutImage, originalImage.getMaxColor(), height, width);
+            this.outputImage = new ImageGrey(cutImage, originalImage.getMaxColor(), 0, height, width);
             grid.add(outputImage.getView(), 1, 3);
             System.out.println("X2: " + cutRegion.x2 + ", Y2: " + cutRegion.y2);
 
@@ -1338,7 +1338,7 @@ public class ImageGreyTransformer {
 
 
     public void painter(ImageGrey originalImage){
-        this.outputImage = new ImageGrey(originalImage.getImage(), 255, originalImage.getHeight(), originalImage.getWidth());
+        this.outputImage = new ImageGrey(originalImage.getImage(), 255, 0, originalImage.getHeight(), originalImage.getWidth());
         Region cutRegion = new Region();
         cutRegion.x1 = 0;
         cutRegion.y1 = 0;

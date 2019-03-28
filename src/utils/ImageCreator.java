@@ -107,7 +107,7 @@ public class ImageCreator {
             Integer[][] square = drawRectangle(new int[height][width],
                     (width/2) - (rectWidth/2), (height/2) - (rectHeight/2),
                     (width/2) + (rectWidth/2), (height/2) + (rectHeight/2),255);
-            new ImageGreyViewer(new ImageGrey(square, 255, height, width));
+            new ImageGreyViewer(new ImageGrey(square, 255, 0, height, width));
 
             stage.close();
         });
@@ -184,7 +184,7 @@ public class ImageCreator {
 
             Integer[][] circle = drawCircle(new int[height][width],
                     width/2, height/2, radius, 255);
-            new ImageGreyViewer(new ImageGrey(circle, 255, height, width));
+            new ImageGreyViewer(new ImageGrey(circle, 255, 0, height, width));
 
             stage.close();
         });
@@ -248,7 +248,7 @@ public class ImageCreator {
             }
 
             Integer[][] square = generateBWGradient(width, height);
-            new ImageGreyViewer(new ImageGrey(square, 255, height, width));
+            new ImageGreyViewer(new ImageGrey(square, 255, 0, height, width));
             stage.close();
         });
 

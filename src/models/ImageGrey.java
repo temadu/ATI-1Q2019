@@ -16,6 +16,7 @@ import java.util.Scanner;
 public class ImageGrey implements ImageInt{
     private Integer[][] image;
     private int maxColor;
+    private int minColor;
     private int height;
     private int width;
     private double mean;
@@ -30,9 +31,10 @@ public class ImageGrey implements ImageInt{
         parse(filePath);
     }
 
-    public ImageGrey(Integer[][] image, int maxColor, int height, int width){
+    public ImageGrey(Integer[][] image, int maxColor, int minColor, int height, int width){
         this.image = image;
         this.maxColor = maxColor;
+        this.minColor = minColor;
         this.height = height;
         this.width = width;
         this.renderer = new WritableImage(width, height);
@@ -168,5 +170,9 @@ public class ImageGrey implements ImageInt{
             return this.image[y][x];
         }
         return null;
+    }
+
+    public int getMinColor() {
+        return minColor;
     }
 }
