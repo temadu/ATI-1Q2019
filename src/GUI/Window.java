@@ -91,7 +91,7 @@ public class Window {
         if (i > 0) {
             extension = extension.substring(i+1);
         }
-
+        System.out.println(extension);
         if(extension.toLowerCase().equals("ppm")){
             ImageColor openedImage;
             try {
@@ -106,6 +106,17 @@ public class Window {
             ImageGrey openedImage;
             try {
                 openedImage = IOManager.loadPGM(file.getPath());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            addGreyImageContextMenu(openedImage);
+            new Window().addRow(openedImage.getView());
+        }else if(extension.toLowerCase().equals("raw")) {
+            ImageGrey openedImage;
+
+            try {
+                openedImage = IOManager.loadRAW(file.getPath());
             } catch (IOException e1) {
                 e1.printStackTrace();
                 return;

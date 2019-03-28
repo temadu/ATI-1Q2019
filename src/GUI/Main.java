@@ -181,6 +181,17 @@ public class Main extends Application {
             }
             new ImageGreyViewer(openedImage);
             this.stage.close();
+        }else if(extension.toLowerCase().equals("raw")) {
+            ImageGrey openedImage;
+
+            try {
+                openedImage = IOManager.loadRAW(file.getPath());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            new ImageGreyViewer(openedImage);
+            this.stage.close();
         }
 
 

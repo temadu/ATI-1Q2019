@@ -83,7 +83,6 @@ public abstract class ImageViewer {
         if (i > 0) {
             extension = extension.substring(i+1);
         }
-
         if(extension.toLowerCase().equals("ppm")){
             ImageColor openedImage;
             try {
@@ -97,6 +96,16 @@ public abstract class ImageViewer {
             ImageGrey openedImage;
             try {
                 openedImage = IOManager.loadPGM(file.getPath());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            new ImageGreyViewer(openedImage);
+        } else if(extension.toLowerCase().equals("raw")) {
+            ImageGrey openedImage;
+
+            try {
+                openedImage = IOManager.loadRAW(file.getPath());
             } catch (IOException e1) {
                 e1.printStackTrace();
                 return;

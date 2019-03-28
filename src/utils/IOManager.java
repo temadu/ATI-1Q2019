@@ -4,6 +4,7 @@ import models.ImageColor;
 import models.ImageGrey;
 
 import java.io.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class IOManager {
@@ -145,6 +146,42 @@ public class IOManager {
         }
     }
 
+    public static ImageGrey loadRAW(String filePath) throws IOException{
+        //Parse header
+        File f = new File(filePath);
+        FileInputStream fileInputStream = new FileInputStream(filePath);
+        DataInputStream dis = new DataInputStream(fileInputStream);
+        int picHeight = 0;
+        int picWidth = 0;
+        // look for 4 lines (i.e.: the header) and discard them
+        try (BufferedReader br = new BufferedReader(new FileReader("images/informacion.txt"))) {
+            String line;
+            br.readLine();
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                // process the line.
+                String[] spl = line.split("\\s+");
+                if(spl.length > 0 && spl[0].equals(f.getName())){
+                    picWidth = Integer.parseInt(spl[1]);
+                    picHeight = Integer.parseInt(spl[2]);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        // read the image data
+        Integer[][] data2D = new Integer[picHeight][picWidth];
+        int maxvalue = 0;
+        for (int row = 0; row < picHeight; row++) {
+            for (int col = 0; col < picWidth; col++) {
+                data2D[row][col] = dis.readUnsignedByte();
+                maxvalue = Math.max(data2D[row][col], maxvalue);
+            }
+        }
+        return new ImageGrey(data2D, maxvalue, picHeight, picWidth);
+    }
 
 
 }
