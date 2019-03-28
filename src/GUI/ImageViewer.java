@@ -24,12 +24,12 @@ import java.util.List;
 
 public abstract class ImageViewer {
     public Stage stage;
-    public VBox box;
+    public HBox box;
     public MenuBar mainMenu;
 
     public ImageViewer() {
         this.stage = new Stage();
-        this.box = new VBox();
+        this.box = new HBox();
 
 //        ScrollPane s1 = new ScrollPane();
 //        s1.setFitToHeight(true);

@@ -1,9 +1,12 @@
 package GUI;
 
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Stage;
 import models.ImageGrey;
+import tp1.Functions;
 import utils.ImageColorTransformer;
 import utils.ImageGreyTransformer;
 
@@ -43,6 +46,28 @@ public class ImageGreyViewer extends ImageViewer {
 
         transformMenu.getItems().addAll(suma,histogramEqualization,contrast, threshold,gaussNoise,rayleighNoise,expNoise);
 
-        this.mainMenu.getMenus().addAll(transformMenu);
+
+        final Menu showMenu = new Menu("Show");
+        MenuItem showHistogram = new MenuItem("Histogram");
+        showHistogram.setOnAction(event -> this.showHistogram());
+        showMenu.getItems().add(showHistogram);
+
+        this.mainMenu.getMenus().addAll(transformMenu, showMenu);
+    }
+
+    private void showHistogram(){
+        if(this.box.getChildren().size()==1){
+            double [] data = new Functions(this.image).greyHistogram();
+            String[] labels = new String[256];
+            for (int i = 0; i < 256; i++) {
+                labels[i] = String.valueOf(i);
+            }
+            BarChart chart = Histogram.createHistogram(labels,data);
+            chart.getYAxis().setLabel("");
+            chart.getXAxis().setLabel("Intensity");
+            this.box.getChildren().add(chart);
+//            this.stage.setHeight(image.getHeight() + 80);
+            this.stage.setWidth(this.stage.getWidth() + 500);
+        }
     }
 }
