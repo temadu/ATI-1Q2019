@@ -365,7 +365,7 @@ public class ImageGreyTransformer {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        grid.add(new Label("Gamma:"), 0, 1);
+        grid.add(new Label("Threshold:"), 0, 1);
         Slider slider = new Slider();
         slider.setMin(0);
         slider.setMax(255);

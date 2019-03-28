@@ -727,4 +727,105 @@ public class ImageColorTransformer {
 
         stage.show();
     }
+
+    public void thresholding(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).thresholdizationColor(128,128,128);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply threshold");
+
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply threshold");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Red:"), 0, 1);
+        Slider sliderR = new Slider();
+        sliderR.setMin(0);
+        sliderR.setMax(255);
+        sliderR.setValue(128);
+        sliderR.setShowTickLabels(true);
+        sliderR.setShowTickMarks(true);
+        sliderR.setMajorTickUnit(128);
+        sliderR.setMinorTickCount(32);
+        sliderR.setBlockIncrement(1);
+        grid.add(new Label("Green:"), 0, 2);
+        Slider sliderG = new Slider();
+        sliderG.setMin(0);
+        sliderG.setMax(255);
+        sliderG.setValue(128);
+        sliderG.setShowTickLabels(true);
+        sliderG.setShowTickMarks(true);
+        sliderG.setMajorTickUnit(128);
+        sliderG.setMinorTickCount(32);
+        sliderG.setBlockIncrement(1);
+        grid.add(new Label("Blue:"), 0, 3);
+        Slider sliderB = new Slider();
+        sliderB.setMin(0);
+        sliderB.setMax(255);
+        sliderB.setValue(128);
+        sliderB.setShowTickLabels(true);
+        sliderB.setShowTickMarks(true);
+        sliderB.setMajorTickUnit(128);
+        sliderB.setMinorTickCount(32);
+        sliderB.setBlockIncrement(1);
+//        TextField multField = new TextField();
+//        multField.setMaxWidth(60);
+//        grid.add(multField, 1, 1);
+        grid.add(sliderR, 1, 1);
+        sliderR.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).thresholdizationColor(newValue.intValue(), (int) sliderG.getValue(), (int) sliderB.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+        });
+        grid.add(sliderG, 1, 2);
+        sliderG.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).thresholdizationColor((int) sliderR.getValue(), newValue.intValue(), (int)sliderB.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+        });
+        grid.add(sliderB, 1, 3);
+        sliderB.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).thresholdizationColor((int) sliderR.getValue(), (int) sliderG.getValue(), newValue.intValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 4);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 5);
+        grid.add(new Label("Output Image:"), 1, 4);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 6);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageGreyViewer((ImageGrey) outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
 }

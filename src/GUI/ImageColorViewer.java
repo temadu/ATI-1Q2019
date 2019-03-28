@@ -48,6 +48,8 @@ public class ImageColorViewer extends ImageViewer{
         rangeCompressor.setOnAction(e -> new ImageColorTransformer().dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
         negative.setOnAction(e -> new ImageColorTransformer().negative(this.image));
+        MenuItem threshold = new MenuItem("Thresholding");
+        threshold.setOnAction(e -> new ImageColorTransformer().thresholding(this.image));
 
         MenuItem meanFilter = new MenuItem("Add Mean Filter");
         MenuItem medianFilter = new MenuItem("Add Median Filter");
@@ -60,7 +62,7 @@ public class ImageColorViewer extends ImageViewer{
         laplacianFilter.setOnAction(e -> new ImageColorTransformer().laplacianFilter(this.image));
         gaussFilter.setOnAction(e -> new ImageColorTransformer().gaussFilter(this.image));
 
-        transformMenu.getItems().addAll(sum,substract, multiply, gamma, rangeCompressor, negative,
+        transformMenu.getItems().addAll(sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
                 meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
         this.mainMenu.getMenus().addAll(transformMenu);
     }

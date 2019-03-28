@@ -213,6 +213,18 @@ public class Functions {
         return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
     }
 
+    public ImageColor thresholdizationColor(int r, int g, int b) {
+        Integer[][][] res = new Integer[image.getHeight()][image.getHeight()][3];
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                res[i][j][0] = ((ImageColor)image).getImage()[i][j][0] > r ? 255 : 0;
+                res[i][j][1] = ((ImageColor)image).getImage()[i][j][1] > g ? 255 : 0;
+                res[i][j][2] = ((ImageColor)image).getImage()[i][j][2] > b ? 255 : 0;
+            }
+        }
+        return new ImageColor(res, 255, image.getHeight(), image.getWidth());
+    }
+
     public ImageGrey addGaussianNoise(double density, double std) {
         RandomGaussianGenerator rgg = new RandomGaussianGenerator(0, std);
         Random r = new Random();
