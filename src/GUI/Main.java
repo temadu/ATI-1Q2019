@@ -2,6 +2,8 @@ package GUI;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -11,9 +13,13 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
@@ -43,15 +49,24 @@ public class Main extends Application {
         this.rows = new ArrayList<>();
         this.box = new VBox();
 
-        ScrollPane s1 = new ScrollPane();
+//        ScrollPane s1 = new ScrollPane();
 //        s1.setPrefSize(512, 512);
-        s1.setFitToHeight(true);
-        s1.setContent(box);
+//        s1.setFitToHeight(true);
+//        s1.setContent(box);
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Use the menu bar to open or generate a file");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
 
         VBox root = new VBox();
-        root.getChildren().addAll(generateMenuBar(stage), s1);
+        root.getChildren().addAll(generateMenuBar(stage), grid);
 
-        Scene scene = new Scene(root, 512,512);
+        Scene scene = new Scene(root, 512,256);
 
         stage.setTitle("ATI 1Q2019");
 
