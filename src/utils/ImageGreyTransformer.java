@@ -121,6 +121,8 @@ public class ImageGreyTransformer {
         this.outputImage = new Functions(this.originalImage).thresholdization(128);
 
         Stage stage = new Stage();
+        stage.setTitle("Apply threshold");
+
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -128,7 +130,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Add Images");
+        Text scenetitle = new Text("Apply threshold");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -180,7 +182,6 @@ public class ImageGreyTransformer {
         stage.setScene(scene);
         stage.setMaximized(true);
 
-        stage.setTitle("Apply gamma function");
         stage.show();
     }
 
@@ -190,6 +191,7 @@ public class ImageGreyTransformer {
         this.outputImage = f.greyContrast(1);
 
         Stage stage = new Stage();
+        stage.setTitle("Apply contrast");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -197,7 +199,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Add Images");
+        Text scenetitle = new Text("Apply contrast");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -248,7 +250,6 @@ public class ImageGreyTransformer {
         stage.setScene(scene);
         stage.setMaximized(true);
 
-        stage.setTitle("Apply gamma function");
         stage.show();
     }
 
@@ -257,6 +258,7 @@ public class ImageGreyTransformer {
         this.outputImage = new Functions(originalImage).addGaussianNoise(0.2, 10);
 
         Stage stage = new Stage();
+        stage.setTitle("Add gaussian noise");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -264,61 +266,42 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Add Images");
+        Text scenetitle = new Text("Add gaussian noise");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
         grid.add(new Label("Density:"), 0, 1);
-        TextField densityField = new TextField();
-        densityField.setMaxWidth(60);
-        densityField.setText("0.2");
-        grid.add(densityField, 1, 1);
-
+        Slider densitySlider = new Slider();
+        densitySlider.setMin(0);
+        densitySlider.setMax(1);
+        densitySlider.setValue(0);
+        densitySlider.setShowTickLabels(true);
+        densitySlider.setShowTickMarks(true);
+        densitySlider.setMajorTickUnit(0.25);
+        densitySlider.setBlockIncrement(0.05);
+        grid.add(densitySlider, 1, 1);
 
         grid.add(new Label("Sigma:"), 0, 2);
-        TextField sigmaField = new TextField();
-        sigmaField.setMaxWidth(60);
-        sigmaField.setText("10");
-        grid.add(sigmaField, 1, 2);
-        densityField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
-                densityField.setText(oldValue);
-            } else {
-                float density = 0;
-                float sigma = 0;
-                try {
-                    density = Float.parseFloat(densityField.getText());
-                    sigma = Float.parseFloat(sigmaField.getText());
-                } catch (NumberFormatException | NullPointerException nfe) {
-                    return;
-                }
-                if(density >= 0 && sigma >= 0){
-                    grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(this.originalImage).addGaussianNoise(density,sigma);
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        Slider sigmaSlider = new Slider();
+        sigmaSlider.setMin(0);
+        sigmaSlider.setMax(50);
+        sigmaSlider.setValue(0);
+        sigmaSlider.setShowTickLabels(true);
+        sigmaSlider.setShowTickMarks(true);
+        sigmaSlider.setMajorTickUnit(25);
+        sigmaSlider.setMinorTickCount(5);
+        sigmaSlider.setBlockIncrement(1);
+        grid.add(sigmaSlider, 1, 2);
 
-                }
-            }
+        densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoise(newValue.doubleValue(), sigmaSlider.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
-        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
-                sigmaField.setText(oldValue);
-            } else {
-                float density = 0;
-                float sigma = 0;
-                try {
-                    density = Float.parseFloat(densityField.getText());
-                    sigma = Float.parseFloat(densityField.getText());
-                } catch (NumberFormatException | NullPointerException nfe) {
-                    return;
-                }
-                if(density >= 0 && sigma >= 0){
-                    grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(this.originalImage).addGaussianNoise(density,sigma);
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
-
-                }
-            }
+        sigmaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoise(densitySlider.getValue(), newValue.doubleValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
 
         Label firstImageLabel = new Label("First Image:");
@@ -349,7 +332,6 @@ public class ImageGreyTransformer {
         stage.setScene(scene);
         stage.setMaximized(true);
 
-        stage.setTitle("Apply gamma function");
         stage.show();
     }
 
@@ -358,6 +340,7 @@ public class ImageGreyTransformer {
         this.outputImage = new Functions(originalImage).addRayleighNoise(0.2, 2);
 
         Stage stage = new Stage();
+        stage.setTitle("Add rayleigh noise");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -365,7 +348,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Add Images");
+        Text scenetitle = new Text("Add rayleigh noise");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -376,50 +359,37 @@ public class ImageGreyTransformer {
         grid.add(densityField, 1, 1);
 
 
+        grid.add(new Label("Density:"), 0, 1);
+        Slider densitySlider = new Slider();
+        densitySlider.setMin(0);
+        densitySlider.setMax(1);
+        densitySlider.setValue(0);
+        densitySlider.setShowTickLabels(true);
+        densitySlider.setShowTickMarks(true);
+        densitySlider.setMajorTickUnit(0.25);
+        densitySlider.setBlockIncrement(0.05);
+        grid.add(densitySlider, 1, 1);
+
         grid.add(new Label("Psi:"), 0, 2);
-        TextField psiField = new TextField();
-        psiField.setMaxWidth(60);
-        psiField.setText("10");
-        grid.add(psiField, 1, 2);
-        densityField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
-                densityField.setText(oldValue);
-            } else {
-                float density = 0;
-                float psi = 0;
-                try {
-                    density = Float.parseFloat(densityField.getText());
-                    psi = Float.parseFloat(psiField.getText());
-                } catch (NumberFormatException | NullPointerException nfe) {
-                    return;
-                }
-                if(density >= 0 && psi >= 0){
-                    grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(this.originalImage).addRayleighNoise(density,psi);
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        Slider psiSlider = new Slider();
+        psiSlider.setMin(0);
+        psiSlider.setMax(2);
+        psiSlider.setValue(0);
+        psiSlider.setShowTickLabels(true);
+        psiSlider.setShowTickMarks(true);
+        psiSlider.setMajorTickUnit(1);
+        psiSlider.setBlockIncrement(0.05);
+        grid.add(psiSlider, 1, 2);
 
-                }
-            }
+        densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoise(newValue.doubleValue(), psiSlider.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
-        psiField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
-                psiField.setText(oldValue);
-            } else {
-                float density = 0;
-                float psi = 0;
-                try {
-                    density = Float.parseFloat(densityField.getText());
-                    psi = Float.parseFloat(densityField.getText());
-                } catch (NumberFormatException | NullPointerException nfe) {
-                    return;
-                }
-                if(density >= 0 && psi >= 0){
-                    grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(this.originalImage).addRayleighNoise(density,psi);
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
-
-                }
-            }
+        psiSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoise(densitySlider.getValue(), newValue.doubleValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
 
         Label firstImageLabel = new Label("First Image:");
@@ -450,12 +420,142 @@ public class ImageGreyTransformer {
         stage.setScene(scene);
         stage.setMaximized(true);
 
-        stage.setTitle("Apply gamma function");
         stage.show();
     }
 
-    public void addExponentialNoise(ImageGrey originalImage, double density, double lambda){
-        new ImageGreyViewer(new Functions(originalImage).addExponentialNoise(density, lambda));
+    public void addExponentialNoise(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(originalImage).addExponentialNoise(0.2, 1);
+
+        Stage stage = new Stage();
+        stage.setTitle("Add exponential noise");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Add exponential noise");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Density:"), 0, 1);
+        Slider densitySlider = new Slider();
+        densitySlider.setMin(0);
+        densitySlider.setMax(1);
+        densitySlider.setValue(0);
+        densitySlider.setShowTickLabels(true);
+        densitySlider.setShowTickMarks(true);
+        densitySlider.setMajorTickUnit(0.25);
+        densitySlider.setBlockIncrement(0.05);
+        grid.add(densitySlider, 1, 1);
+
+        grid.add(new Label("Lambda:"), 0, 2);
+        Slider lambdaSlider = new Slider();
+        lambdaSlider.setMin(0);
+        lambdaSlider.setMax(4);
+        lambdaSlider.setValue(0);
+        lambdaSlider.setShowTickLabels(true);
+        lambdaSlider.setShowTickMarks(true);
+        lambdaSlider.setMajorTickUnit(2);
+        lambdaSlider.setMinorTickCount(1);
+        lambdaSlider.setBlockIncrement(0.1);
+        grid.add(lambdaSlider, 1, 2);
+
+        densitySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoise(newValue.doubleValue(), lambdaSlider.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+        lambdaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).addGaussianNoise(densitySlider.getValue(), newValue.doubleValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+
+//        grid.add(new Label("Density:"), 0, 1);
+//        TextField densityField = new TextField();
+//        densityField.setMaxWidth(60);
+//        densityField.setText("0.2");
+//        grid.add(densityField, 1, 1);
+//
+//
+//        grid.add(new Label("lambda:"), 0, 2);
+//        TextField lambdaField = new TextField();
+//        lambdaField.setMaxWidth(60);
+//        lambdaField.setText("1");
+//        grid.add(lambdaField, 1, 2);
+//        densityField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+//                densityField.setText(oldValue);
+//            } else {
+//                float density = 0;
+//                float lambda = 0;
+//                try {
+//                    density = Float.parseFloat(densityField.getText());
+//                    lambda = Float.parseFloat(lambdaField.getText());
+//                } catch (NumberFormatException | NullPointerException nfe) {
+//                    return;
+//                }
+//                if(density >= 0 && lambda >= 0){
+//                    grid.getChildren().remove(outputImage.getView());
+//                    this.outputImage = new Functions(this.originalImage).addExponentialNoise(density,lambda);
+//                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+//
+//                }
+//            }
+//        });
+//        lambdaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+//                lambdaField.setText(oldValue);
+//            } else {
+//                float density = 0;
+//                float lambda = 0;
+//                try {
+//                    density = Float.parseFloat(densityField.getText());
+//                    lambda = Float.parseFloat(densityField.getText());
+//                } catch (NumberFormatException | NullPointerException nfe) {
+//                    return;
+//                }
+//                if(density >= 0 && lambda >= 0){
+//                    grid.getChildren().remove(outputImage.getView());
+//                    this.outputImage = new Functions(this.originalImage).addExponentialNoise(density,lambda);
+//                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+//
+//                }
+//            }
+//        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 3);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
+        grid.add(new Label("Output Image:"), 1, 3);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                new ImageGreyViewer(outputImage);
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
     }
 
 
