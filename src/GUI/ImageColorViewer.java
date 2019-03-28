@@ -11,6 +11,7 @@ import models.ImageInt;
 import utils.IOManager;
 import utils.ImageColorTransformer;
 import utils.ImageCreator;
+import utils.ImageGreyTransformer;
 
 import java.io.File;
 
@@ -47,8 +48,20 @@ public class ImageColorViewer extends ImageViewer{
         rangeCompressor.setOnAction(e -> new ImageColorTransformer().dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
         negative.setOnAction(e -> new ImageColorTransformer().negative(this.image));
-        transformMenu.getItems().addAll(sum,substract, multiply, gamma, rangeCompressor, negative);
 
+        MenuItem meanFilter = new MenuItem("Add Mean Filter");
+        MenuItem medianFilter = new MenuItem("Add Median Filter");
+        MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
+        MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
+        MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
+        meanFilter.setOnAction(e -> new ImageColorTransformer().meanFilter(this.image));
+        medianFilter.setOnAction(e -> new ImageColorTransformer().medianFilter(this.image));
+        weightedMedianFilter.setOnAction(e -> new ImageColorTransformer().weightedMedianFilter(this.image));
+        laplacianFilter.setOnAction(e -> new ImageColorTransformer().laplacianFilter(this.image));
+        gaussFilter.setOnAction(e -> new ImageColorTransformer().gaussFilter(this.image));
+
+        transformMenu.getItems().addAll(sum,substract, multiply, gamma, rangeCompressor, negative,
+                meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
         this.mainMenu.getMenus().addAll(transformMenu);
     }
 

@@ -21,6 +21,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageGrey;
 import models.ImageGrey;
+import models.ImageInt;
 import tp1.Functions;
 
 import java.io.File;
@@ -29,9 +30,9 @@ import java.util.function.Function;
 
 public class ImageGreyTransformer {
 
-    ImageGrey originalImage;
-    ImageGrey secondImage;
-    ImageGrey outputImage;
+    ImageInt originalImage;
+    ImageInt secondImage;
+    ImageInt outputImage;
 
 
 
@@ -399,7 +400,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -467,7 +468,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -549,7 +550,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -630,7 +631,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -765,7 +766,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -834,7 +835,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -906,7 +907,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -980,7 +981,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -1053,7 +1054,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -1126,7 +1127,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 
@@ -1223,7 +1224,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer(outputImage);
+                new ImageGreyViewer((ImageGrey) outputImage);
                 stage.close();
             }
 

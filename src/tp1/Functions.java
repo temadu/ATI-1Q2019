@@ -284,7 +284,7 @@ public class Functions {
         return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
     }
 
-    public ImageGrey meanFilter(int n) {
+    public ImageInt meanFilter(int n) {
         double[][] w = new double[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -294,7 +294,7 @@ public class Functions {
         return filter(w, false);
     }
 
-    public ImageGrey medianFilter(int n) {
+    public ImageInt medianFilter(int n) {
         double[][] w = new double[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
@@ -304,7 +304,7 @@ public class Functions {
         return filter(w, true);
     }
 
-    public ImageGrey weightedMedianFilter(int n) {
+    public ImageInt weightedMedianFilter(int n) {
         double[][] w = new double[n][n];
         int half = (int) Math.floor(n/2);
         for (int i = 0; i < half + 1; i++) {
@@ -318,7 +318,7 @@ public class Functions {
         return filter(w, true);
     }
 
-    public ImageGrey laplacianFilter(int n) {
+    public ImageInt laplacianFilter(int n) {
         double[][] w = new double[n][n];
         int half = (int) Math.floor(n/2);
 //        double pre = 1/(Math.PI * Math.pow(sigma, 4));
@@ -332,8 +332,7 @@ public class Functions {
         return filter(w, false);
     }
 
-    public ImageGrey gaussFilter(int n, double sigma) {
-        System.out.println(n + " " + sigma);
+    public ImageInt gaussFilter(int n, double sigma) {
         double[][] w = new double[n][n];
         int half = (int) Math.floor(n/2);
         double pre = 1/(2 * Math.PI * sigma * sigma);
@@ -352,50 +351,74 @@ public class Functions {
         return filter(w, false);
     }
 
-    private ImageGrey filter(double[][] w, boolean median) {
+    private ImageInt filter(double[][] w, boolean median) {
         int n = w.length;
         int half = (int) Math.floor(n/2);
 
         Integer[][] res = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][][] res2 = new Integer[image.getHeight()][image.getWidth()][3];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
                 double sum = 0;
+                double sum2 = 0;
+                double sum3 = 0;
                 ArrayList<Integer> med = null;
-                if(median)
+                ArrayList<Integer> med2 = null;
+                ArrayList<Integer> med3 = null;
+                if(median){
                     med = new ArrayList<>();
+                    med2 = new ArrayList<>();
+                    med3 = new ArrayList<>();
+                }
                 for (int k = -half; k < n - half; k++) {
                     for (int l = -half; l < n - half; l++) {
                         if(median){
                             for (int m = 0; m < w[k + half][l + half]; m++) {
-                                med.add(((ImageGrey)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())]);
+                                if(greyscale){
+                                    med.add(((ImageGrey)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())]);
+                                } else {
+                                    med.add(((ImageColor)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][0]);
+                                    med2.add(((ImageColor)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][1]);
+                                    med3.add(((ImageColor)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][2]);
+                                }
                             }
                         } else {
-                            sum += (double) ((ImageGrey)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * w[k + half][l + half];
+                            if(greyscale) {
+                                sum += (double) ((ImageGrey) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * w[k + half][l + half];
+                            } else {
+                                sum += (double) ((ImageColor) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][0] * w[k + half][l + half];
+                                sum2 += (double) ((ImageColor) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][1] * w[k + half][l + half];
+                                sum3 += (double) ((ImageColor) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][2] * w[k + half][l + half];
+                            }
                         }
                     }
                 }
                 if(median) {
-                    med.sort(Integer::compareTo);
-                    res[i][j] = med.get(med.size()/2);
+                    if(greyscale){
+                        med.sort(Integer::compareTo);
+                        res[i][j] = med.get(med.size()/2);
+                    } else {
+                        med.sort(Integer::compareTo);
+                        res2[i][j][0] = med.get(med.size()/2);
+                        med2.sort(Integer::compareTo);
+                        res2[i][j][1] = med2.get(med2.size()/2);
+                        med3.sort(Integer::compareTo);
+                        res2[i][j][2] = med3.get(med3.size()/2);
+                    }
                 } else {
-                    res[i][j] = (int) sum < 0 ? 0 : (int) sum;
+                    if(greyscale) {
+                        res[i][j] = (int) sum < 0 ? 0 : (int) sum;
+                    } else {
+                        res2[i][j][0] = (int) sum < 0 ? 0 : (int) sum;
+                        res2[i][j][1] = (int) sum2 < 0 ? 0 : (int) sum2;
+                        res2[i][j][2] = (int) sum3 < 0 ? 0 : (int) sum3;
+                    }
                 }
 
             }
-//            for (int j = 0; j < half; j++) {
-//                res[i][j] = ((ImageGrey)image).getImage()[i][j];
-//                res[i][image.getWidth() - j - 1] = ((ImageGrey)image).getImage()[i][image.getWidth() - j - 1];
-//            }
         }
-//        for(int i = 0; i < image.getWidth(); i++) {
-//            for (int j = 0; j < half; j++) {
-//                res[j][i] = ((ImageGrey)image).getImage()[j][i];
-//                res[image.getHeight() - j - 1][i] = ((ImageGrey)image).getImage()[image.getHeight() - j - 1][i];
-//
-//            }
-//        }
-
-        return new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return greyscale ? new ImageGrey(res, image.getMaxColor(), image.getHeight(), image.getWidth())
+                : new ImageColor(res2, image.getMaxColor(), image.getHeight(), image.getWidth());
 
     }
 }
