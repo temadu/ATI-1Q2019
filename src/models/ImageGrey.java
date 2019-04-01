@@ -11,12 +11,11 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
 public class ImageGrey implements ImageInt{
     private Integer[][] image;
-    private int maxColor;
-    private int minColor;
     private int height;
     private int width;
     private double mean;
@@ -27,14 +26,11 @@ public class ImageGrey implements ImageInt{
     private ImageView view;
 
     public ImageGrey(String filePath) throws IOException{
-        maxColor = 0;
         parse(filePath);
     }
 
-    public ImageGrey(Integer[][] image, int maxColor, int minColor, int height, int width){
+    public ImageGrey(Integer[][] image, int height, int width){
         this.image = image;
-        this.maxColor = maxColor;
-        this.minColor = minColor;
         this.height = height;
         this.width = width;
         this.renderer = new WritableImage(width, height);
@@ -86,7 +82,6 @@ public class ImageGrey implements ImageInt{
         for (int row = 0; row < height; row++) {
             for (int col = 0; col < width; col++) {
                 image[row][col] = dis.readUnsignedByte();
-                maxColor = Math.max(maxColor, image[row][col]);
                 sum += image[row][col];
             }
         }
@@ -123,9 +118,6 @@ public class ImageGrey implements ImageInt{
         return image;
     }
 
-    public int getMaxColor() {
-        return maxColor;
-    }
 
     public int getHeight() {
         return height;
@@ -172,7 +164,8 @@ public class ImageGrey implements ImageInt{
         return null;
     }
 
-    public int getMinColor() {
-        return minColor;
+    public int getMaxGrey() {
+        return Arrays.stream(image).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();
     }
+
 }

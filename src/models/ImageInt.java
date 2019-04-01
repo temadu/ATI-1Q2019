@@ -10,7 +10,6 @@ public interface ImageInt {
     void parse(String filePath) throws IOException;
     int getHeight();
     int getWidth();
-    int getMaxColor();
     ImageView getView();
     WritableImage getRenderer();
     void updateRenderer();

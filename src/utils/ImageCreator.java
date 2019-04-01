@@ -107,7 +107,7 @@ public class ImageCreator {
             Integer[][] square = drawRectangle(new int[height][width],
                     (width/2) - (rectWidth/2), (height/2) - (rectHeight/2),
                     (width/2) + (rectWidth/2), (height/2) + (rectHeight/2),255);
-            new ImageGreyViewer(new ImageGrey(square, 255, 0, height, width));
+            new ImageGreyViewer(new ImageGrey(square, height, width));
 
             stage.close();
         });
@@ -184,7 +184,7 @@ public class ImageCreator {
 
             Integer[][] circle = drawCircle(new int[height][width],
                     width/2, height/2, radius, 255);
-            new ImageGreyViewer(new ImageGrey(circle, 255, 0, height, width));
+            new ImageGreyViewer(new ImageGrey(circle, height, width));
 
             stage.close();
         });
@@ -248,7 +248,7 @@ public class ImageCreator {
             }
 
             Integer[][] square = generateBWGradient(width, height);
-            new ImageGreyViewer(new ImageGrey(square, 255, 0, height, width));
+            new ImageGreyViewer(new ImageGrey(square, height, width));
             stage.close();
         });
 
@@ -389,7 +389,7 @@ public class ImageCreator {
             }
 
             Integer[][][] square = generateColorGradient(width, height);
-            new ImageColorViewer(new ImageColor(square, 255, height, width));
+            new ImageColorViewer(new ImageColor(square[0], square[1], square[2],  height, width));
             stage.close();
         });
 
@@ -454,63 +454,70 @@ public class ImageCreator {
     }
 
     public static Integer[][][] generateColorGradient(int length, int height){
-        Integer[][][] retImage =  new Integer[height][length][3];
+        Integer[][][] ret = new Integer[3][][];
+        Integer[][] retImageR =  new Integer[height][length];
+        Integer[][] retImageG =  new Integer[height][length];
+        Integer[][] retImageB =  new Integer[height][length];
+
         int lengthCounter = 0;
         for (int x=0; x<(length/6); x++){
             for (int y=0; y<height; y++){
-                retImage[y][lengthCounter][0] = x*255*6/length;
-                retImage[y][lengthCounter][1] = 255;
-                retImage[y][lengthCounter][2] = 0;
+                retImageR[y][lengthCounter] = x*255*6/length;
+                retImageG[y][lengthCounter] = 255;
+                retImageB[y][lengthCounter] = 0;
             }
             lengthCounter++;
         }
         for (int x=0; x<(length/6); x++){
             for (int y=0; y<height; y++){
-                retImage[y][lengthCounter][0] = 255;
-                retImage[y][lengthCounter][1] = 255 - x*255*6/length;
-                retImage[y][lengthCounter][2] = 0;
+                retImageR[y][lengthCounter] = 255;
+                retImageG[y][lengthCounter] = 255 - x*255*6/length;
+                retImageB[y][lengthCounter] = 0;
             }
             lengthCounter++;
         }
         for (int x=0; x<(length/6); x++){
             for (int y=0; y<height; y++){
-                retImage[y][lengthCounter][0] = 255;
-                retImage[y][lengthCounter][1] = 0;
-                retImage[y][lengthCounter][2] = x*255*6/length;
+                retImageR[y][lengthCounter] = 255;
+                retImageG[y][lengthCounter] = 0;
+                retImageB[y][lengthCounter] = x*255*6/length;
             }
             lengthCounter++;
         }
         for (int x=0; x<(length/6); x++){
             for (int y=0; y<height; y++){
-                retImage[y][lengthCounter][0] = 255 - x*255*6/length;
-                retImage[y][lengthCounter][1] = 0;
-                retImage[y][lengthCounter][2] = 255;
+                retImageR[y][lengthCounter] = 255 - x*255*6/length;
+                retImageG[y][lengthCounter] = 0;
+                retImageB[y][lengthCounter] = 255;
             }
             lengthCounter++;
         }
         for (int x=0; x<(length/6); x++){
             for (int y=0; y<height; y++){
-                retImage[y][lengthCounter][0] = 0;
-                retImage[y][lengthCounter][1] = x*255*6/length;
-                retImage[y][lengthCounter][2] = 255;
+                retImageR[y][lengthCounter] = 0;
+                retImageG[y][lengthCounter] = x*255*6/length;
+                retImageB[y][lengthCounter] = 255;
             }
             lengthCounter++;
         }
         for (int x=0; x<(length/6); x++){
             for (int y=0; y<height; y++){
-                retImage[y][lengthCounter][0] = 0;
-                retImage[y][lengthCounter][1] = 255;
-                retImage[y][lengthCounter][2] = 255 - x*255*6/length;
+                retImageR[y][lengthCounter] = 0;
+                retImageG[y][lengthCounter] = 255;
+                retImageB[y][lengthCounter] = 255 - x*255*6/length;
             }
             lengthCounter++;
         }
         for (int x=lengthCounter; x<length; x++){
             for (int y=0; y<height; y++){
-                retImage[y][x][0] = 0;
-                retImage[y][x][1] = 255;
-                retImage[y][x][2] = 0;
+                retImageR[y][x] = 0;
+                retImageG[y][x] = 255;
+                retImageB[y][x] = 0;
             }
         }
-        return retImage;
+        ret[0] = retImageR;
+        ret[1] = retImageG;
+        ret[2] = retImageB;
+        return ret;
     }
 }

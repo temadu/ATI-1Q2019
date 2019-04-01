@@ -6,6 +6,7 @@ import models.ImageInt;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Random;
 import java.util.stream.IntStream;
 
@@ -24,196 +25,133 @@ public class Functions {
 
 
     public ImageInt imageSum(ImageInt addend) {
-        Integer[][][] sum = new Integer[image.getHeight()][image.getWidth()][3];
-        Integer[][] greySum = new Integer[image.getHeight()][image.getWidth()];
-        boolean over255 = false;
-        double maxPixel = 0;
-        int maxColor = 0;
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+//        Integer[][] greySum = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(greyscale){
-                    greySum[i][j] = ((ImageGrey) image).getImage()[i][j] + ((ImageGrey) addend).getImage()[i][j];
-                    if(greySum[i][i] > 255) {
-                        over255 = true;
-                        maxPixel = Math.max(maxPixel, greySum[i][j]);
-                    }
+                    red[i][j] = ((ImageGrey) image).getImage()[i][j] + ((ImageGrey) addend).getImage()[i][j];
                 } else {
-                    sum[i][j][0] = ((ImageColor) image).getImage()[i][j][0] + ((ImageColor) addend).getImage()[i][j][0];
-                    sum[i][j][1] = ((ImageColor) image).getImage()[i][j][1] + ((ImageColor) addend).getImage()[i][j][1];
-                    sum[i][j][2] = ((ImageColor) image).getImage()[i][j][2] + ((ImageColor) addend).getImage()[i][j][2];
-                    if(sum[i][j][0] > 255 || sum[i][j][1] > 255 || sum[i][j][2] > 255) {
-                        over255 = true;
-                        maxPixel = Math.max(maxPixel, Math.max(sum[i][j][0], Math.max(sum[i][j][1],sum[i][j][2])));
-                    }
+                    red[i][j] = ((ImageColor) image).getRed()[i][j] + ((ImageColor) addend).getRed()[i][j];
+                    green[i][j] = ((ImageColor) image).getGreen()[i][j] + ((ImageColor) addend).getGreen()[i][j];
+                    blue[i][j] = ((ImageColor) image).getBlue()[i][j] + ((ImageColor) addend).getBlue()[i][j];
                 }
             }
         }
-        if(over255) {
-            for (int i = 0; i < image.getHeight(); i++) {
-                for (int j = 0; j < image.getWidth(); j++) {
-                    if(greyscale){
-                        greySum[i][j] = (int) (greySum[i][j] * 255 / maxPixel);
-
-                    } else {
-                        sum[i][j][0] = (int) (sum[i][j][0] * 255 / maxPixel);
-                        sum[i][j][1] = (int) (sum[i][j][1] * 255 / maxPixel);
-                        sum[i][j][2] = (int) (sum[i][j][2] * 255 / maxPixel);
-                        maxColor = Math.max(maxColor, Math.max(sum[i][j][0], Math.max(sum[i][j][1], sum[i][j][2])));
-                    }
-                }
-            }
-        }
-
-        return greyscale ? new ImageGrey(greySum, maxPixel > 255 ? maxColor : (int) maxPixel, 0, image.getHeight(), image.getWidth())
-                : new ImageColor(sum, maxPixel > 255 ? maxColor : (int) maxPixel, image.getHeight(), image.getWidth());
-
-
+//        clamp
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageInt imageSub(ImageInt substract) {
-        Integer[][][] sub = new Integer[image.getHeight()][image.getWidth()][3];
-        Integer[][] greySub = new Integer[image.getHeight()][image.getWidth()];
-        double maxColor = 0;
-        double minColor = 255;
-        double maxColorR = 0;
-        double minColorR = 255;
-        double maxColorG = 0;
-        double minColorG = 255;
-        double maxColorB = 0;
-        double minColorB = 255;
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if (greyscale) {
-                    greySub[i][j] = ((ImageGrey)image).getImage()[i][j] - ((ImageGrey)substract).getImage()[i][j];
-                    maxColor = Math.max(maxColor, greySub[i][j]);
-                    minColor = Math.min(minColor, greySub[i][j]);
+                    red[i][j] = ((ImageGrey)image).getImage()[i][j] - ((ImageGrey)substract).getImage()[i][j];
                 } else {
-                    sub[i][j][0] = ((ImageColor)image).getImage()[i][j][0] - ((ImageColor)substract).getImage()[i][j][0];
-                    sub[i][j][1] = ((ImageColor)image).getImage()[i][j][1] - ((ImageColor)substract).getImage()[i][j][1];
-                    sub[i][j][2] = ((ImageColor)image).getImage()[i][j][2] - ((ImageColor)substract).getImage()[i][j][2];
-                    maxColorR = Math.max(maxColorR, sub[i][j][0]);
-                    minColorR = Math.min(minColorR, sub[i][j][0]);
-                    maxColorG = Math.max(maxColorG, sub[i][j][1]);
-                    minColorG = Math.min(minColorG, sub[i][j][1]);
-                    maxColorB = Math.max(maxColorB, sub[i][j][2]);
-                    minColorB = Math.min(minColorB, sub[i][j][2]);
+                    red[i][j] = ((ImageColor)image).getRed()[i][j] - ((ImageColor)substract).getRed()[i][j];
+                    green[i][j] = ((ImageColor)image).getGreen()[i][j] - ((ImageColor)substract).getGreen()[i][j];
+                    blue[i][j] = ((ImageColor)image).getBlue()[i][j] - ((ImageColor)substract).getBlue()[i][j];
                 }
             }
         }
-        if(greyscale) {
-            if(maxColor > 255 || minColor < 0) {
-                for (int i = 0; i < image.getHeight(); i++) {
-                    for (int j = 0; j < image.getWidth(); j++) {
-                        greySub[i][j] = (int)(greySub[i][j] * 255/(maxColor - minColor));
-                    }
-                }
-            }
-        } else {
-            if(maxColorR > 255 || minColorR < 0 || maxColorG > 255 || minColorG < 0 || maxColorB > 255 || minColorB < 0) {
-                for (int i = 0; i < image.getHeight(); i++) {
-                    for (int j = 0; j < image.getWidth(); j++) {
-                        sub[i][j][0] = (int)(sub[i][j][0] * 255/(maxColorR - minColorR));
-                        sub[i][j][1] = (int)(sub[i][j][1] * 255/(maxColorG - minColorG));
-                        sub[i][j][2] = (int)(sub[i][j][2] * 255/(maxColorB - minColorB));
-                    }
-                }
-            }
-        }
-        return greyscale ? new ImageGrey(greySub, (int) maxColor, 0, image.getHeight(), image.getWidth())
-                : new ImageColor(sub, (int) maxColor, image.getHeight(), image.getWidth());
+//        clamp
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageInt imageProd(double multiplier) {
-        Integer[][][] prod = new Integer[image.getHeight()][image.getWidth()][3];
-        Integer[][] greyProd = new Integer[image.getHeight()][image.getWidth()];
-        double maxColor = 0;
-        double minColor = 255;
-        double maxColorR = 0;
-        double minColorR = 255;
-        double maxColorG = 0;
-        double minColorG = 255;
-        double maxColorB = 0;
-        double minColorB = 255;
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if (greyscale) {
-                    greyProd[i][j] = (int) (((ImageGrey)image).getImage()[i][j] * multiplier);
-                    maxColor = Math.max(maxColor, greyProd[i][j]);
-                    minColor = Math.min(minColor, greyProd[i][j]);
+                    red[i][j] = (int) (((ImageGrey)image).getImage()[i][j] * multiplier);
 
                 } else {
-                    prod[i][j][0] = (int) (((ImageColor)image).getImage()[i][j][0] * multiplier);
-                    prod[i][j][1] = (int) (((ImageColor)image).getImage()[i][j][1] * multiplier);
-                    prod[i][j][2] = (int) (((ImageColor)image).getImage()[i][j][2] * multiplier);
-                    maxColorR = Math.max(maxColorR, prod[i][j][0]);
-                    minColorR = Math.min(minColorR, prod[i][j][0]);
-                    maxColorG = Math.max(maxColorG, prod[i][j][1]);
-                    minColorG = Math.min(minColorG, prod[i][j][1]);
-                    maxColorB = Math.max(maxColorB, prod[i][j][2]);
-                    minColorB = Math.min(minColorB, prod[i][j][2]);
+                    red[i][j] = (int) (((ImageColor)image).getRed()[i][j] * multiplier);
+                    green[i][j] = (int) (((ImageColor)image).getGreen()[i][j] * multiplier);
+                    blue[i][j] = (int) (((ImageColor)image).getBlue()[i][j] * multiplier);
                 }
             }
         }
-        return greyscale ? new ImageGrey(greyProd, (int) maxColor, (int) minColor,  image.getHeight(), image.getWidth())
-                : new ImageColor(prod, (int) maxColor, image.getHeight(), image.getWidth());
+//        clamp
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageInt rangeCompressor() {
-        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
-        Integer[][] greyRes = new Integer[image.getHeight()][image.getWidth()];
-        double multiplier = 255.0 / Math.log(1 + image.getMaxColor());
-        int maxColor = 0;
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+//        double multiplier = 255.0 / Math.log(1 + image.getMaxColor());
+        int maxRed = 0;
+        if(greyscale){
+            maxRed = ((ImageGrey)image).getMaxGrey();
+        } else {
+            maxRed = ((ImageColor)image).getMaxRed();
+        }
+        int maxGreen = ((ImageColor)image).getMaxGreen();
+        int maxBlue = ((ImageColor)image).getMaxBlue();
+        double multiplierR = 255.0 / Math.log(1 + maxRed);
+        double multiplierG = 255.0 / Math.log(1 + maxGreen);
+        double multiplierB = 255.0 / Math.log(1 + maxBlue);
+
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(greyscale) {
-                    greyRes[i][j] = (int) (multiplier * Math.log(1 + ((ImageGrey)image).getImage()[i][j]));
-                    maxColor = Math.max(maxColor, greyRes[i][j]);
-
+                    red[i][j] = (int) (multiplierR * Math.log(1 + ((ImageGrey)image).getImage()[i][j]));
                 } else {
-                    res[i][j][0] = (int) (multiplier * Math.log(1 + ((ImageColor)image).getImage()[i][j][0]));
-                    res[i][j][1] = (int) (multiplier * Math.log(1 + ((ImageColor)image).getImage()[i][j][1]));
-                    res[i][j][2] = (int) (multiplier * Math.log(1 + ((ImageColor)image).getImage()[i][j][2]));
-                    maxColor = Math.max(maxColor, Math.max(res[i][j][0], Math.max(res[i][j][1], res[i][j][2])));
+                    red[i][j] = (int) (multiplierR * Math.log(1 + ((ImageColor)image).getRed()[i][j]));
+                    green[i][j] = (int) (multiplierG * Math.log(1 + ((ImageColor)image).getBlue()[i][j]));
+                    blue[i][j] = (int) (multiplierB * Math.log(1 + ((ImageColor)image).getGreen()[i][j]));
                 }
             }
         }
-        return greyscale ? new ImageGrey(greyRes, maxColor, 0, image.getHeight(), image.getWidth())
-                : new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageInt gammaFunction(double gamma) {
-        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
-        Integer[][] greyRes = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
         double multiplier = Math.pow(255.0, 1 - gamma);
         int maxColor = 0;
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(greyscale){
-                    greyRes[i][j] = (int) (multiplier * Math.pow(((ImageGrey)image).getImage()[i][j], gamma));
-                    maxColor = Math.max(maxColor, greyRes[i][j]);
+                    red[i][j] = (int) (multiplier * Math.pow(((ImageGrey)image).getImage()[i][j], gamma));
                 } else {
-                    res[i][j][0] = (int) (multiplier * Math.pow(((ImageColor)image).getImage()[i][j][0], gamma));
-                    res[i][j][1] = (int) (multiplier * Math.pow(((ImageColor)image).getImage()[i][j][1], gamma));
-                    res[i][j][2] = (int) (multiplier * Math.pow(((ImageColor)image).getImage()[i][j][2], gamma));
-                    maxColor = Math.max(maxColor, Math.max(res[i][j][0], Math.max(res[i][j][1], res[i][j][2])));
+                    red[i][j] = (int) (multiplier * Math.pow(((ImageColor)image).getRed()[i][j], gamma));
+                    green[i][j] = (int) (multiplier * Math.pow(((ImageColor)image).getGreen()[i][j], gamma));
+                    blue[i][j] = (int) (multiplier * Math.pow(((ImageColor)image).getBlue()[i][j], gamma));
                 }
             }
         }
-        return greyscale ? new ImageGrey(greyRes, maxColor, 0, image.getHeight(), image.getWidth())
-                : new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageInt negative() {
-        Integer[][][] res = null;
-        Integer[][] greyRes = null;
-        int maxColor = 0;
+        Integer[][] red =  null;
+        Integer[][] green = null;
+        Integer[][] blue = null;
         if(greyscale){
-            greyRes = Arrays.stream(((ImageGrey) image).getImage()).map(a -> Arrays.stream(a).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new);
+            red = Arrays.stream(((ImageGrey) image).getImage()).map(a -> Arrays.stream(a).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new);
         } else {
-            res = Arrays.stream(((ImageColor)image).getImage()).map(a -> Arrays.stream(a).map(b -> Arrays.stream(b).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new)).toArray(Integer[][][]::new);
+            red = Arrays.stream(((ImageColor) image).getRed()).map(a -> Arrays.stream(a).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new);
+            green = Arrays.stream(((ImageColor) image).getGreen()).map(a -> Arrays.stream(a).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new);
+            blue = Arrays.stream(((ImageColor) image).getBlue()).map(a -> Arrays.stream(a).map(e -> 255 - e).toArray(Integer[]::new)).toArray(Integer[][]::new);
         }
-        return greyscale ?  new ImageGrey(greyRes, maxColor, 0, image.getHeight(), image.getWidth())
-                :  new ImageColor(res, maxColor, image.getHeight(), image.getWidth());
+        return greyscale ?  new ImageGrey(red, image.getHeight(), image.getWidth())
+                :  new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
 
@@ -231,43 +169,43 @@ public class Functions {
         Arrays.setAll(cum, i -> cum[i] * 255.0);
 
         Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a -> Arrays.stream(a).map(p -> (int) Math.floor(cum[p])).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
     public ImageGrey greyContrast(double sigmaMult) {
+        ((ImageGrey)image).calcMean();
         ((ImageGrey)image).calcStd();
-        int r1 = Math.max(0, (int) (((ImageGrey)image).getMean() - ((ImageGrey)image).getSigma() * sigmaMult));
-        int r2 = Math.min(255, (int) (((ImageGrey)image).getMean() + ((ImageGrey)image).getSigma() * sigmaMult));
+        int s1 = 32;
+        int s2 = 224;
+        int r1 = Math.max(s1, (int) (((ImageGrey)image).getMean() - ((ImageGrey)image).getSigma() * sigmaMult));
+        int r2 = Math.min(s2, (int) (((ImageGrey)image).getMean() + ((ImageGrey)image).getSigma() * sigmaMult));
         Integer [][] res = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(((ImageGrey)image).getImage()[i][j] < r1) {
-                    res[i][j] = 0;
+                    //calcular bien la pendiende de 0 -> s1
+                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] - r1) * (255.0 / (r2 - r1)));
                 } else if(((ImageGrey)image).getImage()[i][j] < r2) {
                     res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] - r1) * (255.0 / (r2 - r1)));
                 } else {
-                    res[i][j] = 255;
+                    //calcular bien la pendiend de s2-> 255
+                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] - r1) * (255.0 / (r2 - r1)));
                 }
             }
         }
-        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
     public ImageGrey thresholdization(int threshold) {
-        Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a -> Arrays.stream(a).map(p -> p > threshold ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
+        Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > threshold ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
     public ImageColor thresholdizationColor(int r, int g, int b) {
-        Integer[][][] res = new Integer[image.getHeight()][image.getHeight()][3];
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                res[i][j][0] = ((ImageColor)image).getImage()[i][j][0] > r ? 255 : 0;
-                res[i][j][1] = ((ImageColor)image).getImage()[i][j][1] > g ? 255 : 0;
-                res[i][j][2] = ((ImageColor)image).getImage()[i][j][2] > b ? 255 : 0;
-            }
-        }
-        return new ImageColor(res, 255, image.getHeight(), image.getWidth());
+        Integer[][] red = Arrays.stream(((ImageColor)image).getRed()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > r ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        Integer[][] green = Arrays.stream(((ImageColor)image).getGreen()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > g ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        Integer[][] blue = Arrays.stream(((ImageColor)image).getBlue()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > b ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageGrey addGaussianNoise(double density, double std) {
@@ -278,155 +216,112 @@ public class Functions {
             if(r.nextDouble() > density) {
                 return p;
             }
-            if(p + rnd > 255) {
-                return 255;
-            } else if (p + rnd < 0) {
-                return 0;
-            } else {
+//            if(p + rnd > 255) {
+//                return 255;
+//            } else if (p + rnd < 0) {
+//                return 0;
+//            } else {
                 return (int) Math.floor(p + rnd);
-            }
+//            }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
+
+        //clamp
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
     public ImageColor addGaussianNoiseColor(double density, double std) {
-        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
         RandomGaussianGenerator rgg = new RandomGaussianGenerator(0, std);
-        Random r = new Random();
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                for (int k = 0; k < 3; k++) {
-                    int p = ((ImageColor)image).getImage()[i][j][k];
-                    double rnd = rgg.nextRandom();
-                    if(r.nextDouble() > density) {
-                        res[i][j][k] = p;
-                    } else {
-                        if(p + rnd > 255) {
-                            res[i][j][k] = 255;
-                        } else if (p + rnd < 0) {
-                            res[i][j][k] = 0;
-                        } else {
-                            res[i][j][k] = (int) Math.floor(p + rnd);
-                        }
-                    }
-                }
-            }
-        }
-        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        Random ra = new Random();
+        Integer[][] red = Arrays.stream(((ImageColor)image).getRed()).map(a-> Arrays.stream(a)
+                .map(p -> ra.nextDouble() > density ? p : (int) Math.floor(p + rgg.nextRandom())).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        Integer[][] green = Arrays.stream(((ImageColor)image).getGreen()).map(a-> Arrays.stream(a)
+                .map(p -> ra.nextDouble() > density ? p : (int) Math.floor(p + rgg.nextRandom())).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        Integer[][] blue = Arrays.stream(((ImageColor)image).getBlue()).map(a-> Arrays.stream(a)
+                .map(p -> ra.nextDouble() > density ? p : (int) Math.floor(p + rgg.nextRandom())).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        //clamp
+        return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageColor addRayleighNoiseColor(double density, double psi) {
-        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
         RandomRayleighGenerator rrg = new RandomRayleighGenerator(psi);
         Random r = new Random();
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                for (int k = 0; k < 3; k++) {
-                    int p = ((ImageColor)image).getImage()[i][j][k];
-                    double rnd = rrg.nextRandom();
-                    if(r.nextDouble() > density) {
-                        res[i][j][k] = p;
-                    } else {
-                        if(p * rnd > 255) {
-                            res[i][j][k] = 255;
-                        } else if (p * rnd < 0) {
-                            res[i][j][k] = 0;
-                        } else {
-                            res[i][j][k] = (int) Math.floor(p * rnd);
-                        }
-                    }
-                }
-            }
-        }
-        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        Integer[][] red = Arrays.stream(((ImageColor)image).getRed()).map(a-> Arrays.stream(a).map(p ->
+                r.nextDouble() > density ? p : (int) Math.floor(p * rrg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+
+        Integer[][] green = Arrays.stream(((ImageColor)image).getGreen()).map(a-> Arrays.stream(a).map(p ->
+                r.nextDouble() > density ? p : (int) Math.floor(p * rrg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+
+        Integer[][] blue = Arrays.stream(((ImageColor)image).getBlue()).map(a-> Arrays.stream(a).map(p ->
+                r.nextDouble() > density ? p : (int) Math.floor(p * rrg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+
+        return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageGrey addRayleighNoise(double density, double psi) {
         RandomRayleighGenerator rrg = new RandomRayleighGenerator(psi);
         Random r = new Random();
-        Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a-> Arrays.stream(a).map(p -> {
-            double rnd = rrg.nextRandom();
-            if(r.nextDouble() > density) {
-                return p;
-            }
-            if(p * rnd > 255) {
-                return 255;
-            } else if (p * rnd < 0) {
-                return 0;
-            } else {
-                return (int) Math.floor(p * rnd);
-            }
-        }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
+        Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a-> Arrays.stream(a).map(p ->
+            r.nextDouble() > density ? p : (int) Math.floor(p * rrg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
     public ImageColor addExponentialNoiseColor(double density, double lambda) {
-        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
         RandomExpGenerator reg = new RandomExpGenerator(lambda);
         Random r = new Random();
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                for (int k = 0; k < 3; k++) {
-                    int p = ((ImageColor)image).getImage()[i][j][k];
-                    double rnd = reg.nextRandom();
-                    if(r.nextDouble() > density) {
-                        res[i][j][k] = p;
-                    } else{
-                        if(p * rnd > 255) {
-                            res[i][j][k] = 255;
-                        } else if (p * rnd < 0) {
-                            res[i][j][k] = 0;
-                        } else {
-                            res[i][j][k] = (int) Math.floor(p * rnd);
-                        }
-                    }
-                }
-            }
-        }
-        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        Integer[][] red = Arrays.stream(((ImageColor)image).getRed()).map(a-> Arrays.stream(a).map(p ->
+                r.nextDouble() > density ? p : (int) Math.floor(p * reg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+
+        Integer[][] green = Arrays.stream(((ImageColor)image).getGreen()).map(a-> Arrays.stream(a).map(p ->
+                r.nextDouble() > density ? p : (int) Math.floor(p * reg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+
+        Integer[][] blue = Arrays.stream(((ImageColor)image).getBlue()).map(a-> Arrays.stream(a).map(p ->
+                r.nextDouble() > density ? p : (int) Math.floor(p * reg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+
+        return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
     public ImageGrey addExponentialNoise(double density, double lamda) {
         RandomExpGenerator reg = new RandomExpGenerator(lamda);
         Random r = new Random();
-        Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a-> Arrays.stream(a).map(p -> {
-            double rnd = reg.nextRandom();
-            if(r.nextDouble() > density) {
-                return p;
-            }
-            if(p * rnd > 255) {
-                return 255;
-            } else if (p * rnd < 0) {
-                return 0;
-            } else {
-                return (int) Math.floor(p * rnd);
-            }
-        }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
+        Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a-> Arrays.stream(a).map(p ->
+            r.nextDouble() > density ? p : (int) Math.floor(p * reg.nextRandom())
+        ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
     public ImageColor addSaltAndPepperColor(double density) {
-        Integer[][][] res = new Integer[image.getHeight()][image.getWidth()][3];
-        Random r = new Random();
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+        Random ra = new Random();
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
-                Integer[] p = ((ImageColor)image).getImage()[i][j];
-                double rn = r.nextDouble();
+                Integer r = ((ImageColor)image).getRed()[i][j];
+                Integer g = ((ImageColor)image).getGreen()[i][j];
+                Integer b = ((ImageColor)image).getBlue()[i][j];
+                double rn = ra.nextDouble();
                 if(rn < density) {
-                    res[i][j][0] = 0;
-                    res[i][j][1] = 0;
-                    res[i][j][2] = 0;
+                    red[i][j] = 0;
+                    green[i][j] = 0;
+                    blue[i][j] = 0;
                 } else if(rn > 1 - density) {
-                    res[i][j][0] = 255;
-                    res[i][j][1] = 255;
-                    res[i][j][2] = 255;
+                    red[i][j] = 255;
+                    green[i][j] = 255;
+                    blue[i][j] = 255;
                 } else {
-                    res[i][j][0] = p[0];
-                    res[i][j][1] = p[1];
-                    res[i][j][2] = p[2];
+                    red[i][j] = r;
+                    green[i][j] = g;
+                    blue[i][j] = b;
                 }
             }
         }
-        return new ImageColor(res, image.getMaxColor(), image.getHeight(), image.getWidth());
+        return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     public ImageGrey addSaltAndPepper(double density) {
@@ -441,7 +336,7 @@ public class Functions {
                 return p;
             }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        return new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth());
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
     public ImageInt meanFilter(int n) {
@@ -515,7 +410,9 @@ public class Functions {
         int n = w.length;
         int half = (int) Math.floor(n/2);
 
-        Integer[][] res = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
         Integer[][][] res2 = new Integer[image.getHeight()][image.getWidth()][3];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
@@ -537,18 +434,18 @@ public class Functions {
                                 if(greyscale){
                                     med.add(((ImageGrey)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())]);
                                 } else {
-                                    med.add(((ImageColor)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][0]);
-                                    med2.add(((ImageColor)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][1]);
-                                    med3.add(((ImageColor)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][2]);
+                                    med.add(((ImageColor)image).getRed()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())]);
+                                    med2.add(((ImageColor)image).getGreen()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())]);
+                                    med3.add(((ImageColor)image).getBlue()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())]);
                                 }
                             }
                         } else {
                             if(greyscale) {
                                 sum += (double) ((ImageGrey) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * w[k + half][l + half];
                             } else {
-                                sum += (double) ((ImageColor) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][0] * w[k + half][l + half];
-                                sum2 += (double) ((ImageColor) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][1] * w[k + half][l + half];
-                                sum3 += (double) ((ImageColor) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())][2] * w[k + half][l + half];
+                                sum += (double) ((ImageColor) image).getRed()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * w[k + half][l + half];
+                                sum2 += (double) ((ImageColor) image).getGreen()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * w[k + half][l + half];
+                                sum3 += (double) ((ImageColor) image).getBlue()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * w[k + half][l + half];
                             }
                         }
                     }
@@ -556,29 +453,31 @@ public class Functions {
                 if(median) {
                     if(greyscale){
                         med.sort(Integer::compareTo);
-                        res[i][j] = med.get(med.size()/2);
+                        red[i][j] = med.get(med.size()/2);
                     } else {
                         med.sort(Integer::compareTo);
-                        res2[i][j][0] = med.get(med.size()/2);
+                        red[i][j] = med.get(med.size()/2);
                         med2.sort(Integer::compareTo);
-                        res2[i][j][1] = med2.get(med2.size()/2);
+                        green[i][j] = med2.get(med2.size()/2);
                         med3.sort(Integer::compareTo);
-                        res2[i][j][2] = med3.get(med3.size()/2);
+                        blue[i][j] = med3.get(med3.size()/2);
                     }
                 } else {
                     if(greyscale) {
-                        res[i][j] = (int) sum < 0 ? 0 : (int) sum;
+                        red[i][j] = (int) sum;
                     } else {
-                        res2[i][j][0] = (int) sum < 0 ? 0 : (int) sum;
-                        res2[i][j][1] = (int) sum2 < 0 ? 0 : (int) sum2;
-                        res2[i][j][2] = (int) sum3 < 0 ? 0 : (int) sum3;
+                        red[i][j] = (int) sum;
+                        green[i][j] = (int) sum2;
+                        blue[i][j] = (int) sum3;
                     }
                 }
 
             }
         }
-        return greyscale ? new ImageGrey(res, image.getMaxColor(), 0, image.getHeight(), image.getWidth())
-                : new ImageColor(res2, image.getMaxColor(), image.getHeight(), image.getWidth());
+
+        //clamp
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
 
     }
 }

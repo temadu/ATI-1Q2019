@@ -48,7 +48,7 @@ public class IOManager {
                 data2D[row][col] = dis.readUnsignedByte();
             }
         }
-        return new ImageGrey(data2D, maxvalue, 0, picHeight, picWidth);
+        return new ImageGrey(data2D, picHeight, picWidth);
     }
 
     public static void savePGM(String filePath, ImageGrey image){
@@ -58,7 +58,7 @@ public class IOManager {
             int height = image.getHeight();
             int width = image.getWidth();
 
-            String header = "P6\n" + width + " " + height + "\n" + image.getMaxColor() + "\n";
+            String header = "P6\n" + width + " " + height + "\n" + 255 + "\n";
             byte[] headerBytes = header.getBytes();
 
             for (int i = 0; i < headerBytes.length; i++) {
@@ -108,26 +108,27 @@ public class IOManager {
         }
 
         // read the image data
-        Integer[][][] data2D = new Integer[picHeight][picWidth][3];
+        Integer[][] red = new Integer[picHeight][picWidth];
+        Integer[][] green = new Integer[picHeight][picWidth];
+        Integer[][] blue = new Integer[picHeight][picWidth];
         for (int row = 0; row < picHeight; row++) {
             for (int col = 0; col < picWidth; col++) {
-                data2D[row][col][0] = dis.readUnsignedByte();
-                data2D[row][col][1] = dis.readUnsignedByte();
-                data2D[row][col][2] = dis.readUnsignedByte();
+                red[row][col] = dis.readUnsignedByte();
+                green[row][col] = dis.readUnsignedByte();
+                blue[row][col] = dis.readUnsignedByte();
             }
         }
-        return new ImageColor(data2D, maxvalue, picHeight, picWidth);
+        return new ImageColor(red, green, blue, picHeight, picWidth);
     }
 
     public static void savePPM(String filePath, ImageColor image){
         try {
 
-            Integer[][][] rawImage = image.getImage();
             OutputStream w = new FileOutputStream(filePath);
             int height = image.getHeight();
             int width = image.getWidth();
 
-            String header = "P6\n" + width + " " + height + "\n" + image.getMaxColor() + "\n";
+            String header = "P6\n" + width + " " + height + "\n" + 255 + "\n";
             byte[] headerBytes = header.getBytes();
 
             for (int i = 0; i < headerBytes.length; i++) {
@@ -135,9 +136,9 @@ public class IOManager {
             }
             for (int row = 0; row < height; row++) {
                 for (int col = 0; col < width; col++) {
-                    for(int rgb = 0; rgb < 3; rgb++){
-                        w.write(rawImage[row][col][rgb].byteValue());
-                    }
+                    w.write(image.getRed()[row][col].byteValue());
+                    w.write(image.getGreen()[row][col].byteValue());
+                    w.write(image.getBlue()[row][col].byteValue());
                 }
             }
             w.close();
@@ -180,7 +181,7 @@ public class IOManager {
                 maxvalue = Math.max(data2D[row][col], maxvalue);
             }
         }
-        return new ImageGrey(data2D, maxvalue, 0, picHeight, picWidth);
+        return new ImageGrey(data2D, picHeight, picWidth);
     }
 
 

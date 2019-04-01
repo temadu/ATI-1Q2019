@@ -1151,7 +1151,7 @@ public class ImageColorTransformer {
     }
 
     public void painter(ImageColor originalImage){
-        this.outputImage = new ImageColor(originalImage.getImage(), 255, originalImage.getHeight(), originalImage.getWidth());
+        this.outputImage = new ImageColor(originalImage.getRed(), originalImage.getGreen(), originalImage.getBlue(), originalImage.getHeight(), originalImage.getWidth());
         Region cutRegion = new Region();
         cutRegion.x1 = 0;
         cutRegion.y1 = 0;
