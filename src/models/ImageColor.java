@@ -137,6 +137,18 @@ public class ImageColor implements ImageInt{
         return Arrays.stream(blue).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();
     }
 
+    public int getMinRed() {
+        return Arrays.stream(red).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).min().getAsInt();
+    }
+
+    public int getMinGreen() {
+        return Arrays.stream(green).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).min().getAsInt();
+    }
+
+    public int getMinBlue() {
+        return Arrays.stream(blue).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).min().getAsInt();
+    }
+
     public WritableImage getRenderer() { return renderer; }
     public ImageView getView() { return view; }
 

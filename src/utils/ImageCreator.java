@@ -326,7 +326,7 @@ public class ImageCreator {
             if(color> 255) color = 255;
 
             Integer[][] square = generateBaseColor(width, height, color);
-            new ImageGreyViewer(new ImageGrey(square, 255, 0, height, width));
+            new ImageGreyViewer(new ImageGrey(square, height, width));
             stage.close();
         });
 

@@ -168,4 +168,8 @@ public class ImageGrey implements ImageInt{
         return Arrays.stream(image).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();
     }
 
+    public int getMinGrey() {
+        return Arrays.stream(image).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).min().getAsInt();
+    }
+
 }

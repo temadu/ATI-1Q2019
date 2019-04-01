@@ -1092,7 +1092,7 @@ public class ImageGreyTransformer {
 
     public void laplacianFilter(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.outputImage = new Functions(this.originalImage).laplacianFilter(1);
+        this.outputImage = new Functions(this.originalImage).highpassFilter(3);
 
         Stage stage = new Stage();
         stage.setTitle("Apply laplacian filter");
@@ -1125,7 +1125,7 @@ public class ImageGreyTransformer {
                 }
                 if(multiplier >= 0){
                     grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(this.originalImage).laplacianFilter(multiplier);
+                    this.outputImage = new Functions(this.originalImage).highpassFilter(multiplier);
                     grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
 
                 }

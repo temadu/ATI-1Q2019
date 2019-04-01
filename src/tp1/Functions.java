@@ -23,12 +23,23 @@ public class Functions {
         }
     }
 
+    private Integer[][] clamp(Integer[][] m) {
+        int max = Arrays.stream(m).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();
+        int min = Arrays.stream(m).mapToInt(a -> Arrays.stream(a).min(Comparator.naturalOrder()).get()).min().getAsInt();
+//        if(max < 256 && min >= 0){
+//            return m;
+//        }
+        double mult = 255.0/(max - min);
+        Integer[][] as = Arrays.stream(m).parallel().map(a -> Arrays.stream(a).map(p -> (int) ((double) (p - min) * mult)).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return as;
+    }
+
 
     public ImageInt imageSum(ImageInt addend) {
         Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
-//        Integer[][] greySum = new Integer[image.getHeight()][image.getWidth()];
+
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(greyscale){
@@ -40,7 +51,13 @@ public class Functions {
                 }
             }
         }
-//        clamp
+        if(greyscale) {
+            red = clamp(red);
+        } else {
+            red = clamp(red);
+            green = clamp(green);
+            blue = clamp(blue);
+        }
         return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
                 : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
@@ -60,7 +77,13 @@ public class Functions {
                 }
             }
         }
-//        clamp
+        if(greyscale) {
+            red = clamp(red);
+        } else {
+            red = clamp(red);
+            green = clamp(green);
+            blue = clamp(blue);
+        }
         return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
                 : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
@@ -81,10 +104,42 @@ public class Functions {
                 }
             }
         }
-//        clamp
-        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
-                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+        return rangeCompressorPriv(red, green, blue);
     }
+
+    private ImageInt rangeCompressorPriv(Integer[][] red, Integer[][] green, Integer[][] blue) {
+        Integer[][] newRed = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] newGreen = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] newBlue = new Integer[image.getHeight()][image.getWidth()];
+        int maxRed = 0;
+        int maxGreen = 0;
+        int maxBlue = 0;
+        if(greyscale){
+            maxRed = Arrays.stream(red).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();;
+        } else {
+            maxRed = Arrays.stream(red).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();;
+            maxGreen = Arrays.stream(green).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();;
+            maxBlue = Arrays.stream(blue).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();;
+        }
+        double multiplierR = 255.0 / Math.log(1 + maxRed);
+        double multiplierG = 255.0 / Math.log(1 + maxGreen);
+        double multiplierB = 255.0 / Math.log(1 + maxBlue);
+
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                if(greyscale) {
+                    newRed[i][j] = (int) (multiplierR * Math.log(1 + red[i][j]));
+                } else {
+                    newRed[i][j] = (int) (multiplierR * Math.log(1 + red[i][j]));
+                    newGreen[i][j] = (int) (multiplierG * Math.log(1 + green[i][j]));
+                    newBlue[i][j] = (int) (multiplierB * Math.log(1 + blue[i][j]));
+                }
+            }
+        }
+        return greyscale ? new ImageGrey(newRed, image.getHeight(), image.getWidth())
+                : new ImageColor(newRed, newGreen, newBlue, image.getHeight(), image.getWidth());
+    }
+
 
     public ImageInt rangeCompressor() {
         Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
@@ -92,13 +147,15 @@ public class Functions {
         Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
 //        double multiplier = 255.0 / Math.log(1 + image.getMaxColor());
         int maxRed = 0;
+        int maxGreen = 0;
+        int maxBlue = 0;
         if(greyscale){
             maxRed = ((ImageGrey)image).getMaxGrey();
         } else {
             maxRed = ((ImageColor)image).getMaxRed();
+            maxGreen = ((ImageColor)image).getMaxGreen();
+            maxBlue = ((ImageColor)image).getMaxBlue();
         }
-        int maxGreen = ((ImageColor)image).getMaxGreen();
-        int maxBlue = ((ImageColor)image).getMaxBlue();
         double multiplierR = 255.0 / Math.log(1 + maxRed);
         double multiplierG = 255.0 / Math.log(1 + maxGreen);
         double multiplierB = 255.0 / Math.log(1 + maxBlue);
@@ -109,8 +166,8 @@ public class Functions {
                     red[i][j] = (int) (multiplierR * Math.log(1 + ((ImageGrey)image).getImage()[i][j]));
                 } else {
                     red[i][j] = (int) (multiplierR * Math.log(1 + ((ImageColor)image).getRed()[i][j]));
-                    green[i][j] = (int) (multiplierG * Math.log(1 + ((ImageColor)image).getBlue()[i][j]));
-                    blue[i][j] = (int) (multiplierB * Math.log(1 + ((ImageColor)image).getGreen()[i][j]));
+                    green[i][j] = (int) (multiplierG * Math.log(1 + ((ImageColor)image).getGreen()[i][j]));
+                    blue[i][j] = (int) (multiplierB * Math.log(1 + ((ImageColor)image).getBlue()[i][j]));
                 }
             }
         }
@@ -123,7 +180,6 @@ public class Functions {
         Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
         double multiplier = Math.pow(255.0, 1 - gamma);
-        int maxColor = 0;
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(greyscale){
@@ -179,17 +235,21 @@ public class Functions {
         int s2 = 224;
         int r1 = Math.max(s1, (int) (((ImageGrey)image).getMean() - ((ImageGrey)image).getSigma() * sigmaMult));
         int r2 = Math.min(s2, (int) (((ImageGrey)image).getMean() + ((ImageGrey)image).getSigma() * sigmaMult));
+        double pend1 = (double)s1/(double)r1;
+        double rest1 = 0;
+        double pend2 = (double)(s2 - s1)/(double)(r2- r1);
+        double rest2 = (double)s1 - pend2 * r1;
+        double pend3 = (255.0 - (double)s2)/(255.0 - (double)r2);
+        double rest3 = (double)s2 - pend3 * r2;
         Integer [][] res = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(((ImageGrey)image).getImage()[i][j] < r1) {
-                    //calcular bien la pendiende de 0 -> s1
-                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] - r1) * (255.0 / (r2 - r1)));
+                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] * pend1) + rest1);
                 } else if(((ImageGrey)image).getImage()[i][j] < r2) {
-                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] - r1) * (255.0 / (r2 - r1)));
+                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] * pend2) + rest2);
                 } else {
-                    //calcular bien la pendiend de s2-> 255
-                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] - r1) * (255.0 / (r2 - r1)));
+                    res[i][j] = (int) ((((ImageGrey)image).getImage()[i][j] * pend3) + rest3);
                 }
             }
         }
@@ -216,16 +276,10 @@ public class Functions {
             if(r.nextDouble() > density) {
                 return p;
             }
-//            if(p + rnd > 255) {
-//                return 255;
-//            } else if (p + rnd < 0) {
-//                return 0;
-//            } else {
                 return (int) Math.floor(p + rnd);
-//            }
         }).toArray(Integer[]::new)).toArray(Integer[][]::new);
 
-        //clamp
+        res = clamp(res);
         return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
@@ -238,7 +292,10 @@ public class Functions {
                 .map(p -> ra.nextDouble() > density ? p : (int) Math.floor(p + rgg.nextRandom())).toArray(Integer[]::new)).toArray(Integer[][]::new);
         Integer[][] blue = Arrays.stream(((ImageColor)image).getBlue()).map(a-> Arrays.stream(a)
                 .map(p -> ra.nextDouble() > density ? p : (int) Math.floor(p + rgg.nextRandom())).toArray(Integer[]::new)).toArray(Integer[][]::new);
-        //clamp
+
+        red = clamp(red);
+        green = clamp(green);
+        blue = clamp(blue);
         return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
@@ -257,6 +314,10 @@ public class Functions {
                 r.nextDouble() > density ? p : (int) Math.floor(p * rrg.nextRandom())
         ).toArray(Integer[]::new)).toArray(Integer[][]::new);
 
+        red = clamp(red);
+        green = clamp(green);
+        blue = clamp(blue);
+
         return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
@@ -266,6 +327,8 @@ public class Functions {
         Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a-> Arrays.stream(a).map(p ->
             r.nextDouble() > density ? p : (int) Math.floor(p * rrg.nextRandom())
         ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        res = clamp(res);
+
         return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
@@ -284,6 +347,10 @@ public class Functions {
                 r.nextDouble() > density ? p : (int) Math.floor(p * reg.nextRandom())
         ).toArray(Integer[]::new)).toArray(Integer[][]::new);
 
+        red = clamp(red);
+        green = clamp(green);
+        blue = clamp(blue);
+
         return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
     public ImageGrey addExponentialNoise(double density, double lamda) {
@@ -292,6 +359,9 @@ public class Functions {
         Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).map(a-> Arrays.stream(a).map(p ->
             r.nextDouble() > density ? p : (int) Math.floor(p * reg.nextRandom())
         ).toArray(Integer[]::new)).toArray(Integer[][]::new);
+
+        res = clamp(res);
+
         return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
@@ -360,20 +430,25 @@ public class Functions {
     }
 
     public ImageInt weightedMedianFilter(int n) {
-        double[][] w = new double[n][n];
-        int half = (int) Math.floor(n/2);
-        for (int i = 0; i < half + 1; i++) {
-            for (int j = 0; j < half + 1; j++) {
-                w[i][j] = 1 + i + j;
-                w[n - i - 1][n - j - 1] = 1 + i + j;
-                w[i][n - j - 1] = 1 + i + j;
-                w[n - i - 1][j] = 1 + i + j;
-            }
-        }
+        double[][] w = new double[3][3];
+
+//        int half = (int) Math.floor(n/2);
+        w[0][0] = w[0][2] = w[2][0] = w[2][2] = 1.0;
+        w[0][1] = w[1][0] = w[1][2] = w[2][1] = 2.0;
+        w[1][1] = 4.0;
+
+//        for (int i = 0; i < half + 1; i++) {
+//            for (int j = 0; j < half + 1; j++) {
+//                w[i][j] = 1 + i + j;
+//                w[n - i - 1][n - j - 1] = 1 + i + j;
+//                w[i][n - j - 1] = 1 + i + j;
+//                w[n - i - 1][j] = 1 + i + j;
+//            }
+//        }
         return filter(w, true);
     }
 
-    public ImageInt laplacianFilter(int n) {
+    public ImageInt highpassFilter(int n) {
         double[][] w = new double[n][n];
         int half = (int) Math.floor(n/2);
 //        double pre = 1/(Math.PI * Math.pow(sigma, 4));
@@ -413,7 +488,6 @@ public class Functions {
         Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
-        Integer[][][] res2 = new Integer[image.getHeight()][image.getWidth()][3];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getHeight(); j++) {
                 double sum = 0;
@@ -474,8 +548,16 @@ public class Functions {
 
             }
         }
+        if(!median){
+            if(greyscale){
+                red = clamp(red);
+            } else {
+                red = clamp(red);
+                green = clamp(green);
+                blue = clamp(blue);
+            }
+        }
 
-        //clamp
         return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
                 : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
 
