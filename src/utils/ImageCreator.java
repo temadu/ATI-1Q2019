@@ -293,9 +293,9 @@ public class ImageCreator {
             }
         });
 
-        grid.add(new Label("Color:"), 2, 1);
+        grid.add(new Label("Color:"), 4, 1);
         TextField colorField = new TextField();
-        grid.add(colorField, 3, 1);
+        grid.add(colorField, 5, 1);
         colorField.setMaxWidth(60);
         colorField.setText("0");
         colorField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
