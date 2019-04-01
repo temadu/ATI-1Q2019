@@ -59,14 +59,24 @@ public class ImageGreyTransformer {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("./images"));
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image files", "*.pgm")
+                    new FileChooser.ExtensionFilter("Image files", "*.pgm; *.raw")
             );
             File file = fileChooser.showOpenDialog(stage);
+            String extension = file.getName();
 
+            int i = extension.lastIndexOf('.');
+            if (i > 0) {
+                extension = extension.substring(i+1);
+            }
             try {
                 if(this.secondImage != null)
                     grid.getChildren().remove(secondImage.getView());
-                this.secondImage = IOManager.loadPGM(file.getPath());
+                System.out.println(extension);
+                if(extension.toLowerCase().equals("raw")) {
+                    this.secondImage = IOManager.loadRAW(file.getPath());
+                } else {
+                    this.secondImage = IOManager.loadPGM(file.getPath());
+                }
                 grid.add(this.secondImage.getView(),1,3);
                 if(this.originalImage.getHeight() == this.secondImage.getHeight() &&
                         this.originalImage.getWidth() == this.secondImage.getWidth()){
@@ -138,14 +148,23 @@ public class ImageGreyTransformer {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File("./images"));
             fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("Image files", "*.pgm")
+                    new FileChooser.ExtensionFilter("Image files", "*.pgm; *.raw")
             );
             File file = fileChooser.showOpenDialog(stage);
+            String extension = file.getName();
 
+            int i = extension.lastIndexOf('.');
+            if (i > 0) {
+                extension = extension.substring(i+1);
+            }
             try {
                 if(this.secondImage != null)
                     grid.getChildren().remove(secondImage.getView());
-                this.secondImage = IOManager.loadPGM(file.getPath());
+                if(extension.toLowerCase().equals("raw")) {
+                    this.secondImage = IOManager.loadRAW(file.getPath());
+                } else {
+                    this.secondImage = IOManager.loadPGM(file.getPath());
+                }
                 grid.add(this.secondImage.getView(),1,3);
                 if(this.originalImage.getHeight() == this.secondImage.getHeight() &&
                         this.originalImage.getWidth() == this.secondImage.getWidth()){
