@@ -67,8 +67,8 @@ public class ImageColorTransformer {
                     grid.getChildren().remove(secondImage.getView());
                 this.secondImage = IOManager.loadPPM(file.getPath());
                 grid.add(this.secondImage.getView(),1,3);
-                if(this.originalImage.getHeight() == this.secondImage.getHeight() &&
-                        this.originalImage.getWidth() == this.secondImage.getWidth()){
+                if(this.originalImage.getHeight() >= this.secondImage.getHeight() &&
+                        this.originalImage.getWidth() >= this.secondImage.getWidth()){
                     if(this.outputImage != null)
                         grid.getChildren().remove(outputImage.getView());
                     this.outputImage = new Functions(originalImage).imageSum(secondImage);
@@ -146,8 +146,8 @@ public class ImageColorTransformer {
                     grid.getChildren().remove(secondImage.getView());
                 this.secondImage = IOManager.loadPPM(file.getPath());
                 grid.add(this.secondImage.getView(),1,3);
-                if(this.originalImage.getHeight() == this.secondImage.getHeight() &&
-                        this.originalImage.getWidth() == this.secondImage.getWidth()){
+                if(this.originalImage.getHeight() >= this.secondImage.getHeight() &&
+                        this.originalImage.getWidth() >= this.secondImage.getWidth()){
                     if(this.outputImage != null)
                         grid.getChildren().remove(outputImage.getView());
                     this.outputImage = new Functions(originalImage).imageSub(secondImage);

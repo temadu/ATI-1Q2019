@@ -1,21 +1,12 @@
 package GUI;
 
-import javafx.event.ActionEvent;
 import javafx.scene.chart.BarChart;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
-import javafx.scene.image.ImageView;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import models.ImageColor;
 import models.ImageGrey;
-import models.ImageInt;
 import tp1.Functions;
 import utils.IOManager;
-import utils.ImageColorTransformer;
 import utils.ImageGreyTransformer;
 
 import java.io.File;
@@ -31,6 +22,7 @@ public class ImageGreyViewer extends ImageViewer {
         this.stage.setHeight(image.getHeight() + 80);
         this.stage.setWidth(this.image.getWidth() + 20);
         this.box.getChildren().add(image.getView());
+        this.box.getStylesheets().add("GUI/black_histogram.css");
         this.addGreyMenuBars();
         stage.show();
     }
@@ -39,7 +31,6 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem save = new MenuItem("Save image");
         save.setOnAction(event -> this.saveImage());
         mainMenu.getMenus().get(0).getItems().add(1, save);
-
         final Menu transformMenu = new Menu("Transform");
         MenuItem cutter = new MenuItem("Cut Image");
         cutter.setOnAction(e -> new ImageGreyTransformer().cutImage(this.image));

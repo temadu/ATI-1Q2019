@@ -260,6 +260,84 @@ public class ImageCreator {
 
     }
 
+    public static void createBaseImageGray(){
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Create Grey Gradient");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Image Width:"), 0, 1);
+        TextField widthField = new TextField();
+        widthField.setMaxWidth(60);
+        grid.add(widthField, 1, 1);
+        widthField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                widthField.setText(oldValue);
+            }
+        });
+
+        grid.add(new Label("Image Height:"), 2, 1);
+        TextField heightField = new TextField();
+        grid.add(heightField, 3, 1);
+        heightField.setMaxWidth(60);
+        heightField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                widthField.setText(oldValue);
+            }
+        });
+
+        grid.add(new Label("Color:"), 2, 1);
+        TextField colorField = new TextField();
+        grid.add(colorField, 3, 1);
+        colorField.setMaxWidth(60);
+        colorField.setText("0");
+        colorField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                widthField.setText(oldValue);
+            }
+        });
+
+        Button btn = new Button("Generate");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(btn);
+        grid.add(hbBtn, 3, 4);
+
+        btn.setOnAction((e) -> {
+
+            int width = 0;
+            int height = 0;
+            int color = 0;
+            try {
+                width = Integer.parseInt(widthField.getText());
+                height = Integer.parseInt(heightField.getText());
+                color = Integer.parseInt(colorField.getText());
+            } catch (NumberFormatException | NullPointerException nfe) {
+                return;
+            }
+
+            if(color> 255) color = 255;
+
+            Integer[][] square = generateBaseColor(width, height, color);
+            new ImageGreyViewer(new ImageGrey(square, 255, 0, height, width));
+            stage.close();
+        });
+
+        Scene scene = new Scene(grid, 600, 275);
+        stage.setScene(scene);
+
+        stage.setTitle("Create Base Image");
+        stage.show();
+
+    }
+
     public static void createColorGradient(){
         Stage stage = new Stage();
 
@@ -362,6 +440,15 @@ public class ImageCreator {
         for (int x=0; x<length; x++)
             for (int y=0; y<height; y++)
                 retImage[y][x] = x*255/length;
+
+        return retImage;
+    }
+
+    public static Integer[][] generateBaseColor(int length, int height, int color){
+        Integer[][] retImage =  new Integer[height][length];
+        for (int x=0; x<length; x++)
+            for (int y=0; y<height; y++)
+                retImage[y][x] = color;
 
         return retImage;
     }

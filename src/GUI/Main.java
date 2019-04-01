@@ -112,7 +112,12 @@ public class Main extends Application {
             ImageCreator.createColorGradient();
             this.stage.close();
         });
-        generateMenu.getItems().addAll(generateSquare,generateCircle, generateGreyGradient, generateColorGradient);
+        MenuItem createBase = new MenuItem("Base image");
+        createBase.setOnAction(event -> {
+            ImageCreator.createBaseImageGray();
+            this.stage.close();
+        });
+        generateMenu.getItems().addAll(generateSquare,generateCircle, generateGreyGradient, generateColorGradient, createBase);
 
 
         MenuBar menuBar = new MenuBar();

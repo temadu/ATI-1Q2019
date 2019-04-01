@@ -78,8 +78,8 @@ public class ImageGreyTransformer {
                     this.secondImage = IOManager.loadPGM(file.getPath());
                 }
                 grid.add(this.secondImage.getView(),1,3);
-                if(this.originalImage.getHeight() == this.secondImage.getHeight() &&
-                        this.originalImage.getWidth() == this.secondImage.getWidth()){
+                if(this.originalImage.getHeight() >= this.secondImage.getHeight() &&
+                        this.originalImage.getWidth() >= this.secondImage.getWidth()){
                     if(this.outputImage != null)
                         grid.getChildren().remove(outputImage.getView());
                     this.outputImage = (ImageGrey) new Functions(originalImage).imageSum(secondImage);
@@ -166,8 +166,8 @@ public class ImageGreyTransformer {
                     this.secondImage = IOManager.loadPGM(file.getPath());
                 }
                 grid.add(this.secondImage.getView(),1,3);
-                if(this.originalImage.getHeight() == this.secondImage.getHeight() &&
-                        this.originalImage.getWidth() == this.secondImage.getWidth()){
+                if(this.originalImage.getHeight() >= this.secondImage.getHeight() &&
+                        this.originalImage.getWidth() >= this.secondImage.getWidth()){
                     if(this.outputImage != null)
                         grid.getChildren().remove(outputImage.getView());
                     this.outputImage = (ImageGrey) new Functions(originalImage).imageSub(secondImage);
@@ -804,7 +804,6 @@ public class ImageGreyTransformer {
         stage.show();
     }
 
-
     public void addSaltAndPepper(ImageGrey originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).addSaltAndPepper(0);
@@ -944,7 +943,6 @@ public class ImageGreyTransformer {
 
         stage.show();
     }
-
 
     public void medianFilter(ImageGrey originalImage){
         this.originalImage = originalImage;
