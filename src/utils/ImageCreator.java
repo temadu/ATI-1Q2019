@@ -1,8 +1,8 @@
 package utils;
 
+import GUI.ATIApp;
 import GUI.ImageColorViewer;
 import GUI.ImageGreyViewer;
-import GUI.Window;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 
 public class ImageCreator {
 
-    public static void createSquare(){
+    public static void createSquare(int windowIndex){
         Stage stage = new Stage();
 
         GridPane grid = new GridPane();
@@ -107,7 +107,7 @@ public class ImageCreator {
             Integer[][] square = drawRectangle(new int[height][width],
                     (width/2) - (rectWidth/2), (height/2) - (rectHeight/2),
                     (width/2) + (rectWidth/2), (height/2) + (rectHeight/2),255);
-            new ImageGreyViewer(new ImageGrey(square, height, width));
+            ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new ImageGrey(square, height, width),windowIndex));
 
             stage.close();
         });
@@ -120,7 +120,7 @@ public class ImageCreator {
 
     }
 
-    public static void createCircle(){
+    public static void createCircle(int windowIndex){
         Stage stage = new Stage();
 
         GridPane grid = new GridPane();
@@ -184,7 +184,7 @@ public class ImageCreator {
 
             Integer[][] circle = drawCircle(new int[height][width],
                     width/2, height/2, radius, 255);
-            new ImageGreyViewer(new ImageGrey(circle, height, width));
+            ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new ImageGrey(circle, height, width),windowIndex));
 
             stage.close();
         });
@@ -197,7 +197,7 @@ public class ImageCreator {
         stage.show();
     }
 
-    public static void createGreyGradient(){
+    public static void createGreyGradient(int windowIndex){
         Stage stage = new Stage();
 
         GridPane grid = new GridPane();
@@ -248,7 +248,7 @@ public class ImageCreator {
             }
 
             Integer[][] square = generateBWGradient(width, height);
-            new ImageGreyViewer(new ImageGrey(square, height, width));
+            ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new ImageGrey(square, height, width),windowIndex));
             stage.close();
         });
 
@@ -260,7 +260,7 @@ public class ImageCreator {
 
     }
 
-    public static void createBaseImageGray(){
+    public static void createBaseImageGray(int windowIndex){
         Stage stage = new Stage();
 
         GridPane grid = new GridPane();
@@ -326,7 +326,7 @@ public class ImageCreator {
             if(color> 255) color = 255;
 
             Integer[][] square = generateBaseColor(width, height, color);
-            new ImageGreyViewer(new ImageGrey(square, height, width));
+            ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new ImageGrey(square, height, width),windowIndex));
             stage.close();
         });
 
@@ -338,7 +338,7 @@ public class ImageCreator {
 
     }
 
-    public static void createColorGradient(){
+    public static void createColorGradient(int windowIndex){
         Stage stage = new Stage();
 
         GridPane grid = new GridPane();
@@ -389,7 +389,7 @@ public class ImageCreator {
             }
 
             Integer[][][] square = generateColorGradient(width, height);
-            new ImageColorViewer(new ImageColor(square[0], square[1], square[2],  height, width));
+            ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer(new ImageColor(square[0], square[1], square[2],  height, width),windowIndex));
             stage.close();
         });
 

@@ -1,8 +1,10 @@
 package GUI;
 
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
@@ -19,41 +21,37 @@ public class ImageColorViewer extends ImageViewer{
 
     ImageColor image;
 
-    public ImageColorViewer(ImageColor image) {
-        super();
+    public ImageColorViewer(ImageColor image, int windowIndex) {
+        super(windowIndex);
         this.image = image;
-//        this.addColorImageContextMenu(image);
-        this.stage.setHeight(this.image.getHeight() + 80);
-        this.stage.setWidth(this.image.getWidth() + 20);
-        this.box.getChildren().add(image.getView());
-        this.addColorMenuBars();
-        stage.show();
+        this.imageView = new ImageView(image.getRenderer());
+        this.pane.getChildren().add(this.imageView);
+        this.addColorContextMenu();
     }
 
-    private void addColorMenuBars(){
+    private void addColorContextMenu(){
         MenuItem save = new MenuItem("Save image");
         save.setOnAction(event -> this.saveImage());
-        mainMenu.getMenus().get(0).getItems().add(1, save);
 
         final Menu transformMenu = new Menu("Transform");
         MenuItem painter = new MenuItem("Get and Set Colors");
-        painter.setOnAction(e -> new ImageColorTransformer().painter(this.image));
+        painter.setOnAction(e -> new ImageColorTransformer(windowIndex).painter(this.image));
         MenuItem cutter = new MenuItem("Cut Image");
-        cutter.setOnAction(e -> new ImageColorTransformer().cutImage(this.image));
+        cutter.setOnAction(e -> new ImageColorTransformer(windowIndex).cutImage(this.image));
         MenuItem sum = new MenuItem("Sum");
-        sum.setOnAction(e -> new ImageColorTransformer().sumImages(this.image));
+        sum.setOnAction(e -> new ImageColorTransformer(windowIndex).sumImages(this.image));
         MenuItem substract = new MenuItem("Substract");
-        substract.setOnAction(e -> new ImageColorTransformer().substractImages(this.image));
+        substract.setOnAction(e -> new ImageColorTransformer(windowIndex).substractImages(this.image));
         MenuItem multiply = new MenuItem("Multiply by scalar");
-        multiply.setOnAction(e -> new ImageColorTransformer().multiplyImage(this.image));
+        multiply.setOnAction(e -> new ImageColorTransformer(windowIndex).multiplyImage(this.image));
         MenuItem gamma = new MenuItem("Apply gamma function");
-        gamma.setOnAction(e -> new ImageColorTransformer().gammaFunction(this.image));
+        gamma.setOnAction(e -> new ImageColorTransformer(windowIndex).gammaFunction(this.image));
         MenuItem rangeCompressor = new MenuItem("Range Compressor");
-        rangeCompressor.setOnAction(e -> new ImageColorTransformer().dynamicRangeCompression(this.image));
+        rangeCompressor.setOnAction(e -> new ImageColorTransformer(windowIndex).dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
-        negative.setOnAction(e -> new ImageColorTransformer().negative(this.image));
+        negative.setOnAction(e -> new ImageColorTransformer(windowIndex).negative(this.image));
         MenuItem threshold = new MenuItem("Thresholding");
-        threshold.setOnAction(e -> new ImageColorTransformer().thresholding(this.image));
+        threshold.setOnAction(e -> new ImageColorTransformer(windowIndex).thresholding(this.image));
 
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
@@ -66,21 +64,22 @@ public class ImageColorViewer extends ImageViewer{
         MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
 
-        gaussNoise.setOnAction(e -> new ImageColorTransformer().addGaussianNoise(this.image));
-        rayleighNoise.setOnAction(e -> new ImageColorTransformer().addRayleighNoise(this.image));
-        expNoise.setOnAction(e -> new ImageColorTransformer().addExponentialNoise(this.image));
-        saltAndPepper.setOnAction(e -> new ImageColorTransformer().addSaltAndPepper(this.image));
+        gaussNoise.setOnAction(e -> new ImageColorTransformer(windowIndex).addGaussianNoise(this.image));
+        rayleighNoise.setOnAction(e -> new ImageColorTransformer(windowIndex).addRayleighNoise(this.image));
+        expNoise.setOnAction(e -> new ImageColorTransformer(windowIndex).addExponentialNoise(this.image));
+        saltAndPepper.setOnAction(e -> new ImageColorTransformer(windowIndex).addSaltAndPepper(this.image));
 
-        meanFilter.setOnAction(e -> new ImageColorTransformer().meanFilter(this.image));
-        medianFilter.setOnAction(e -> new ImageColorTransformer().medianFilter(this.image));
-        weightedMedianFilter.setOnAction(e -> new ImageColorTransformer().weightedMedianFilter(this.image));
-        laplacianFilter.setOnAction(e -> new ImageColorTransformer().laplacianFilter(this.image));
-        gaussFilter.setOnAction(e -> new ImageColorTransformer().gaussFilter(this.image));
+        meanFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).meanFilter(this.image));
+        medianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).medianFilter(this.image));
+        weightedMedianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).weightedMedianFilter(this.image));
+        laplacianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).laplacianFilter(this.image));
+        gaussFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).gaussFilter(this.image));
 
         transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
                 gaussNoise, rayleighNoise, expNoise, saltAndPepper,
                 meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
-        this.mainMenu.getMenus().addAll(transformMenu);
+        this.menu = new ContextMenu(save,transformMenu);
+        this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }
 
     protected void saveImage(){
@@ -89,7 +88,7 @@ public class ImageColorViewer extends ImageViewer{
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image files", "*.ppm","*.raw")
         );
-        File file = fileChooser.showSaveDialog(stage);
+        File file = fileChooser.showSaveDialog(ATIApp.WINDOWS.get(windowIndex).stage);
 
         IOManager.savePPM(file.getPath(), (ImageColor) image);
 

@@ -1,8 +1,8 @@
 package utils;
 
+import GUI.ATIApp;
 import GUI.ImageGreyViewer;
 import GUI.ImageGreyViewer;
-import GUI.Window;
 import com.sun.org.apache.xpath.internal.functions.Function2Args;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -34,10 +34,16 @@ import java.util.function.Function;
 public class ImageGreyTransformer {
 
     ImageInt originalImage;
+    ImageView originalImageView;
     ImageInt secondImage;
+    ImageView secondImageView;
     ImageInt outputImage;
+    ImageView outputImageView;
+    int windowIndex;
 
-
+    public ImageGreyTransformer(int windowIndex) {
+        this.windowIndex = windowIndex;
+    }
 
     public void sumImages(ImageGrey originalImage){
         this.originalImage = originalImage;
@@ -111,7 +117,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey)outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -199,7 +205,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey)outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -271,7 +277,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey)outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -288,7 +294,7 @@ public class ImageGreyTransformer {
         stage.show();
     }
     public void dynamicRangeCompression(ImageGrey originalImage){
-        new ImageGreyViewer((ImageGrey)new Functions(originalImage).rangeCompressor());
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).rangeCompressor(), windowIndex));
     }
     public void gammaFunction(ImageGrey originalImage){
         this.originalImage = originalImage;
@@ -344,7 +350,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey)outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -362,11 +368,11 @@ public class ImageGreyTransformer {
     }
 
     public void negative(ImageGrey originalImage){
-        new ImageGreyViewer((ImageGrey)new Functions(originalImage).negative());
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).negative(),windowIndex));
     }
 
     public void histogramEqualization(ImageGrey originalImage){
-        new ImageGreyViewer(new Functions(originalImage).histogramEqualization());
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).histogramEqualization(),windowIndex));
     }
 
     public void threshold(ImageGrey originalImage){
@@ -422,7 +428,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -490,7 +496,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -572,7 +578,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -653,7 +659,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -788,7 +794,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -856,7 +862,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -928,7 +934,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -1001,7 +1007,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -1074,7 +1080,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -1147,7 +1153,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -1244,7 +1250,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey) outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -1336,7 +1342,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey)outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 
@@ -1452,7 +1458,7 @@ public class ImageGreyTransformer {
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
-                new ImageGreyViewer((ImageGrey)outputImage);
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
                 stage.close();
             }
 

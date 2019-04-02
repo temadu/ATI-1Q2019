@@ -1,8 +1,10 @@
 package GUI;
 
 import javafx.scene.chart.BarChart;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import models.ImageGrey;
 import tp1.Functions;
@@ -15,39 +17,36 @@ public class ImageGreyViewer extends ImageViewer {
 
     ImageGrey image;
 
-    public ImageGreyViewer(ImageGrey image) {
-        super();
+    public ImageGreyViewer(ImageGrey image, int windowIndex) {
+        super(windowIndex);
         this.image = image;
-//        this.addGreyImageContextMenu(image);
-        this.stage.setHeight(image.getHeight() + 80);
-        this.stage.setWidth(this.image.getWidth() + 20);
-        this.box.getChildren().add(image.getView());
-        this.box.getStylesheets().add("GUI/black_histogram.css");
-        this.addGreyMenuBars();
-        stage.show();
+        this.imageView = new ImageView(image.getRenderer());
+        this.pane.getChildren().add(this.imageView);
+        this.pane.getStylesheets().add("GUI/black_histogram.css");
+        this.addGreyContextMenu();
     }
 
-    private void addGreyMenuBars(){
+    private void addGreyContextMenu(){
         MenuItem save = new MenuItem("Save image");
-        save.setOnAction(event -> this.saveImage());
-        mainMenu.getMenus().get(0).getItems().add(1, save);
+//        save.setOnAction(event -> this.saveImage());
+
         final Menu transformMenu = new Menu("Transform");
         MenuItem cutter = new MenuItem("Cut Image");
-        cutter.setOnAction(e -> new ImageGreyTransformer().cutImage(this.image));
+        cutter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).cutImage(this.image));
         MenuItem painter = new MenuItem("Get and Set Colors");
-        painter.setOnAction(e -> new ImageGreyTransformer().painter(this.image));
+        painter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).painter(this.image));
         MenuItem sum = new MenuItem("Sum");
-        sum.setOnAction(e -> new ImageGreyTransformer().sumImages(this.image));
+        sum.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).sumImages(this.image));
         MenuItem substract = new MenuItem("Substract");
-        substract.setOnAction(e -> new ImageGreyTransformer().substractImages(this.image));
+        substract.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).substractImages(this.image));
         MenuItem multiply = new MenuItem("Multiply by scalar");
-        multiply.setOnAction(e -> new ImageGreyTransformer().multiplyImage(this.image));
+        multiply.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).multiplyImage(this.image));
         MenuItem gamma = new MenuItem("Apply gamma function");
-        gamma.setOnAction(e -> new ImageGreyTransformer().gammaFunction(this.image));
+        gamma.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).gammaFunction(this.image));
         MenuItem rangeCompressor = new MenuItem("Range Compressor");
-        rangeCompressor.setOnAction(e -> new ImageGreyTransformer().dynamicRangeCompression(this.image));
+        rangeCompressor.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
-        negative.setOnAction(e -> new ImageGreyTransformer().negative(this.image));
+        negative.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).negative(this.image));
 
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
         MenuItem contrast = new MenuItem("Contrast Improvement");
@@ -61,18 +60,18 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
         MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
-        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
-        contrast.setOnAction(e -> new ImageGreyTransformer().greyContrast(this.image));
-        threshold.setOnAction(e -> new ImageGreyTransformer().threshold(this.image));
-        gaussNoise.setOnAction(e -> new ImageGreyTransformer().addGaussianNoise(this.image));
-        rayleighNoise.setOnAction(e -> new ImageGreyTransformer().addRayleighNoise(this.image));
-        expNoise.setOnAction(e -> new ImageGreyTransformer().addExponentialNoise(this.image));
-        saltAndPepper.setOnAction(e -> new ImageGreyTransformer().addSaltAndPepper(this.image));
-        meanFilter.setOnAction(e -> new ImageGreyTransformer().meanFilter(this.image));
-        medianFilter.setOnAction(e -> new ImageGreyTransformer().medianFilter(this.image));
-        weightedMedianFilter.setOnAction(e -> new ImageGreyTransformer().weightedMedianFilter(this.image));
-        laplacianFilter.setOnAction(e -> new ImageGreyTransformer().laplacianFilter(this.image));
-        gaussFilter.setOnAction(e -> new ImageGreyTransformer().gaussFilter(this.image));
+        histogramEqualization.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).histogramEqualization(this.image));
+        contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
+        threshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).threshold(this.image));
+        gaussNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addGaussianNoise(this.image));
+        rayleighNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addRayleighNoise(this.image));
+        expNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addExponentialNoise(this.image));
+        saltAndPepper.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addSaltAndPepper(this.image));
+        meanFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).meanFilter(this.image));
+        medianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).medianFilter(this.image));
+        weightedMedianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).weightedMedianFilter(this.image));
+        laplacianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianFilter(this.image));
+        gaussFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).gaussFilter(this.image));
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
@@ -85,12 +84,12 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem showHistogram = new MenuItem("Histogram");
         showHistogram.setOnAction(event -> this.showHistogram());
         showMenu.getItems().add(showHistogram);
-
-        this.mainMenu.getMenus().addAll(transformMenu, showMenu);
+        this.menu = new ContextMenu(save,transformMenu, showMenu);
+        this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }
 
     private void showHistogram(){
-        if(this.box.getChildren().size()==1){
+        if(this.pane.getChildren().size()==1){
             double [] data = new Functions(this.image).greyHistogram();
             String[] labels = new String[256];
             for (int i = 0; i < 256; i++) {
@@ -99,9 +98,9 @@ public class ImageGreyViewer extends ImageViewer {
             BarChart chart = Histogram.createHistogram(labels,data);
             chart.getYAxis().setLabel("");
             chart.getXAxis().setLabel("Intensity");
-            this.box.getChildren().add(chart);
+            this.pane.getChildren().add(chart);
 //            this.stage.setHeight(image.getHeight() + 80);
-            this.stage.setWidth(this.stage.getWidth() + 500);
+//            this.stage.setWidth(this.stage.getWidth() + 500);
         }
     }
 
@@ -125,7 +124,7 @@ public class ImageGreyViewer extends ImageViewer {
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Image files", "*.pgm","*.raw")
         );
-        File file = fileChooser.showSaveDialog(stage);
+        File file = fileChooser.showSaveDialog(ATIApp.WINDOWS.get(windowIndex).stage);
 
         IOManager.savePGM(file.getPath(), image);
     }
