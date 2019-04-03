@@ -56,7 +56,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Add Images");
+        Text scenetitle = new Text("Sum Images");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -1174,7 +1174,7 @@ public class ImageGreyTransformer {
         this.outputImage = new Functions(this.originalImage).gaussFilter(1,0);
 
         Stage stage = new Stage();
-        stage.setTitle("Apply median filter");
+        stage.setTitle("Apply gaussian filter");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -1310,13 +1310,18 @@ public class ImageGreyTransformer {
         EventHandler<MouseEvent> mouseRelease = e -> {
             cutRegion.x2 = (int) e.getX();
             cutRegion.y2 = (int) e.getY();
+            int minX = Math.max(Math.min(cutRegion.x1,cutRegion.x2),0);
+            int maxX = Math.min(Math.max(cutRegion.x1,cutRegion.x2),originalImage.getWidth()-1);
+            int minY = Math.max(Math.min(cutRegion.y1,cutRegion.y2),0);
+            int maxY = Math.min(Math.max(cutRegion.y1,cutRegion.y2),originalImage.getHeight()-1);
+
             grid.getChildren().remove(outputImage.getView());
-            int width = Math.abs(cutRegion.x1-cutRegion.x2+1);
-            int height = Math.abs(cutRegion.y1-cutRegion.y2+1);
+            int width = maxX-minX+1;
+            int height = maxY-minY+1;
             Integer[][] cutImage = new Integer[height][width];
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
-                    cutImage[i][j] = originalImage.getImage()[i+Math.min(cutRegion.y1,cutRegion.y2)][j+Math.min(cutRegion.x1,cutRegion.x2)];
+            for (int i = minY; i < maxY; i++) {
+                for (int j = minX; j < maxX; j++) {
+                    cutImage[i][j] = originalImage.getPixel(j,i);
                 }
             }
             System.out.println(cutImage);
@@ -1355,7 +1360,7 @@ public class ImageGreyTransformer {
         stage.setScene(scene);
         stage.setMaximized(true);
 
-        stage.setTitle("Multiply image by scalar");
+        stage.setTitle("Cut image");
         stage.show();
     }
 
@@ -1377,7 +1382,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Cut image");
+        Text scenetitle = new Text("Painter");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -1436,15 +1441,13 @@ public class ImageGreyTransformer {
                 text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
             }else{
                 ((ImageGrey)outputImage).setPixel(cutRegion.x1,cutRegion.y1,cutRegion.paintColor);
-                outputImage.updateRenderer();
             }
         };
         EventHandler<MouseEvent> mouseDrag = e -> {
             cutRegion.x1 = (int) e.getX();
             cutRegion.y1 = (int) e.getY();
             if(cutRegion.painterState == 1){
-                ((ImageGrey)outputImage).getImage()[cutRegion.y1][cutRegion.x1] = cutRegion.paintColor;
-                outputImage.updateRenderer();
+                ((ImageGrey)outputImage).setPixel(cutRegion.x1,cutRegion.y1,cutRegion.paintColor);
             }
         };
         outputImage.getView().addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);

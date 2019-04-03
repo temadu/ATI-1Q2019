@@ -152,4 +152,23 @@ public class ImageColor implements ImageInt{
     public WritableImage getRenderer() { return renderer; }
     public ImageView getView() { return view; }
 
+    public void setPixel(int x, int y, Integer[] color){
+        if(x >= 0 && x < width
+            && y >= 0 && y < height
+            && color.length == 3
+            && color[0] >= 0 && color[0] < 256
+            && color[1] >= 0 && color[1] < 256
+            && color[2] >= 0 && color[2] < 256){
+            this.red[y][x] = color[0];
+            this.green[y][x] = color[1];
+            this.blue[y][x] = color[2];
+            this.renderer.getPixelWriter().setColor(x,y,Color.rgb(color[0], color[1], color[2]));
+        }
+    }
+    public Integer[] getPixel(int x, int y){
+        if(x >= 0 && x < width && y >= 0 && y < height){
+            return new Integer[] {this.red[y][x], this.green[y][x], this.blue[y][x]};
+        }
+        return null;
+    }
 }

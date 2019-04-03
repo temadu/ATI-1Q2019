@@ -153,12 +153,11 @@ public class ImageGrey implements ImageInt{
         if(x >= 0 && x < width && y >= 0 && y < height
                 && color >= 0 && color < 256){
             this.image[y][x] = color;
-
+            this.renderer.getPixelWriter().setColor(x,y,Color.grayRgb(color));
         }
     }
-    public Integer getPixel(int x, int y, int color){
-        if(x >= 0 && x < width && y >= 0 && y < height
-                && color >= 0 && color < 256){
+    public Integer getPixel(int x, int y){
+        if(x >= 0 && x < width && y >= 0 && y < height){
             return this.image[y][x];
         }
         return null;
