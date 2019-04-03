@@ -26,9 +26,9 @@ public class Functions {
     private Integer[][] clamp(Integer[][] m) {
         int max = Arrays.stream(m).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();
         int min = Arrays.stream(m).mapToInt(a -> Arrays.stream(a).min(Comparator.naturalOrder()).get()).min().getAsInt();
-//        if(max < 256 && min >= 0){
-//            return m;
-//        }
+        if(max < 256 && min >= 0){
+            return m;
+        }
         double mult = 255.0/(max - min);
         Integer[][] as = Arrays.stream(m).parallel().map(a -> Arrays.stream(a).map(p -> (int) ((double) (p - min) * mult)).toArray(Integer[]::new)).toArray(Integer[][]::new);
         return as;
@@ -120,6 +120,10 @@ public class Functions {
             maxRed = Arrays.stream(red).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();;
             maxGreen = Arrays.stream(green).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();;
             maxBlue = Arrays.stream(blue).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();;
+        }
+        if(maxRed < 256 && maxGreen < 256 && maxBlue < 256){
+            return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                    : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
         }
         double multiplierR = 255.0 / Math.log(1 + maxRed);
         double multiplierG = 255.0 / Math.log(1 + maxGreen);
