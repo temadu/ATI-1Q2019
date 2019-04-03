@@ -32,6 +32,9 @@ public class ImageColorViewer extends ImageViewer{
     private void addColorContextMenu(){
         MenuItem save = new MenuItem("Save image");
         save.setOnAction(event -> this.saveImage());
+        MenuItem remove = new MenuItem("Remove");
+        remove.setOnAction(event -> ATIApp.WINDOWS.get(this.windowIndex).imageViews.getChildren().remove(this.getPane()));
+
 
         final Menu transformMenu = new Menu("Transform");
         MenuItem painter = new MenuItem("Get and Set Colors");
@@ -78,7 +81,7 @@ public class ImageColorViewer extends ImageViewer{
         transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
                 gaussNoise, rayleighNoise, expNoise, saltAndPepper,
                 meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
-        this.menu = new ContextMenu(save,transformMenu);
+        this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }
 

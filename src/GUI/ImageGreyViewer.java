@@ -29,6 +29,8 @@ public class ImageGreyViewer extends ImageViewer {
     private void addGreyContextMenu(){
         MenuItem save = new MenuItem("Save image");
         save.setOnAction(event -> this.saveImage());
+        MenuItem remove = new MenuItem("Remove");
+        remove.setOnAction(event -> ATIApp.WINDOWS.get(this.windowIndex).imageViews.getChildren().remove(this.getPane()));
 
         final Menu transformMenu = new Menu("Transform");
         MenuItem cutter = new MenuItem("Cut Image");
@@ -80,11 +82,11 @@ public class ImageGreyViewer extends ImageViewer {
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
 
 
-        final Menu showMenu = new Menu("Show");
-        MenuItem showHistogram = new MenuItem("Histogram");
+//        final Menu showMenu = new Menu("Show");
+        MenuItem showHistogram = new MenuItem("Show Histogram");
         showHistogram.setOnAction(event -> this.showHistogram());
-        showMenu.getItems().add(showHistogram);
-        this.menu = new ContextMenu(save,transformMenu, showMenu);
+//        showMenu.getItems().add(showHistogram);
+        this.menu = new ContextMenu(save,remove,transformMenu, showHistogram);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }
 
