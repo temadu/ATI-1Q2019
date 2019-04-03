@@ -38,6 +38,19 @@ public class ImageColor implements ImageInt{
         this.view = new ImageView(this.renderer);
     }
 
+    public ImageColor(Integer[][] red, Integer[][] green, Integer[][] blue, int height, int width, boolean render){
+        this.red = red;
+        this.green = green;
+        this.blue = blue;
+        this.height = height;
+        this.width = width;
+        if(render) {
+            this.renderer = new WritableImage(width, height);
+            this.updateRenderer();
+            this.view = new ImageView(this.renderer);
+        }
+    }
+
     public void parse(String filePath) throws IOException {
 
         //Parse header

@@ -39,6 +39,20 @@ public class ImageGrey implements ImageInt{
         calcMean();
         calcStd();
     }
+
+    public ImageGrey(Integer[][] image, int height, int width, boolean renderer){
+        this.image = image;
+        this.height = height;
+        this.width = width;
+        if(renderer){
+            this.renderer = new WritableImage(width, height);
+            this.updateRenderer();
+            this.view = new ImageView(this.renderer);
+        }
+        calcMean();
+        calcStd();
+    }
+
     public ImageGrey(){
 
     }

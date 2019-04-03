@@ -272,9 +272,15 @@ public class ImageColorTransformer {
         stage.setTitle("Multiply image by scalar");
         stage.show();
     }
+
     public void dynamicRangeCompression(ImageColor originalImage){
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)new Functions(originalImage).rangeCompressor(),windowIndex));
     }
+
+    public void prewitt(ImageColor originalImage){
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)new Functions(originalImage).prewittOperator(),windowIndex));
+    }
+
     public void gammaFunction(ImageColor originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).imageProd(1);

@@ -4,6 +4,7 @@ import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -420,7 +421,7 @@ public class Functions {
                 w[i][j] = 1.0/(double)(n*n);
             }
         }
-        return filter(w, false);
+        return filter(w, false, true);
     }
 
     public ImageInt medianFilter(int n) {
@@ -430,7 +431,7 @@ public class Functions {
                 w[i][j] = 1;
             }
         }
-        return filter(w, true);
+        return filter(w, true, true);
     }
 
     public ImageInt weightedMedianFilter(int n) {
@@ -449,7 +450,7 @@ public class Functions {
 //                w[n - i - 1][j] = 1 + i + j;
 //            }
 //        }
-        return filter(w, true);
+        return filter(w, true, true);
     }
 
     public ImageInt highpassFilter(int n) {
@@ -463,7 +464,7 @@ public class Functions {
             }
         }
         w[half][half] = 1.0-(1.0/(double)(n*n));
-        return filter(w, false);
+        return filter(w, false, true);
     }
 
     public ImageInt gaussFilter(int n, double sigma) {
@@ -482,10 +483,55 @@ public class Functions {
                 w[i + half][j + half] *= (1.0/total);
             }
         }
-        return filter(w, false);
+        return filter(w, false, true);
     }
 
-    private ImageInt filter(double[][] w, boolean median) {
+    public ImageInt prewittOperator() {
+        double[][] w1 = new double[3][3];
+        double[][] w2 = new double[3][3];
+
+//        int half = (int) Math.floor(n/2);
+        w1[0][0] = w1[0][1] = w1[0][2] = -1.0;
+        w1[1][0] = w1[1][1] = w1[1][2] = 0.0;
+        w1[2][0] = w1[2][1] = w1[2][2] = 1.0;
+
+        ImageInt i1 = filter(w1, false, false);
+
+        w2[0][0] = w2[1][0] = w2[2][0] = -1.0;
+        w2[0][1] = w2[1][1] = w2[2][1] = 0.0;
+        w2[0][2] = w2[1][2] = w2[2][2] = 1.0;
+
+        ImageInt i2 = filter(w2, false, false);
+
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                if(greyscale) {
+                    red[i][j] = Math.abs(((ImageGrey)i1).getImage()[i][j]) + Math.abs(((ImageGrey)i2).getImage()[i][j]);
+                } else {
+                    red[i][j] = Math.abs(((ImageColor)i1).getRed()[i][j]) + Math.abs(((ImageColor)i2).getRed()[i][j]);
+                    green[i][j] = Math.abs(((ImageColor)i1).getGreen()[i][j]) + Math.abs(((ImageColor)i2).getGreen()[i][j]);
+                    blue[i][j] = Math.abs(((ImageColor)i1).getBlue()[i][j]) + Math.abs(((ImageColor)i2).getBlue()[i][j]);
+                }
+            }
+        }
+
+        if(greyscale){
+            red = this.clamp(red);
+        } else {
+            red = this.clamp(red);
+            green = this.clamp(green);
+            blue = this.clamp(blue);
+        }
+
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+    }
+
+    private ImageInt filter(double[][] w, boolean median, boolean clamp) {
         int n = w.length;
         int half = (int) Math.floor(n/2);
 
@@ -493,7 +539,7 @@ public class Functions {
         Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getHeight(); j++) {
+            for (int j = 0; j < image.getWidth(); j++) {
                 double sum = 0;
                 double sum2 = 0;
                 double sum3 = 0;
@@ -552,18 +598,18 @@ public class Functions {
 
             }
         }
-        if(!median){
+        if(!median && clamp){
             if(greyscale){
-                red = clamp(red);
+                red = this.clamp(red);
             } else {
-                red = clamp(red);
-                green = clamp(green);
-                blue = clamp(blue);
+                red = this.clamp(red);
+                green = this.clamp(green);
+                blue = this.clamp(blue);
             }
         }
 
-        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
-                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth(), clamp)
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth(), clamp);
 
     }
 }

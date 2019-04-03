@@ -49,6 +49,8 @@ public class ImageGreyViewer extends ImageViewer {
         rangeCompressor.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
         negative.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).negative(this.image));
+        MenuItem prewitt = new MenuItem("Prewitt");
+        prewitt.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).prewitt(this.image));
 
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
         MenuItem contrast = new MenuItem("Contrast Improvement");
@@ -79,7 +81,7 @@ public class ImageGreyViewer extends ImageViewer {
 
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
                 histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
-                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter);
+                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, prewitt);
 
 
 //        final Menu showMenu = new Menu("Show");
