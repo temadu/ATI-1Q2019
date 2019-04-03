@@ -28,7 +28,7 @@ public class ImageGreyViewer extends ImageViewer {
 
     private void addGreyContextMenu(){
         MenuItem save = new MenuItem("Save image");
-//        save.setOnAction(event -> this.saveImage());
+        save.setOnAction(event -> this.saveImage());
 
         final Menu transformMenu = new Menu("Transform");
         MenuItem cutter = new MenuItem("Cut Image");
