@@ -133,49 +133,49 @@ public class ATIApp extends Application {
         );
         File file = fileChooser.showOpenDialog(stage);
 
-        String extension = file.getName();
+        if(file != null){
+            String extension = file.getName();
 
-        int i = extension.lastIndexOf('.');
-        if (i > 0) {
-            extension = extension.substring(i+1);
+            int i = extension.lastIndexOf('.');
+            if (i > 0) {
+                extension = extension.substring(i+1);
+            }
+
+            if(extension.toLowerCase().equals("ppm")){
+                ImageColor openedImage;
+                try {
+                    openedImage = IOManager.loadPPM(file.getPath());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+                this.addImageViewer(new ImageColorViewer(openedImage, this.windowIndex));
+
+//            this.stage.close();
+            }else if(extension.toLowerCase().equals("pgm")){
+                ImageGrey openedImage;
+                try {
+                    openedImage = IOManager.loadPGM(file.getPath());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+                this.addImageViewer(new ImageGreyViewer(openedImage, this.windowIndex));
+
+//            this.stage.close();
+            }else if(extension.toLowerCase().equals("raw")) {
+                ImageGrey openedImage;
+
+                try {
+                    openedImage = IOManager.loadRAW(file.getPath());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+                this.addImageViewer(new ImageGreyViewer(openedImage, this.windowIndex));
+//            this.stage.close();
+            }
         }
-
-        if(extension.toLowerCase().equals("ppm")){
-            ImageColor openedImage;
-            try {
-                openedImage = IOManager.loadPPM(file.getPath());
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                return;
-            }
-            this.addImageViewer(new ImageColorViewer(openedImage, this.windowIndex));
-
-//            this.stage.close();
-        }else if(extension.toLowerCase().equals("pgm")){
-            ImageGrey openedImage;
-            try {
-                openedImage = IOManager.loadPGM(file.getPath());
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                return;
-            }
-            this.addImageViewer(new ImageGreyViewer(openedImage, this.windowIndex));
-
-//            this.stage.close();
-        }else if(extension.toLowerCase().equals("raw")) {
-            ImageGrey openedImage;
-
-            try {
-                openedImage = IOManager.loadRAW(file.getPath());
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                return;
-            }
-            this.addImageViewer(new ImageGreyViewer(openedImage, this.windowIndex));
-//            this.stage.close();
-        }
-
-
     }
 
     public void addImageViewer(ImageViewer imageViewer){

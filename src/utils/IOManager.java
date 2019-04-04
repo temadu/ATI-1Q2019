@@ -4,6 +4,9 @@ import models.ImageColor;
 import models.ImageGrey;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -184,5 +187,27 @@ public class IOManager {
         return new ImageGrey(data2D, picHeight, picWidth);
     }
 
+    public static void saveRAW(String filePath, String name ,ImageGrey image){
+        try {
+            System.out.println(filePath);
+            Integer[][] rawImage = image.getImage();
+            OutputStream w = new FileOutputStream(filePath);
+            int height = image.getHeight();
+            int width = image.getWidth();
+
+            for (int row = 0; row < height; row++) {
+                for (int col = 0; col < width; col++) {
+                    w.write(rawImage[row][col].byteValue());
+                }
+            }
+            w.close();
+
+            String info = "\n" + name + "      " + width + "       " + height;
+
+            Files.write(Paths.get("images/informacion.txt"), info.getBytes(), StandardOpenOption.APPEND);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

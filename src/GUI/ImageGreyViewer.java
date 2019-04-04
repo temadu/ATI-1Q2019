@@ -27,8 +27,13 @@ public class ImageGreyViewer extends ImageViewer {
     }
 
     private void addGreyContextMenu(){
-        MenuItem save = new MenuItem("Save image");
-        save.setOnAction(event -> this.saveImage());
+        Menu save = new Menu("Save image");
+        MenuItem savePGM = new MenuItem("As PGM");
+        savePGM.setOnAction(event -> this.saveImagePGM());
+        MenuItem saveRAW = new MenuItem("As RAW");
+        saveRAW.setOnAction(event -> this.saveImageRAW());
+        save.getItems().addAll(savePGM,saveRAW);
+
         MenuItem remove = new MenuItem("Remove");
         remove.setOnAction(event -> ATIApp.WINDOWS.get(this.windowIndex).imageViews.getChildren().remove(this.getPane()));
 
@@ -122,14 +127,25 @@ public class ImageGreyViewer extends ImageViewer {
 //        );
 //    }
 
-    protected void saveImage(){
+    protected void saveImagePGM(){
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./images"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.raw")
+                new FileChooser.ExtensionFilter("Image files", "*.pgm")
         );
         File file = fileChooser.showSaveDialog(ATIApp.WINDOWS.get(windowIndex).stage);
 
         IOManager.savePGM(file.getPath(), image);
+    }
+
+    protected void saveImageRAW(){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File("./images"));
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image files", "*.raw")
+        );
+        File file = fileChooser.showSaveDialog(ATIApp.WINDOWS.get(windowIndex).stage);
+
+        IOManager.saveRAW(file.getPath(), file.getName(),image);
     }
 }
