@@ -1100,12 +1100,12 @@ public class ImageGreyTransformer {
         stage.show();
     }
 
-    public void laplacianFilter(ImageGrey originalImage){
+    public void highpassFilter(ImageGrey originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).highpassFilter(3);
 
         Stage stage = new Stage();
-        stage.setTitle("Apply laplacian filter");
+        stage.setTitle("Apply highpass filter");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -1114,7 +1114,7 @@ public class ImageGreyTransformer {
         grid.setPadding(new Insets(25, 25, 25, 25));
 
 
-        Text scenetitle = new Text("Apply laplacian filter");
+        Text scenetitle = new Text("Apply highpass filter");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -1197,29 +1197,29 @@ public class ImageGreyTransformer {
         multField.setText("1");
         grid.add(multField, 1, 1);
 
-        grid.add(new Label("Sigma:"), 0, 2);
-        Slider sigmaSlider = new Slider();
-        sigmaSlider.setMin(0);
-        sigmaSlider.setMax(10);
-        sigmaSlider.setValue(0.1);
-        sigmaSlider.setShowTickLabels(true);
-        sigmaSlider.setShowTickMarks(true);
-        sigmaSlider.setMajorTickUnit(5);
-        sigmaSlider.setMinorTickCount(1);
-        sigmaSlider.setBlockIncrement(1);
-        grid.add(sigmaSlider, 1, 2);
-
-        sigmaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            int multiplier = 0;
-            try {
-                multiplier = Integer.parseInt(multField.getText());
-            } catch (NumberFormatException | NullPointerException nfe) {
-                return;
-            }
-            grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).gaussFilter(multiplier, newValue.doubleValue());
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
-        });
+//        grid.add(new Label("Sigma:"), 0, 2);
+//        Slider sigmaSlider = new Slider();
+//        sigmaSlider.setMin(0);
+//        sigmaSlider.setMax(10);
+//        sigmaSlider.setValue(0.1);
+//        sigmaSlider.setShowTickLabels(true);
+//        sigmaSlider.setShowTickMarks(true);
+//        sigmaSlider.setMajorTickUnit(5);
+//        sigmaSlider.setMinorTickCount(1);
+//        sigmaSlider.setBlockIncrement(1);
+//        grid.add(sigmaSlider, 1, 2);
+//
+//        sigmaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+//            int multiplier = 0;
+//            try {
+//                multiplier = Integer.parseInt(multField.getText());
+//            } catch (NumberFormatException | NullPointerException nfe) {
+//                return;
+//            }
+//            grid.getChildren().remove(outputImage.getView());
+//            this.outputImage = new Functions(this.originalImage).gaussFilter(multiplier, newValue.doubleValue());
+//            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+//        });
         multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             if (!newValue.matches("\\d*")) {
                 multField.setText(oldValue);
@@ -1232,9 +1232,8 @@ public class ImageGreyTransformer {
                 }
                 if(multiplier >= 0){
                     grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(this.originalImage).gaussFilter(multiplier, sigmaSlider.getValue());
+                    this.outputImage = new Functions(this.originalImage).gaussFilter(multiplier, (multiplier-1)/2);
                     grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
-
                 }
             }
         });

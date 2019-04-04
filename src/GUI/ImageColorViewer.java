@@ -66,7 +66,7 @@ public class ImageColorViewer extends ImageViewer{
         MenuItem meanFilter = new MenuItem("Add Mean Filter");
         MenuItem medianFilter = new MenuItem("Add Median Filter");
         MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
-        MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
+        MenuItem laplacianFilter = new MenuItem("Add Highpass Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
 
         gaussNoise.setOnAction(e -> new ImageColorTransformer(windowIndex).addGaussianNoise(this.image));
@@ -77,7 +77,7 @@ public class ImageColorViewer extends ImageViewer{
         meanFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).meanFilter(this.image));
         medianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).medianFilter(this.image));
         weightedMedianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).weightedMedianFilter(this.image));
-        laplacianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).laplacianFilter(this.image));
+        laplacianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).highpassFilter(this.image));
         gaussFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).gaussFilter(this.image));
 
         transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,

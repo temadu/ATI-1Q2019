@@ -202,7 +202,7 @@ public class IOManager {
             }
             w.close();
 
-            String info = "\n" + name + "      " + width + "       " + height;
+            String info = "\r\n" + name + "      " + width + "       " + height;
 
             Files.write(Paths.get("images/informacion.txt"), info.getBytes(), StandardOpenOption.APPEND);
         } catch (Exception e) {

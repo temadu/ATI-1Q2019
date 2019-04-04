@@ -67,7 +67,7 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem meanFilter = new MenuItem("Add Mean Filter");
         MenuItem medianFilter = new MenuItem("Add Median Filter");
         MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
-        MenuItem laplacianFilter = new MenuItem("Add Laplacian Filter");
+        MenuItem laplacianFilter = new MenuItem("Add Highpass Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
         histogramEqualization.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).histogramEqualization(this.image));
         contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
@@ -79,7 +79,7 @@ public class ImageGreyViewer extends ImageViewer {
         meanFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).meanFilter(this.image));
         medianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).medianFilter(this.image));
         weightedMedianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).weightedMedianFilter(this.image));
-        laplacianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianFilter(this.image));
+        laplacianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).highpassFilter(this.image));
         gaussFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).gaussFilter(this.image));
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
