@@ -84,11 +84,16 @@ public class ATIApp extends Application {
             this.openImage();
 //            this.testZone();
         });
+        MenuItem removeAll = new MenuItem("Remove All");
+        removeAll.setOnAction(e -> {
+            this.imageViews.getChildren().clear();
+//            this.testZone();
+        });
 
         MenuItem exit = new MenuItem("Exit");
         exit.setOnAction(e-> stage.close());
 
-        fileMenu.getItems().addAll(openItem,exit);
+        fileMenu.getItems().addAll(openItem, removeAll,exit);
 
         final Menu generateMenu = new Menu("Generate");
         MenuItem generateSquare = new MenuItem("Square");
