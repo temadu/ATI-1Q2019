@@ -41,14 +41,19 @@ public class Functions {
         Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
 
+        Integer r;
+        Integer[] rgb;
+
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(greyscale){
-                    red[i][j] = ((ImageGrey) image).getImage()[i][j] + ((ImageGrey) addend).getImage()[i][j];
+                    r = ((ImageGrey) addend).getPixel(j,i);
+                    red[i][j] = ((ImageGrey) image).getImage()[i][j] + (r!=null?r:0);
                 } else {
-                    red[i][j] = ((ImageColor) image).getRed()[i][j] + ((ImageColor) addend).getRed()[i][j];
-                    green[i][j] = ((ImageColor) image).getGreen()[i][j] + ((ImageColor) addend).getGreen()[i][j];
-                    blue[i][j] = ((ImageColor) image).getBlue()[i][j] + ((ImageColor) addend).getBlue()[i][j];
+                    rgb = ((ImageColor) addend).getPixel(j,i);
+                    red[i][j] = ((ImageColor) image).getRed()[i][j] + (rgb!=null?rgb[0]:0);
+                    green[i][j] = ((ImageColor) image).getGreen()[i][j] + (rgb!=null?rgb[1]:0);
+                    blue[i][j] = ((ImageColor) image).getBlue()[i][j] + (rgb!=null?rgb[2]:0);
                 }
             }
         }
@@ -67,14 +72,20 @@ public class Functions {
         Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+
+        Integer r;
+        Integer[] rgb;
+
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
-                if (greyscale) {
-                    red[i][j] = ((ImageGrey)image).getImage()[i][j] - ((ImageGrey)substract).getImage()[i][j];
+                if(greyscale){
+                    r = ((ImageGrey) substract).getPixel(j,i);
+                    red[i][j] = ((ImageGrey) image).getImage()[i][j] - (r!=null?r:0);
                 } else {
-                    red[i][j] = ((ImageColor)image).getRed()[i][j] - ((ImageColor)substract).getRed()[i][j];
-                    green[i][j] = ((ImageColor)image).getGreen()[i][j] - ((ImageColor)substract).getGreen()[i][j];
-                    blue[i][j] = ((ImageColor)image).getBlue()[i][j] - ((ImageColor)substract).getBlue()[i][j];
+                    rgb = ((ImageColor) substract).getPixel(j,i);
+                    red[i][j] = ((ImageColor) image).getRed()[i][j] - (rgb!=null?rgb[0]:0);
+                    green[i][j] = ((ImageColor) image).getGreen()[i][j] - (rgb!=null?rgb[1]:0);
+                    blue[i][j] = ((ImageColor) image).getBlue()[i][j] - (rgb!=null?rgb[2]:0);
                 }
             }
         }
