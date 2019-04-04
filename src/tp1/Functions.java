@@ -521,11 +521,60 @@ public class Functions {
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
                 if(greyscale) {
-                    red[i][j] = Math.abs(((ImageGrey)i1).getImage()[i][j]) + Math.abs(((ImageGrey)i2).getImage()[i][j]);
+                    red[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageGrey)i1).getImage()[i][j], 2) + Math.pow(((ImageGrey)i2).getImage()[i][j], 2)));
                 } else {
-                    red[i][j] = Math.abs(((ImageColor)i1).getRed()[i][j]) + Math.abs(((ImageColor)i2).getRed()[i][j]);
-                    green[i][j] = Math.abs(((ImageColor)i1).getGreen()[i][j]) + Math.abs(((ImageColor)i2).getGreen()[i][j]);
-                    blue[i][j] = Math.abs(((ImageColor)i1).getBlue()[i][j]) + Math.abs(((ImageColor)i2).getBlue()[i][j]);
+                    red[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageColor)i1).getRed()[i][j], 2) + Math.pow(((ImageColor)i2).getRed()[i][j], 2)));
+                    green[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageColor)i1).getGreen()[i][j], 2) + Math.pow(((ImageColor)i2).getGreen()[i][j], 2)));
+                    blue[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageColor)i1).getBlue()[i][j], 2) + Math.pow(((ImageColor)i2).getBlue()[i][j], 2)));
+                }
+            }
+        }
+
+        if(greyscale){
+            red = this.clamp(red);
+        } else {
+            red = this.clamp(red);
+            green = this.clamp(green);
+            blue = this.clamp(blue);
+        }
+
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+    }
+
+    public ImageInt sobelOperator() {
+        double[][] w1 = new double[3][3];
+        double[][] w2 = new double[3][3];
+
+//        int half = (int) Math.floor(n/2);
+        w1[0][0] = w1[0][2] = -1.0;
+        w1[1][0] = w1[1][1] = w1[1][2] = 0.0;
+        w1[2][0] = w1[2][2] = 1.0;
+        w1[0][1] = -2.0;
+        w1[2][1] = 2.0;
+
+        ImageInt i1 = filter(w1, false, false);
+
+        w2[0][0] = w2[2][0] = -1.0;
+        w2[0][1] = w2[1][1] = w2[2][1] = 0.0;
+        w2[0][2] = w2[2][2] = 1.0;
+        w2[1][0] = -2.0;
+        w2[1][2] = 2.0;
+
+        ImageInt i2 = filter(w2, false, false);
+
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                if(greyscale) {
+                    red[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageGrey)i1).getImage()[i][j], 2) + Math.pow(((ImageGrey)i2).getImage()[i][j], 2)));
+                } else {
+                    red[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageColor)i1).getRed()[i][j], 2) + Math.pow(((ImageColor)i2).getRed()[i][j], 2)));
+                    green[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageColor)i1).getGreen()[i][j], 2) + Math.pow(((ImageColor)i2).getGreen()[i][j], 2)));
+                    blue[i][j] = (int) Math.floor(Math.sqrt(Math.pow(((ImageColor)i1).getBlue()[i][j], 2) + Math.pow(((ImageColor)i2).getBlue()[i][j], 2)));
                 }
             }
         }

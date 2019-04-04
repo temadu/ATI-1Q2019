@@ -375,6 +375,10 @@ public class ImageGreyTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).prewittOperator(),windowIndex));
     }
 
+    public void sobel(ImageGrey originalImage){
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).sobelOperator(),windowIndex));
+    }
+
     public void histogramEqualization(ImageGrey originalImage){
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).histogramEqualization(),windowIndex));
     }

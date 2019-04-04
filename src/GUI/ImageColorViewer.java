@@ -58,6 +58,9 @@ public class ImageColorViewer extends ImageViewer{
         MenuItem prewitt = new MenuItem("Prewitt");
         prewitt.setOnAction(e -> new ImageColorTransformer(this.windowIndex).prewitt(this.image));
 
+        MenuItem sobel = new MenuItem("Sobel");
+        sobel.setOnAction(e -> new ImageColorTransformer(this.windowIndex).sobel(this.image));
+
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
         MenuItem expNoise = new MenuItem("Add Exponential Noise");
@@ -82,7 +85,7 @@ public class ImageColorViewer extends ImageViewer{
 
         transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
                 gaussNoise, rayleighNoise, expNoise, saltAndPepper,
-                meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, prewitt);
+                meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, prewitt, sobel);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }

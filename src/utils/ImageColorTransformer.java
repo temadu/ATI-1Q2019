@@ -281,6 +281,10 @@ public class ImageColorTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)new Functions(originalImage).prewittOperator(),windowIndex));
     }
 
+    public void sobel(ImageColor originalImage){
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)new Functions(originalImage).sobelOperator(),windowIndex));
+    }
+
     public void gammaFunction(ImageColor originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).imageProd(1);
