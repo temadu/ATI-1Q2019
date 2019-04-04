@@ -1314,29 +1314,27 @@ public class ImageGreyTransformer {
         EventHandler<MouseEvent> mouseRelease = e -> {
             cutRegion.x2 = (int) e.getX();
             cutRegion.y2 = (int) e.getY();
+            System.out.println("X2: " + cutRegion.x2 + ", Y2: " + cutRegion.y2);
+
             int minX = Math.max(Math.min(cutRegion.x1,cutRegion.x2),0);
             int maxX = Math.min(Math.max(cutRegion.x1,cutRegion.x2),originalImage.getWidth()-1);
             int minY = Math.max(Math.min(cutRegion.y1,cutRegion.y2),0);
             int maxY = Math.min(Math.max(cutRegion.y1,cutRegion.y2),originalImage.getHeight()-1);
+            System.out.println("X: [" + minX + ", " + maxX + "]");
+            System.out.println("Y: [" + minY + ", " + maxY + "]");
 
             grid.getChildren().remove(outputImage.getView());
-            int width = maxX-minX+1;
-            int height = maxY-minY+1;
+            int width = (maxX-minX)+1;
+            int height = (maxY-minY)+1;
+            System.out.println("Width:" + width + ", Height:" + height);
             Integer[][] cutImage = new Integer[height][width];
-            for (int i = minY; i < maxY; i++) {
-                for (int j = minX; j < maxX; j++) {
-                    cutImage[i][j] = originalImage.getPixel(j,i);
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    cutImage[i][j] = originalImage.getPixel(minX+j,minY+i);
                 }
             }
-            System.out.println(cutImage);
-            System.out.println(width);
-            System.out.println(cutImage[0].length);
-            System.out.println(height);
-            System.out.println(cutImage.length);
             this.outputImage = new ImageGrey(cutImage, height, width);
             grid.add(outputImage.getView(), 1, 3);
-            System.out.println("X2: " + cutRegion.x2 + ", Y2: " + cutRegion.y2);
-
 
         };
         //Registering the event filter

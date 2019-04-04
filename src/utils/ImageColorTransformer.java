@@ -1311,25 +1311,31 @@ public class ImageColorTransformer {
         EventHandler<MouseEvent> mouseRelease = e -> {
             cutRegion.x2 = (int) e.getX();
             cutRegion.y2 = (int) e.getY();
-            grid.getChildren().remove(outputImage.getView());
-            int width = Math.abs(cutRegion.x1-cutRegion.x2+1);
-            int height = Math.abs(cutRegion.y1-cutRegion.y2+1);
-            Integer[][][] cutImage = new Integer[height][width][3];
-            for (int i = 0; i < height; i++) {
-                for (int j = 0; j < width; j++) {
-                    cutImage[i][j] = originalImage.getPixel(j+Math.min(cutRegion.x1,cutRegion.x2), i+Math.min(cutRegion.y1,cutRegion.y2));
-                }
-            }
-            System.out.println(cutImage);
-            System.out.println(width);
-            System.out.println(cutImage[0].length);
-            System.out.println(height);
-            System.out.println(cutImage.length);
-            this.outputImage = new ImageColor(cutImage[0], cutImage[1], cutImage[2], height, width);
-            grid.add(outputImage.getView(), 1, 3);
             System.out.println("X2: " + cutRegion.x2 + ", Y2: " + cutRegion.y2);
 
+            int minX = Math.max(Math.min(cutRegion.x1,cutRegion.x2),0);
+            int maxX = Math.min(Math.max(cutRegion.x1,cutRegion.x2),originalImage.getWidth()-1);
+            int minY = Math.max(Math.min(cutRegion.y1,cutRegion.y2),0);
+            int maxY = Math.min(Math.max(cutRegion.y1,cutRegion.y2),originalImage.getHeight()-1);
+            System.out.println("X: [" + minX + ", " + maxX + "]");
+            System.out.println("Y: [" + minY + ", " + maxY + "]");
 
+            grid.getChildren().remove(outputImage.getView());
+            int width = (maxX-minX)+1;
+            int height = (maxY-minY)+1;
+            System.out.println("Width:" + width + ", Height:" + height);
+            Integer[][] cutImageR = new Integer[height][width];
+            Integer[][] cutImageG = new Integer[height][width];
+            Integer[][] cutImageB = new Integer[height][width];
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    cutImageR[i][j] = originalImage.getPixel(minX+j,minY+i)[0];
+                    cutImageG[i][j] = originalImage.getPixel(minX+j,minY+i)[1];
+                    cutImageB[i][j] = originalImage.getPixel(minX+j,minY+i)[2];
+                }
+            }
+            this.outputImage = new ImageColor(cutImageR, cutImageG, cutImageB, height, width);
+            grid.add(outputImage.getView(), 1, 3);
         };
         //Registering the event filter
         input.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
