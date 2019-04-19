@@ -60,6 +60,10 @@ public class ImageColorViewer extends ImageViewer{
 
         MenuItem sobel = new MenuItem("Sobel");
         sobel.setOnAction(e -> new ImageColorTransformer(this.windowIndex).sobel(this.image));
+        MenuItem kirsh = new MenuItem("Kirsh");
+        kirsh.setOnAction(e -> new ImageColorTransformer(this.windowIndex).kirsh(this.image));
+        MenuItem mask5a = new MenuItem("Mask 5a");
+        mask5a.setOnAction(e -> new ImageColorTransformer(this.windowIndex).mask5a(this.image));
 
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");

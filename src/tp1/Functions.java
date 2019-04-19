@@ -520,55 +520,206 @@ public class Functions {
         return null;
     }
 
-    public ImageInt prewittOperator() {
-        double[][] w1 = new double[3][3];
-        double[][] w2 = new double[3][3];
+    private double[][] rotate(double[][] w) {
+        double[][] rot = new double[3][3];
+
+        rot[0][0] = w[1][0];
+        rot[0][1] = w[0][0];
+        rot[0][2] = w[0][1];
+
+        rot[1][0] = w[2][0];
+        rot[1][1] = w[1][1];
+        rot[1][2] = w[0][2];
+
+        rot[2][0] = w[2][1];
+        rot[2][1] = w[2][2];
+        rot[2][2] = w[1][2];
+
+        return rot;
+    }
+
+    public ImageInt prewittOperator(boolean n, boolean w, boolean s, boolean e, boolean nw, boolean ne, boolean sw, boolean se) {
+        double[][] wS = new double[3][3];
+//        double[][] w2 = new double[3][3];
         ArrayList<ImageInt> imgs = new ArrayList<>();
 
 //        int half = (int) Math.floor(n/2);
-        w1[0][0] = w1[0][1] = w1[0][2] = -1.0; //-1 -1 -1
-        w1[1][0] = w1[1][1] = w1[1][2] = 0.0;  // 0  0  0
-        w1[2][0] = w1[2][1] = w1[2][2] = 1.0;  // 1  1  1
+        wS[0][0] = wS[0][1] = wS[0][2] = -1.0; //-1 -1 -1
+        wS[1][0] = wS[1][1] = wS[1][2] = 0.0;  // 0  0  0
+        wS[2][0] = wS[2][1] = wS[2][2] = 1.0;  // 1  1  1
 
-        ImageInt i1 = filter(w1, false, false);
+        double[][] wSW = rotate(wS);
+        double[][] wW = rotate(wSW);
+        double[][] wNW = rotate(wW);
+        double[][] wN = rotate(wNW);
+        double[][] wNE = rotate(wN);
+        double[][] wE = rotate(wNE);
+        double[][] wSE = rotate(wE);
 
-        w2[0][0] = w2[1][0] = w2[2][0] = -1.0; //-1  0  1
-        w2[0][1] = w2[1][1] = w2[2][1] = 0.0;  //-1  0  1
-        w2[0][2] = w2[1][2] = w2[2][2] = 1.0;  //-1  0  1
+        if(s){
+            imgs.add(filter(wS, false, false));
+        }
+        if(sw){
+            imgs.add(filter(wSW, false, false));
+        }
+        if(w){
+            imgs.add(filter(wW, false, false));
+        }
+        if(nw){
+            imgs.add(filter(wNW, false, false));
+        }
+        if(n){
+            imgs.add(filter(wN, false, false));
+        }
+        if(ne){
+            imgs.add(filter(wNE, false, false));
+        }
+        if(e){
+            imgs.add(filter(wE, false, false));
+        }
+        if(se){
+            imgs.add(filter(wSE, false, false));
+        }
 
-        ImageInt i2 = filter(w2, false, false);
-
-        imgs.add(i1);
-        imgs.add(i2);
-        return multiFilter(imgs.toArray());
+        return imgs.size() > 0 ? multiFilter(imgs.toArray()) : image;
 //        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
 //                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
-    public ImageInt sobelOperator() {
-        double[][] w1 = new double[3][3];
-        double[][] w2 = new double[3][3];
+    public ImageInt sobelOperator(boolean n, boolean w, boolean s, boolean e, boolean nw, boolean ne, boolean sw, boolean se) {
+        double[][] wS = new double[3][3];
         ArrayList<ImageInt> imgs = new ArrayList<>();
 //        int half = (int) Math.floor(n/2);
-        w1[0][0] = w1[0][2] = -1.0;
-        w1[1][0] = w1[1][1] = w1[1][2] = 0.0;
-        w1[2][0] = w1[2][2] = 1.0;
-        w1[0][1] = -2.0;
-        w1[2][1] = 2.0;
+        wS[0][0] = wS[0][2] = -1.0;                 // -1  -2  -1
+        wS[1][0] = wS[1][1] = wS[1][2] = 0.0;       //  0   0   0
+        wS[2][0] = wS[2][2] = 1.0;                  //  1   2   1
+        wS[0][1] = -2.0;
+        wS[2][1] = 2.0;
 
-        ImageInt i1 = filter(w1, false, false);
-        imgs.add(i1);
+        double[][] wSW = rotate(wS);
+        double[][] wW = rotate(wSW);
+        double[][] wNW = rotate(wW);
+        double[][] wN = rotate(wNW);
+        double[][] wNE = rotate(wN);
+        double[][] wE = rotate(wNE);
+        double[][] wSE = rotate(wE);
 
-        w2[0][0] = w2[2][0] = -1.0;
-        w2[0][1] = w2[1][1] = w2[2][1] = 0.0;
-        w2[0][2] = w2[2][2] = 1.0;
-        w2[1][0] = -2.0;
-        w2[1][2] = 2.0;
+        if(s){
+            imgs.add(filter(wS, false, false));
+        }
+        if(sw){
+            imgs.add(filter(wSW, false, false));
+        }
+        if(w){
+            imgs.add(filter(wW, false, false));
+        }
+        if(nw){
+            imgs.add(filter(wNW, false, false));
+        }
+        if(n){
+            imgs.add(filter(wN, false, false));
+        }
+        if(ne){
+            imgs.add(filter(wNE, false, false));
+        }
+        if(e){
+            imgs.add(filter(wE, false, false));
+        }
+        if(se){
+            imgs.add(filter(wSE, false, false));
+        }
 
-        ImageInt i2 = filter(w2, false, false);
-        imgs.add(i2);
+        return return imgs.size() > 0 ? multiFilter(imgs.toArray()) : image;
+    }
 
-        return multiFilter(imgs.toArray());
+    public ImageInt kirshOperator(boolean n, boolean w, boolean s, boolean e, boolean nw, boolean ne, boolean sw, boolean se) {
+        double[][] wS = new double[3][3];
+        ArrayList<ImageInt> imgs = new ArrayList<>();
+//        int half = (int) Math.floor(n/2);
+        wS[0][0] = wS[0][1] = wS[0][2] = -3.0;  // -3  -3  -3
+        wS[1][0] = wS[1][2] = -3.0;             // -3   0  -3
+        wS[2][0] = wS[2][1] = wS[2][2] = 5.0;   //  5   5   5
+        wS[1][1] = 0.0;
+
+        double[][] wSW = rotate(wS);
+        double[][] wW = rotate(wSW);
+        double[][] wNW = rotate(wW);
+        double[][] wN = rotate(wNW);
+        double[][] wNE = rotate(wN);
+        double[][] wE = rotate(wNE);
+        double[][] wSE = rotate(wE);
+
+        if(s){
+            imgs.add(filter(wS, false, false));
+        }
+        if(sw){
+            imgs.add(filter(wSW, false, false));
+        }
+        if(w){
+            imgs.add(filter(wW, false, false));
+        }
+        if(nw){
+            imgs.add(filter(wNW, false, false));
+        }
+        if(n){
+            imgs.add(filter(wN, false, false));
+        }
+        if(ne){
+            imgs.add(filter(wNE, false, false));
+        }
+        if(e){
+            imgs.add(filter(wE, false, false));
+        }
+        if(se){
+            imgs.add(filter(wSE, false, false));
+        }
+
+        return return imgs.size() > 0 ? multiFilter(imgs.toArray()) : image;
+    }
+
+    public ImageInt mask5aOperator(boolean n, boolean w, boolean s, boolean e, boolean nw, boolean ne, boolean sw, boolean se) {
+        double[][] wS = new double[3][3];
+        ArrayList<ImageInt> imgs = new ArrayList<>();
+//        int half = (int) Math.floor(n/2);
+        wS[0][0] = wS[0][1] = wS[0][2] = -1.0;  // -1  -1  -1
+        wS[1][0] = wS[1][2] = 1.0;              //  1  -2   1
+        wS[2][0] = wS[2][1] = wS[2][2] = 1.0;   //  1   1   1
+        wS[1][1] = -2.0;
+
+        double[][] wSW = rotate(wS);
+        double[][] wW = rotate(wSW);
+        double[][] wNW = rotate(wW);
+        double[][] wN = rotate(wNW);
+        double[][] wNE = rotate(wN);
+        double[][] wE = rotate(wNE);
+        double[][] wSE = rotate(wE);
+
+        if(s){
+            imgs.add(filter(wS, false, false));
+        }
+        if(sw){
+            imgs.add(filter(wSW, false, false));
+        }
+        if(w){
+            imgs.add(filter(wW, false, false));
+        }
+        if(nw){
+            imgs.add(filter(wNW, false, false));
+        }
+        if(n){
+            imgs.add(filter(wN, false, false));
+        }
+        if(ne){
+            imgs.add(filter(wNE, false, false));
+        }
+        if(e){
+            imgs.add(filter(wE, false, false));
+        }
+        if(se){
+            imgs.add(filter(wSE, false, false));
+        }
+
+        return return imgs.size() > 0 ? multiFilter(imgs.toArray()) : image;
     }
 
     public ImageInt multiFilter(Object[] imgs) {

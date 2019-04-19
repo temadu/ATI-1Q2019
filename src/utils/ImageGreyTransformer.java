@@ -372,11 +372,463 @@ public class ImageGreyTransformer {
     }
 
     public void prewitt(ImageGrey originalImage){
-        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).prewittOperator(),windowIndex));
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).prewittOperator(false,false,true,true,false,false,false,false);
+        Stage stage = new Stage();
+        stage.setTitle("Apply Prewitt");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply Prewitt");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Directions:"), 0, 2, 1,3);
+
+        CheckBox n = new CheckBox();
+
+        n.setSelected(false);
+        CheckBox nw = new CheckBox();
+        nw.setSelected(false);
+        CheckBox ne = new CheckBox();
+        ne.setSelected(false);
+        CheckBox s = new CheckBox();
+        s.setSelected(true);
+        CheckBox sw = new CheckBox();
+        sw.setSelected(false);
+        CheckBox se = new CheckBox();
+        se.setSelected(false);
+        CheckBox e = new CheckBox();
+        e.setSelected(true);
+        CheckBox w = new CheckBox();
+        w.setSelected(false);
+        grid.add(n, 3,3);
+        grid.add(nw, 2,3);
+        grid.add(ne, 4,3);
+        grid.add(s, 3,5);
+        grid.add(sw, 2,5);
+        grid.add(se, 4,5);
+        grid.add(e, 4,4);
+        grid.add(w, 2,4);
+        n.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(newValue, w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        ne.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), newValue, sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1, 4);
+        }));
+        nw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), newValue, ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        s.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(n.isSelected(), w.isSelected(), newValue, e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        se.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        sw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), newValue, se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        e.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(n.isSelected(), w.isSelected(), s.isSelected(), newValue, nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        w.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).prewittOperator(n.isSelected(), newValue, s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 5, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 5, 3,1,4);
+        grid.add(new Label("Output Image:"), 6, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 6, 8);
+
+        outputBtn.setOnAction((ev) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage,windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
     }
 
     public void sobel(ImageGrey originalImage){
-        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).sobelOperator(),windowIndex));
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).sobelOperator(false,false,true,true,false,false,false,false);
+        Stage stage = new Stage();
+        stage.setTitle("Apply Sobel");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply Sobel");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Directions:"), 0, 2, 1,3);
+
+        CheckBox n = new CheckBox();
+
+        n.setSelected(false);
+        CheckBox nw = new CheckBox();
+        nw.setSelected(false);
+        CheckBox ne = new CheckBox();
+        ne.setSelected(false);
+        CheckBox s = new CheckBox();
+        s.setSelected(true);
+        CheckBox sw = new CheckBox();
+        sw.setSelected(false);
+        CheckBox se = new CheckBox();
+        se.setSelected(false);
+        CheckBox e = new CheckBox();
+        e.setSelected(true);
+        CheckBox w = new CheckBox();
+        w.setSelected(false);
+        grid.add(n, 3,3);
+        grid.add(nw, 2,3);
+        grid.add(ne, 4,3);
+        grid.add(s, 3,5);
+        grid.add(sw, 2,5);
+        grid.add(se, 4,5);
+        grid.add(e, 4,4);
+        grid.add(w, 2,4);
+        n.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(newValue, w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        ne.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), newValue, sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1, 4);
+        }));
+        nw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), newValue, ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        s.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(n.isSelected(), w.isSelected(), newValue, e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        se.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        sw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), newValue, se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        e.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(n.isSelected(), w.isSelected(), s.isSelected(), newValue, nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        w.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).sobelOperator(n.isSelected(), newValue, s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 5, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 5, 3,1,4);
+        grid.add(new Label("Output Image:"), 6, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 6, 8);
+
+        outputBtn.setOnAction((ev) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage,windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+    public void kirsh(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).kirshOperator(false,false,true,true,false,false,false,false);
+        Stage stage = new Stage();
+        stage.setTitle("Apply Kirsh");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply Kirsh");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Directions:"), 0, 2, 1,3);
+
+        CheckBox n = new CheckBox();
+
+        n.setSelected(false);
+        CheckBox nw = new CheckBox();
+        nw.setSelected(false);
+        CheckBox ne = new CheckBox();
+        ne.setSelected(false);
+        CheckBox s = new CheckBox();
+        s.setSelected(true);
+        CheckBox sw = new CheckBox();
+        sw.setSelected(false);
+        CheckBox se = new CheckBox();
+        se.setSelected(false);
+        CheckBox e = new CheckBox();
+        e.setSelected(true);
+        CheckBox w = new CheckBox();
+        w.setSelected(false);
+        grid.add(n, 3,3);
+        grid.add(nw, 2,3);
+        grid.add(ne, 4,3);
+        grid.add(s, 3,5);
+        grid.add(sw, 2,5);
+        grid.add(se, 4,5);
+        grid.add(e, 4,4);
+        grid.add(w, 2,4);
+        n.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(newValue, w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        ne.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), newValue, sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1, 4);
+        }));
+        nw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), newValue, ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        s.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(n.isSelected(), w.isSelected(), newValue, e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        se.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        sw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), newValue, se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        e.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(n.isSelected(), w.isSelected(), s.isSelected(), newValue, nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        w.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).kirshOperator(n.isSelected(), newValue, s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 5, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 5, 3,1,4);
+        grid.add(new Label("Output Image:"), 6, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 6, 8);
+
+        outputBtn.setOnAction((ev) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage,windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+    public void mask5a(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).mask5aOperator(false,false,true,true,false,false,false,false);
+        Stage stage = new Stage();
+        stage.setTitle("Apply Mask 5a");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply Mask 5a");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Directions:"), 0, 2, 1,3);
+
+        CheckBox n = new CheckBox();
+
+        n.setSelected(false);
+        CheckBox nw = new CheckBox();
+        nw.setSelected(false);
+        CheckBox ne = new CheckBox();
+        ne.setSelected(false);
+        CheckBox s = new CheckBox();
+        s.setSelected(true);
+        CheckBox sw = new CheckBox();
+        sw.setSelected(false);
+        CheckBox se = new CheckBox();
+        se.setSelected(false);
+        CheckBox e = new CheckBox();
+        e.setSelected(true);
+        CheckBox w = new CheckBox();
+        w.setSelected(false);
+        grid.add(n, 3,3);
+        grid.add(nw, 2,3);
+        grid.add(ne, 4,3);
+        grid.add(s, 3,5);
+        grid.add(sw, 2,5);
+        grid.add(se, 4,5);
+        grid.add(e, 4,4);
+        grid.add(w, 2,4);
+        n.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(newValue, w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        ne.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), newValue, sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1, 4);
+        }));
+        nw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), newValue, ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        s.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(n.isSelected(), w.isSelected(), newValue, e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3, 1,4);
+        }));
+        se.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        sw.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(n.isSelected(), w.isSelected(), s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), newValue, se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        e.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(n.isSelected(), w.isSelected(), s.isSelected(), newValue, nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+        w.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).mask5aOperator(n.isSelected(), newValue, s.isSelected(), e.isSelected(), nw.isSelected(), ne.isSelected(), sw.isSelected(), se.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+        }));
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 5, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 5, 3,1,4);
+        grid.add(new Label("Output Image:"), 6, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 6, 3,1,4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 6, 8);
+
+        outputBtn.setOnAction((ev) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage,windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
     }
 
     public void histogramEqualization(ImageGrey originalImage){
