@@ -839,6 +839,10 @@ public class ImageGreyTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).histogramEqualization(),windowIndex));
     }
 
+    public void globalThreshold(ImageGrey originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).globalThresholdization(),windowIndex));
+    }
+
     public void threshold(ImageGrey originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).thresholdization(128);

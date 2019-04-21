@@ -54,34 +54,36 @@ public class ImageGreyViewer extends ImageViewer {
         rangeCompressor.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
         negative.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).negative(this.image));
+
         MenuItem prewitt = new MenuItem("Prewitt");
         prewitt.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).prewitt(this.image));
         MenuItem sobel = new MenuItem("Sobel");
         sobel.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).sobel(this.image));
-
         MenuItem kirsh = new MenuItem("Kirsh");
         kirsh.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).kirsh(this.image));
         MenuItem mask5a = new MenuItem("Mask 5a");
         mask5a.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).mask5a(this.image));
 
-        MenuItem bilateralFilter = new MenuItem("Add Bilateral Filter");
-        bilateralFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).bilateralFilter(this.image));
 
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
         MenuItem contrast = new MenuItem("Contrast Improvement");
         MenuItem threshold = new MenuItem("Thresholding");
+        MenuItem globalThreshold = new MenuItem("Global Thresholding");
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
         MenuItem expNoise = new MenuItem("Add Exponential Noise");
         MenuItem saltAndPepper = new MenuItem("Add Salt and Pepper");
+
         MenuItem meanFilter = new MenuItem("Add Mean Filter");
         MenuItem medianFilter = new MenuItem("Add Median Filter");
         MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
         MenuItem laplacianFilter = new MenuItem("Add Highpass Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
+        MenuItem bilateralFilter = new MenuItem("Add Bilateral Filter");
         histogramEqualization.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).histogramEqualization(this.image));
         contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
         threshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).threshold(this.image));
+        globalThreshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).globalThreshold(this.image));
         gaussNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addGaussianNoise(this.image));
         rayleighNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addRayleighNoise(this.image));
         expNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addExponentialNoise(this.image));
@@ -91,11 +93,12 @@ public class ImageGreyViewer extends ImageViewer {
         weightedMedianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).weightedMedianFilter(this.image));
         laplacianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).highpassFilter(this.image));
         gaussFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).gaussFilter(this.image));
+        bilateralFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).bilateralFilter(this.image));
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
-                histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
+                histogramEqualization, contrast, threshold, globalThreshold, gaussNoise, rayleighNoise, expNoise,
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel, kirsh, mask5a);
 
 

@@ -55,6 +55,9 @@ public class ImageColorViewer extends ImageViewer{
         negative.setOnAction(e -> new ImageColorTransformer(windowIndex).negative(this.image));
         MenuItem threshold = new MenuItem("Thresholding");
         threshold.setOnAction(e -> new ImageColorTransformer(windowIndex).thresholding(this.image));
+        MenuItem globalThreshold = new MenuItem("Global Thresholding");
+        globalThreshold.setOnAction(e -> new ImageColorTransformer(windowIndex).globalThresholding(this.image));
+
         MenuItem prewitt = new MenuItem("Prewitt");
         prewitt.setOnAction(e -> new ImageColorTransformer(this.windowIndex).prewitt(this.image));
 
@@ -91,7 +94,7 @@ public class ImageColorViewer extends ImageViewer{
         gaussFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).gaussFilter(this.image));
 
         transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
-                gaussNoise, rayleighNoise, expNoise, saltAndPepper,
+                globalThreshold, gaussNoise, rayleighNoise, expNoise, saltAndPepper,
                 meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));

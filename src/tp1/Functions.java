@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Random;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Functions {
@@ -281,6 +282,81 @@ public class Functions {
         Integer[][] green = Arrays.stream(((ImageColor)image).getGreen()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > g ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
         Integer[][] blue = Arrays.stream(((ImageColor)image).getBlue()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > b ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
         return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+    }
+
+    public ImageGrey globalThresholdization() {
+        ImageGrey imgAux = (ImageGrey) image;
+        int threshold = 128;
+        int prevThreshold = 0;
+        int minThreshDiff = 1;
+        while(Math.pow(threshold - prevThreshold, 2) > minThreshDiff){
+            double m1 = 0;
+            double m2 = 0;
+            double tot1 = 0;
+            double tot2 = 0;
+            for (int i = 0; i < imgAux.getHeight(); i++) {
+                for (int j = 0; j < imgAux.getWidth(); j++) {
+                    if(imgAux.getImage()[i][j] > threshold) {
+                        m1 += imgAux.getImage()[i][j];
+                        tot1++;
+                    } else {
+                        m2 += imgAux.getImage()[i][j];
+                        tot2++;
+                    }
+               }
+            }
+            prevThreshold = threshold;
+            threshold = (int) Math.floor((m1/(tot1 + 1) + m2/(tot2 + 1)) / 2.0);
+        }
+        return thresholdization(threshold);
+    }
+
+    public ImageColor globalThresholdizationColor() {
+        ImageColor imgAux = (ImageColor) image;
+        int r = 128;
+        int g = 128;
+        int b = 128;
+        int prevR = 0;
+        int prevG = 0;
+        int prevB = 0;
+        int minThreshDiff = 1;
+        while(Math.pow(r - prevR, 2) > minThreshDiff || Math.pow(g - prevG, 2) > minThreshDiff || Math.pow(b - prevB, 2) > minThreshDiff){
+            double m1r = 0; double m2r = 0; double tot1r = 0; double tot2r = 0;
+            double m1g = 0; double m2g = 0; double tot1g = 0; double tot2g = 0;
+            double m1b = 0; double m2b = 0; double tot1b = 0; double tot2b = 0;
+            for (int i = 0; i < imgAux.getHeight(); i++) {
+                for (int j = 0; j < imgAux.getWidth(); j++) {
+                    if(imgAux.getRed()[i][j] > r) {
+                        m1r += imgAux.getRed()[i][j];
+                        tot1r++;
+                    } else {
+                        m2r += imgAux.getRed()[i][j];
+                        tot2r++;
+                    }
+                    if(imgAux.getGreen()[i][j] > g) {
+                        m1g += imgAux.getGreen()[i][j];
+                        tot1g++;
+                    } else {
+                        m2g += imgAux.getGreen()[i][j];
+                        tot2g++;
+                    }
+                    if(imgAux.getBlue()[i][j] > b) {
+                        m1b += imgAux.getBlue()[i][j];
+                        tot1b++;
+                    } else {
+                        m2b += imgAux.getBlue()[i][j];
+                        tot2b++;
+                    }
+                }
+            }
+            prevR = r;
+            r = (int) Math.floor((m1r/(tot1r + 1) + m2r/(tot2r + 1)) / 2.0);
+            prevG = g;
+            g = (int) Math.floor((m1g/(tot1g + 1) + m2g/(tot2g + 1)) / 2.0);
+            prevB = b;
+            b = (int) Math.floor((m1b/(tot1b + 1) + m2b/(tot2b + 1)) / 2.0);
+        }
+        return thresholdizationColor(r,g,b);
     }
 
     public ImageGrey addGaussianNoise(double density, double std) {
