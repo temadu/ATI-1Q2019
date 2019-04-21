@@ -69,6 +69,7 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem contrast = new MenuItem("Contrast Improvement");
         MenuItem threshold = new MenuItem("Thresholding");
         MenuItem globalThreshold = new MenuItem("Global Thresholding");
+        MenuItem otsuThreshold = new MenuItem("Otsu Thresholding");
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
         MenuItem expNoise = new MenuItem("Add Exponential Noise");
@@ -84,6 +85,7 @@ public class ImageGreyViewer extends ImageViewer {
         contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
         threshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).threshold(this.image));
         globalThreshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).globalThreshold(this.image));
+        otsuThreshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).otsuThreshold(this.image));
         gaussNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addGaussianNoise(this.image));
         rayleighNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addRayleighNoise(this.image));
         expNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addExponentialNoise(this.image));
@@ -98,7 +100,7 @@ public class ImageGreyViewer extends ImageViewer {
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
-                histogramEqualization, contrast, threshold, globalThreshold, gaussNoise, rayleighNoise, expNoise,
+                histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel, kirsh, mask5a);
 
 

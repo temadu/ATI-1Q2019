@@ -843,6 +843,10 @@ public class ImageGreyTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).globalThresholdization(),windowIndex));
     }
 
+    public void otsuThreshold(ImageGrey originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).otsuThreshold(),windowIndex));
+    }
+
     public void threshold(ImageGrey originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).thresholdization(128);

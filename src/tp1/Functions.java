@@ -359,6 +359,118 @@ public class Functions {
         return thresholdizationColor(r,g,b);
     }
 
+    public ImageGrey otsuThreshold() {
+        double[] hist = new double[256];
+        Arrays.stream(((ImageGrey)image).getImage()).forEach(a -> Arrays.stream(a).forEach(e -> hist[e]++));
+        double[] histN = Arrays.stream(hist).map(h -> h / (image.getHeight() * image.getWidth())).toArray();
+        double[] sums = new double[256];
+        double[] meanAc = new double[256];
+        sums[0] = histN[0];
+        for (int i = 1; i < 256; i++) {
+            sums[i] = sums[i-1] + histN[i];
+        }
+        meanAc[0] = 0;
+        for (int i = 1; i < 256; i++) {
+            meanAc[i] = meanAc[i-1] + i * histN[i];
+        }
+        double gloablMean = meanAc[255];
+        ArrayList<Integer> maxs = new ArrayList<>();
+        double maxVar = 0;
+        for (int i = 0; i < 256; i++) {
+            if(sums[i] == 0){
+                continue;
+            }
+            if(sums[i] == 1){
+                break;
+            }
+            double var = Math.pow(gloablMean * sums[i] - meanAc[i],2) / (sums[i] * (1.0 - sums[i]));
+            if(var > maxVar){
+                maxs.clear();
+                maxs.add(i);
+                maxVar = var;
+            }
+            if(var == maxVar) {
+                maxs.add(i);
+            }
+        }
+
+        if(maxs.isEmpty()){
+            return thresholdization(128);
+        } else {
+            int t = (int) Math.floor(maxs.stream().mapToInt(e -> e).average().getAsDouble());
+            return thresholdization(t);
+        }
+    }
+
+    public ImageColor otsuThresholdColor() {
+        double[] histR = new double[256]; double[] histG = new double[256]; double[] histB = new double[256];
+        Arrays.stream(((ImageColor)image).getRed()).forEach(a -> Arrays.stream(a).forEach(e -> histR[e]++));
+        Arrays.stream(((ImageColor)image).getGreen()).forEach(a -> Arrays.stream(a).forEach(e -> histG[e]++));
+        Arrays.stream(((ImageColor)image).getBlue()).forEach(a -> Arrays.stream(a).forEach(e -> histB[e]++));
+        double[] histNr = Arrays.stream(histR).map(h -> h / (image.getHeight() * image.getWidth())).toArray();
+        double[] histNg = Arrays.stream(histG).map(h -> h / (image.getHeight() * image.getWidth())).toArray();
+        double[] histNb = Arrays.stream(histB).map(h -> h / (image.getHeight() * image.getWidth())).toArray();
+        double[] sumsR = new double[256]; double[] sumsG = new double[256]; double[] sumsB = new double[256];
+        double[] meanAcR = new double[256]; double[] meanAcG = new double[256]; double[] meanAcB = new double[256];
+        sumsR[0] = histNr[0]; sumsG[0] = histNg[0]; sumsB[0] = histNb[0];
+        for (int i = 1; i < 256; i++) {
+            sumsR[i] = sumsR[i-1] + histNr[i];
+            sumsG[i] = sumsG[i-1] + histNg[i];
+            sumsB[i] = sumsB[i-1] + histNb[i];
+        }
+        meanAcR[0] = 0; meanAcG[0] = 0; meanAcB[0] = 0;
+        for (int i = 1; i < 256; i++) {
+            meanAcR[i] = meanAcR[i-1] + i * histNr[i];
+            meanAcG[i] = meanAcG[i-1] + i * histNg[i];
+            meanAcB[i] = meanAcB[i-1] + i * histNb[i];
+        }
+        double gloablMeanR = meanAcR[255];
+        double gloablMeanG = meanAcG[255];
+        double gloablMeanB = meanAcB[255];
+        ArrayList<Integer> maxsR = new ArrayList<>();
+        ArrayList<Integer> maxsG = new ArrayList<>();
+        ArrayList<Integer> maxsB = new ArrayList<>();
+        double maxVarR = 0; double maxVarG = 0; double maxVarB = 0;
+        for (int i = 0; i < 256; i++) {
+            double varR = 0, varG = 0, varB = 0;
+            if(sumsR[i] != 0 && sumsR[i] != 1){
+                varR = Math.pow(gloablMeanR * sumsR[i] - meanAcR[i],2) / (sumsR[i] * (1.0 - sumsR[i]));
+            }
+            if(sumsG[i] != 0 && sumsG[i] != 1) {
+                varG = Math.pow(gloablMeanG * sumsG[i] - meanAcG[i], 2) / (sumsG[i] * (1.0 - sumsG[i]));
+            }
+            if(sumsB[i] != 0 && sumsB[i] != 1) {
+                varB = Math.pow(gloablMeanB * sumsB[i] - meanAcB[i], 2) / (sumsB[i] * (1.0 - sumsB[i]));
+            }
+            if(varR > maxVarR){
+                maxsR.clear();
+                maxsR.add(i);
+                maxVarR = varR;
+            } else if(varR == maxVarR) {
+                maxsR.add(i);
+            }
+            if(varG > maxVarG){
+                maxsG.clear();
+                maxsG.add(i);
+                maxVarG = varG;
+            } else if(varG == maxVarG) {
+                maxsG.add(i);
+            }
+            if(varB > maxVarB){
+                maxsB.clear();
+                maxsB.add(i);
+                maxVarB = varB;
+            } else if(varB == maxVarB) {
+                maxsB.add(i);
+            }
+        }
+
+        int tr = maxsR.isEmpty() ? 128 : (int) Math.floor(maxsR.stream().mapToInt(e -> e).average().getAsDouble());
+        int tg = maxsG.isEmpty() ? 128 : (int) Math.floor(maxsG.stream().mapToInt(e -> e).average().getAsDouble());
+        int tb = maxsB.isEmpty() ? 128 : (int) Math.floor(maxsB.stream().mapToInt(e -> e).average().getAsDouble());
+        return thresholdizationColor(tr,tg,tb);
+    }
+
     public ImageGrey addGaussianNoise(double density, double std) {
         RandomGaussianGenerator rgg = new RandomGaussianGenerator(0, std);
         Random r = new Random();

@@ -1210,6 +1210,10 @@ public class ImageColorTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer(new Functions(originalImage).globalThresholdizationColor(),windowIndex));
     }
 
+    public void otsuThresholding(ImageColor originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer(new Functions(originalImage).otsuThresholdColor(),windowIndex));
+    }
+
     public void thresholding(ImageColor originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).thresholdizationColor(128,128,128);
