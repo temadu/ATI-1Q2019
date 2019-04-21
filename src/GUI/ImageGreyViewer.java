@@ -65,6 +65,12 @@ public class ImageGreyViewer extends ImageViewer {
         mask5a.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).mask5a(this.image));
 
 
+        MenuItem laplaceMask = new MenuItem("Laplace Mask");
+        laplaceMask.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplaceMask(this.image));
+
+        MenuItem laplaceEvaluated = new MenuItem("Laplace Evaluated");
+        laplaceEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplaceEvaluated(this.image));
+
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
         MenuItem contrast = new MenuItem("Contrast Improvement");
         MenuItem threshold = new MenuItem("Thresholding");
@@ -100,8 +106,8 @@ public class ImageGreyViewer extends ImageViewer {
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
-                histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
-                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel, kirsh, mask5a);
+                histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
+                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated);
 
 
 //        final Menu showMenu = new Menu("Show");

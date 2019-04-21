@@ -690,11 +690,96 @@ public class Functions {
         w[0][1] = w[1][0] = w[1][2] = w[2][1] = -1.0;
         w[1][1] = 4.0;
 
-        ImageInt i = filter(w, false, false);
-        return null;
+        return filter(w, false, true);
+    }
+
+    public ImageInt laplaceEvaluated(int threshold) {
+        double[][] w = new double[3][3];
+        w[0][0] = w[0][2] = w[2][0] = w[2][2] = 0.0;
+        w[0][1] = w[1][0] = w[1][2] = w[2][1] = -1.0;
+        w[1][1] = 4.0;
+
+        ImageInt maskedImage = filter(w, false, false);
+        if(greyscale){
+            Integer[][] mi = this.zeroCross(((ImageGrey) maskedImage).getImage(),threshold);
+            return new ImageGrey(mi, image.getHeight(), image.getWidth());
+        }else{
+
+            return null;
+        }
         //si hay cambio de signo 255 si hay 0. si hay un 0 checqueo uno mas si es otro 0 pongo como no cambio, se chequea horizontal y dsp verticalmente
         //el resultado da basura -> se aplica evaluacion de la pendiente -> se calcula la diferencia entre los numeros (+, -), (+, 0, -) etc. Si da > q un umbral se pone 0 y si no 255.
         //si es (+,+) no se hace nada
+    }
+
+    public Integer[][] zeroCross(Integer[][] image, int threshold) {
+        int height = image.length;
+        int width = image[0].length;
+        Integer[][] horizontals = new Integer[height][width];
+        Integer[][] verticals = new Integer[height][width];
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                horizontals[y][x] = 0;
+                verticals[y][x] = 0;
+            }
+        }
+        System.out.println(height);
+        System.out.println(width);
+        double last;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                double past = 0;
+                double current = 0;
+
+                if (x + 1 < width) {
+                    current = image[y][x + 1];
+                    last = past;
+                    past = image[y][x];
+
+                    if (past == 0 && x > 0) {
+                        past = last;
+                    }
+
+                    if (((current < 0 && past > 0) || (current > 0 && past < 0))
+                            && Math.abs(current - past) >= threshold) {
+                        horizontals[y][x] = 255;
+                    }
+                }
+            }
+        }
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                double past = 0;
+                double current = 0;
+                if (y + 1 < height) {
+                    current = image[y + 1][x];
+                    last = past;
+                    past = image[y][x];
+
+                    if (past == 0 && x > 0) {
+                        past = last;
+                    }
+
+                    if (((current < 0 && past > 0) || (current > 0 && past < 0))
+                            && Math.abs(current - past) >= threshold) {
+                        verticals[y][x] = 255;
+                    }
+                }
+            }
+        }
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+//                System.out.println("x=" + x + ", y=" + y);
+//                System.out.println(verticals[y][x]);
+//                System.out.println(horizontals[y][x]);
+                verticals[y][x] += horizontals[y][x];
+                if (verticals[y][x] > 255) {
+                    verticals[y][x] = 255;
+                }
+            }
+        }
+
+        return verticals;
     }
 
     public ImageInt bilateralFilter(int n, double sigmaS, double sigmaR){
