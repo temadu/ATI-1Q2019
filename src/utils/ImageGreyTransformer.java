@@ -831,6 +831,10 @@ public class ImageGreyTransformer {
         stage.show();
     }
 
+    public void bilateralFilter(ImageGrey originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).bilateralFilter(7,2,30),windowIndex));
+    }
+
     public void histogramEqualization(ImageGrey originalImage){
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).histogramEqualization(),windowIndex));
     }

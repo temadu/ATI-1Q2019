@@ -737,6 +737,11 @@ public class ImageColorTransformer {
         stage.show();
     }
 
+    public void bilateralFilter(ImageColor originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor) new Functions(originalImage).bilateralFilter(7,2,30),windowIndex));
+    }
+
+
     public void gammaFunction(ImageColor originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).imageProd(1);

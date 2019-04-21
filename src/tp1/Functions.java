@@ -4,7 +4,6 @@ import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -510,14 +509,63 @@ public class Functions {
         //si es (+,+) no se hace nada
     }
 
-    public ImageInt bilateralFilter(){
-        /**
-         * combinacion de filtros
-         * con ventana deslizante
-         * combinacion entre gauss y segun las difs de los colores
-         *
-         */
-        return null;
+    public ImageInt bilateralFilter(int n, double sigmaS, double sigmaR){
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+        int half = (int) Math.floor(n/2);
+
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                double sumR = 0;
+                double totR = 0;
+                double sumG = 0;
+                double totG = 0;
+                double sumB = 0;
+                double totB = 0;
+                for (int k = -half; k < n - half; k++) {
+                    for (int l = -half; l < n - half; l++) {
+                        if(greyscale) {
+                            double w = Math.exp( - (double)((k*k) + (l*l)) / (2.0*sigmaS*sigmaS) - ( Math.pow(((ImageGrey)image).getImage()[i][j] -
+                                    ((ImageGrey)image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] ,2) / (2.0*sigmaR*sigmaR)));
+                            sumR += (double) ((ImageGrey) image).getImage()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * w;
+                            totR += w;
+                        } else {
+                            ImageColor imgAux = (ImageColor)image;
+                            double wR = Math.exp( - (double)((k*k) + (l*l)) / (2.0*sigmaS*sigmaS) - ( Math.pow(imgAux.getRed()[i][j] -
+                                    imgAux.getRed()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] ,2) / (2.0*sigmaR*sigmaR)));
+                            sumR += (double) imgAux.getRed()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * wR;
+                            totR += wR;
+                            double wG = Math.exp( - (double)((k*k) + (l*l)) / (2.0*sigmaS*sigmaS) - ( Math.pow(imgAux.getGreen()[i][j] -
+                                    imgAux.getGreen()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] ,2) / (2.0*sigmaR*sigmaR)));
+                            sumG += (double) imgAux.getGreen()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * wG;
+                            totG += wG;
+                            double wB = Math.exp( - (double)((k*k) + (l*l)) / (2.0*sigmaS*sigmaS) - ( Math.pow(imgAux.getBlue()[i][j] -
+                                    imgAux.getBlue()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] ,2) / (2.0*sigmaR*sigmaR)));
+                            sumB += (double) imgAux.getBlue()[Math.floorMod(i + k, image.getHeight())][Math.floorMod(j + l, image.getWidth())] * wB;
+                            totB += wB;
+                        }
+                    }
+                }
+                if(greyscale) {
+                    red[i][j] = (int)(sumR/totR);
+                } else {
+                    red[i][j] = (int)(sumR/totR);
+                    green[i][j] = (int)(sumG/totG);
+                    blue[i][j] = (int)(sumB/totB);
+                }
+            }
+        }
+        if(greyscale){
+            red = this.clamp(red);
+        } else {
+            red = this.clamp(red);
+            green = this.clamp(green);
+            blue = this.clamp(blue);
+        }
+
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+            : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
     private double[][] rotate(double[][] w) {
