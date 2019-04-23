@@ -105,9 +105,14 @@ public class ImageGreyViewer extends ImageViewer {
 //        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
 //        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
 
+        MenuItem anisotropic = new MenuItem("Anisotropic Diffusion");
+        anisotropic.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).anisotropic(this.image));
+
+
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
-                histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
-                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated);
+                histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
+                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter,
+                prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated, anisotropic);
 
 
 //        final Menu showMenu = new Menu("Show");

@@ -1071,4 +1071,60 @@ public class Functions {
                 : new ImageColor(red, green, blue, image.getHeight(), image.getWidth(), clamp);
 
     }
+
+    //leclerc: e ^ (-(|I-i|^2)/sigma^2)
+    //lorentz: 1 / (|I-i|^2/sigma^2 + 1)
+    public ImageInt diffusion(double sigma, int tmax, boolean anisotropic, boolean lorentz) {
+        Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] blue = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] prevRed = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] prevGreen = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] prevBlue = new Integer[image.getHeight()][image.getWidth()];
+
+        if(greyscale) {
+            prevRed = ((ImageGrey)image).getImage();
+        } else {
+            prevRed = ((ImageColor)image).getRed();
+            prevGreen = ((ImageColor)image).getGreen();
+            prevBlue = ((ImageColor)image).getBlue();
+        }
+        int t = 0;
+
+        while(t < tmax) {
+            for (int i = 0; i < image.getHeight(); i++) {
+                for (int j = 0; j < image.getWidth(); j++) {
+                    if(!(j == 0 || i == 0 || j == image.getWidth() - 1 || i == image.getHeight() - 1)){
+
+                        int dN = prevRed[i-1][j] - prevRed[i][j];
+                        int dS = prevRed[i+1][j] - prevRed[i][j];
+                        int dE = prevRed[i][j+1] - prevRed[i][j];
+                        int dO = prevRed[i][j-1] - prevRed[i][j];
+                        if(lorentz){
+                            red[i][j] = (int) Math.floor(prevRed[i][j] + 0.25 * ((double)dN * (anisotropic ? loretnzOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? loretnzOperator(dS, sigma) : 1.0)
+                                    + (double)dE * (anisotropic ? loretnzOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? loretnzOperator(dO, sigma) : 1.0)));
+                        } else {
+                            red[i][j] = (int) Math.floor(prevRed[i][j] + 0.25 * ((double)dN * (anisotropic ? lecrercOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? lecrercOperator(dS, sigma) : 1.0)
+                                    + (double)dE * (anisotropic ? lecrercOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? lecrercOperator(dO, sigma) : 1.0)));
+                        }
+                    } else {
+                        red[i][j] = prevRed[i][j];
+                    }
+                }
+            }
+            prevRed = red;
+            t++;
+        }
+
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+    }
+
+    private double loretnzOperator(double x, double sigma) {
+        return 1.0 / ((x * x) / (sigma * sigma) + 1.0);
+    }
+
+    private double lecrercOperator(double x, double sigma) {
+        return Math.exp(-(x * x)/(sigma * sigma));
+    }
 }

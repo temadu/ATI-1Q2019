@@ -918,6 +918,10 @@ public class ImageGreyTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).otsuThreshold(),windowIndex));
     }
 
+    public void anisotropic(ImageGrey originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey) new Functions(originalImage).diffusion(0.05, 10, true, true),windowIndex));
+    }
+
     public void threshold(ImageGrey originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).thresholdization(128);
