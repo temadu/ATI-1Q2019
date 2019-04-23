@@ -723,16 +723,8 @@ public class Functions {
     public ImageInt applyZeroCross(int threshold) {
         if(greyscale){
             Integer[][] mi = ((ImageGrey) image).getImage();
-//            DecimalFormat df = new DecimalFormat("0.00");
-//            for (int i = 0; i < mi.length; i++) {
-//                for (int j = 0; j < mi[i].length; j++) {
-//                    System.out.print(df.format(mi[i][j]) + " ");
-//                }
-//                System.out.println();
-//            }
-//            System.out.println();
             return new ImageGrey( this.zeroCross(mi,threshold), image.getHeight(), image.getWidth());
-        }else{
+        } else {
 
             return null;
         }
@@ -742,70 +734,48 @@ public class Functions {
         int height = image.length;
         int width = image[0].length;
         Integer[][] horizontals = new Integer[height][width];
-        Integer[][] verticals = new Integer[height][width];
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                horizontals[y][x] = 0;
-                verticals[y][x] = 0;
-            }
-        }
-//        System.out.println(height);
-//        System.out.println(width);
         double last;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
                 double past = 0;
                 double current = 0;
 
-                if (x + 1 < width) {
-                    current = image[y][x + 1];
-                    last = past;
-                    past = image[y][x];
+                current = image[y][Math.floorMod(x + 1, width)];
+                last = past;
+                past = image[y][x];
 
-                    if (past == 0 && x > 0) {
-                        past = last;
-                    }
+                if (past == 0 && x > 0) {
+                    past = last;
+                }
 
-                    if (((current < 0 && past > 0) || (current > 0 && past < 0))
-                            && Math.abs(current - past) >= threshold) {
-                        horizontals[y][x] = 255;
-                    }
+                if (((current < 0 && past > 0) || (current > 0 && past < 0))
+                        && Math.abs(current - past) >= threshold) {
+                    horizontals[y][x] = 255;
+                } else {
+                    horizontals[y][x] = 0;
                 }
             }
         }
-        for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
                 double past = 0;
                 double current = 0;
-                if (y + 1 < height) {
-                    current = image[y + 1][x];
-                    last = past;
-                    past = image[y][x];
+                current = image[Math.floorMod(y + 1, height)][x];
+                last = past;
+                past = image[y][x];
 
-                    if (past == 0 && x > 0) {
-                        past = last;
-                    }
-
-                    if (((current < 0 && past > 0) || (current > 0 && past < 0))
-                            && Math.abs(current - past) >= threshold) {
-                        verticals[y][x] = 255;
-                    }
+                if (past == 0 && y > 0) {
+                    past = last;
                 }
-            }
-        }
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-//                System.out.println("x=" + x + ", y=" + y);
-//                System.out.println(verticals[y][x]);
-//                System.out.println(horizontals[y][x]);
-                verticals[y][x] += horizontals[y][x];
-                if (verticals[y][x] > 255) {
-                    verticals[y][x] = 255;
+
+                if (((current < 0 && past > 0) || (current > 0 && past < 0))
+                        && Math.abs(current - past) >= threshold) {
+                    horizontals[y][x] = 255;
                 }
             }
         }
 
-        return verticals;
+        return horizontals;
     }
 
     public ImageInt laplacianOfGaussian(int size, double sigma){
@@ -813,22 +783,13 @@ public class Functions {
         int subValue = size/2;
         for(int x = 0; x < size; x++) {
             for(int y = 0; y < size; y++) {
-//                System.out.println("x=" + x + ", y=" + y);
                 double factor = Math.pow(Math.sqrt(2 * Math.PI) * Math.pow(sigma, 3), -1);
                 double term = 2 - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2))/Math.pow(sigma, 2);
                 double exp = - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2)) / (2 * Math.pow(sigma, 2));
-                double pixelValue = -1 * factor * term * Math.pow(Math.E, exp);
+                double pixelValue = -1 * factor * term * Math.exp(exp);
                 w[y][x] = pixelValue;
             }
         }
-//        DecimalFormat df = new DecimalFormat("0.00");
-//        for (int i = 0; i < w.length; i++) {
-//            for (int j = 0; j < w[i].length; j++) {
-//                System.out.print(df.format(w[i][j]) + " ");
-//            }
-//            System.out.println();
-//        }
-//        System.out.println();
         return filter(w, false, true);
     }
 
@@ -841,19 +802,10 @@ public class Functions {
                 double factor = Math.pow(Math.sqrt(2 * Math.PI) * Math.pow(sigma, 3), -1);
                 double term = 2 - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2))/Math.pow(sigma, 2);
                 double exp = - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2)) / (2 * Math.pow(sigma, 2));
-                double pixelValue = -1 * factor * term * Math.pow(Math.E, exp);
+                double pixelValue = -1 * factor * term * Math.exp(exp);
                 w[y][x] = pixelValue;
             }
         }
-//        DecimalFormat df = new DecimalFormat("0.00");
-//        for (int i = 0; i < w.length; i++) {
-//            for (int j = 0; j < w[i].length; j++) {
-//                System.out.print(df.format(w[i][j]) + " ");
-//            }
-//            System.out.println();
-//        }
-//        System.out.println();
-//        return filter(w, false, true);
         ImageInt maskedImage = filter(w, false, false);
         if(greyscale){
             Integer[][] mi = this.zeroCross(((ImageGrey) maskedImage).getImage(),threshold);
