@@ -112,12 +112,15 @@ public class ImageGreyViewer extends ImageViewer {
 
         MenuItem anisotropic = new MenuItem("Anisotropic Diffusion");
         anisotropic.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).anisotropic(this.image));
+        MenuItem isotropic = new MenuItem("Isotropic Diffusion");
+        isotropic.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).isotropic(this.image));
 
 
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
-                histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
+                histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, 
-                prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated, laplacianOfGaussianMask, laplacianOfGaussianMaskEvaluated, zeroCross, anisotropic);
+                prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated, laplacianOfGaussianMask, laplacianOfGaussianMaskEvaluated,
+                zeroCross, isotropic, anisotropic);
 
 
 //        final Menu showMenu = new Menu("Show");

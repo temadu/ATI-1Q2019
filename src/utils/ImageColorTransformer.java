@@ -1214,6 +1214,197 @@ public class ImageColorTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer(new Functions(originalImage).otsuThresholdColor(),windowIndex));
     }
 
+    public void anisotropic(ImageColor originalImage) {
+        this.originalImage = originalImage;
+        this.outputImage = originalImage;
+        Stage stage = new Stage();
+        stage.setTitle("Anisotropic Difussion");
+
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply threshold");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Edge detector:"), 1, 3);
+        ToggleGroup tg = new ToggleGroup();
+        RadioButton lor = new RadioButton();
+        RadioButton lec = new RadioButton();
+        lor.setText("Lorentz");
+        lec.setText("Leclerc");
+        lor.setToggleGroup(tg);
+        lec.setToggleGroup(tg);
+        lor.setSelected(true);
+
+        grid.add(lor, 2,3);
+        grid.add(lec, 2,4);
+
+        grid.add(new Label("Sigma:"), 1, 1);
+        TextField sigmaField = new TextField();
+        sigmaField.setMaxWidth(60);
+        grid.add(sigmaField, 2, 1);
+        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                sigmaField.setText(oldValue);
+            }
+        });
+
+        grid.add(new Label("Iterations:"), 1, 2);
+        TextField iterField = new TextField();
+        iterField.setMaxWidth(60);
+        grid.add(iterField, 2, 2);
+        iterField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                iterField.setText(oldValue);
+            }
+        });
+
+        Button preOutputBtn = new Button("Apply");
+        HBox hbBtn1 = new HBox(10);
+        hbBtn1.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn1.getChildren().add(preOutputBtn);
+        grid.add(hbBtn1, 2, 6);
+
+        preOutputBtn.setOnAction((e) -> {
+            double sigma = 10;
+            int iter = 10;
+            try {
+                    iter = Integer.parseInt(iterField.getText());
+                    sigma = Float.parseFloat(sigmaField.getText());
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).diffusion(sigma, iter, true, ((RadioButton)tg.getSelectedToggle()).getText().equals("Lorentz"));
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 5, 2, 1);
+        });
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 3, 6);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor) outputImage,windowIndex));
+                stage.close();
+            }
+
+        });
+
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+
+    }
+
+    public void isotropic(ImageColor originalImage) {
+        this.originalImage = originalImage;
+        this.outputImage = originalImage;
+        Stage stage = new Stage();
+        stage.setTitle("Anisotropic Difussion");
+
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply threshold");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Edge detector:"), 1, 3);
+        ToggleGroup tg = new ToggleGroup();
+        RadioButton lor = new RadioButton();
+        RadioButton lec = new RadioButton();
+        lor.setText("Lorentz");
+        lec.setText("Leclerc");
+        lor.setToggleGroup(tg);
+        lec.setToggleGroup(tg);
+        lor.setSelected(true);
+
+        grid.add(lor, 2,3);
+        grid.add(lec, 2,4);
+
+        grid.add(new Label("Sigma:"), 1, 1);
+        TextField sigmaField = new TextField();
+        sigmaField.setMaxWidth(60);
+        grid.add(sigmaField, 2, 1);
+        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                sigmaField.setText(oldValue);
+            }
+        });
+
+        grid.add(new Label("Iterations:"), 1, 2);
+        TextField iterField = new TextField();
+        iterField.setMaxWidth(60);
+        grid.add(iterField, 2, 2);
+        iterField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                iterField.setText(oldValue);
+            }
+        });
+
+        Button preOutputBtn = new Button("Apply");
+        HBox hbBtn1 = new HBox(10);
+        hbBtn1.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn1.getChildren().add(preOutputBtn);
+        grid.add(hbBtn1, 2, 6);
+
+        preOutputBtn.setOnAction((e) -> {
+            double sigma = 10;
+            int iter = 10;
+            try {
+                iter = Integer.parseInt(iterField.getText());
+                sigma = Float.parseFloat(sigmaField.getText());
+            } catch (NumberFormatException | NullPointerException nfe) {
+                return;
+            }
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).diffusion(sigma, iter, false, ((RadioButton)tg.getSelectedToggle()).getText().equals("Lorentz"));
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 5, 2, 1);
+        });
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 3, 6);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor) outputImage,windowIndex));
+                stage.close();
+            }
+
+        });
+
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
     public void thresholding(ImageColor originalImage){
         this.originalImage = originalImage;
         this.outputImage = new Functions(this.originalImage).thresholdizationColor(128,128,128);

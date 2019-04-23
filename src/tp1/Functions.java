@@ -36,6 +36,13 @@ public class Functions {
         return as;
     }
 
+    private Integer[][] clampAlways(Integer[][] m) {
+        int max = Arrays.stream(m).mapToInt(a -> Arrays.stream(a).max(Comparator.naturalOrder()).get()).max().getAsInt();
+        int min = Arrays.stream(m).mapToInt(a -> Arrays.stream(a).min(Comparator.naturalOrder()).get()).min().getAsInt();
+        double mult = 255.0/(max - min);
+        Integer[][] as = Arrays.stream(m).parallel().map(a -> Arrays.stream(a).map(p -> (int) ((double) (p - min) * mult)).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return as;
+    }
 
     public ImageInt imageSum(ImageInt addend) {
         Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
@@ -1165,16 +1172,14 @@ public class Functions {
             prevBlue = ((ImageColor)image).getBlue();
         }
         int t = 0;
-
         while(t < tmax) {
             for (int i = 0; i < image.getHeight(); i++) {
                 for (int j = 0; j < image.getWidth(); j++) {
-                    if(!(j == 0 || i == 0 || j == image.getWidth() - 1 || i == image.getHeight() - 1)){
 
-                        int dN = prevRed[i-1][j] - prevRed[i][j];
-                        int dS = prevRed[i+1][j] - prevRed[i][j];
-                        int dE = prevRed[i][j+1] - prevRed[i][j];
-                        int dO = prevRed[i][j-1] - prevRed[i][j];
+                        int dN = prevRed[Math.floorMod(i-1, image.getHeight())][j] - prevRed[i][j];
+                        int dS = prevRed[Math.floorMod(i+1, image.getHeight())][j] - prevRed[i][j];
+                        int dE = prevRed[i][Math.floorMod(j+1, image.getWidth())] - prevRed[i][j];
+                        int dO = prevRed[i][Math.floorMod(j-1, image.getWidth())] - prevRed[i][j];
                         if(lorentz){
                             red[i][j] = (int) Math.floor(prevRed[i][j] + 0.25 * ((double)dN * (anisotropic ? loretnzOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? loretnzOperator(dS, sigma) : 1.0)
                                     + (double)dE * (anisotropic ? loretnzOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? loretnzOperator(dO, sigma) : 1.0)));
@@ -1182,12 +1187,43 @@ public class Functions {
                             red[i][j] = (int) Math.floor(prevRed[i][j] + 0.25 * ((double)dN * (anisotropic ? lecrercOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? lecrercOperator(dS, sigma) : 1.0)
                                     + (double)dE * (anisotropic ? lecrercOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? lecrercOperator(dO, sigma) : 1.0)));
                         }
-                    } else {
-                        red[i][j] = prevRed[i][j];
-                    }
+
+                        if(!greyscale){
+                            dN = prevGreen[Math.floorMod(i-1, image.getHeight())][j] - prevGreen[i][j];
+                            dS = prevGreen[Math.floorMod(i+1, image.getHeight())][j] - prevGreen[i][j];
+                            dE = prevGreen[i][Math.floorMod(j+1, image.getWidth())] - prevGreen[i][j];
+                            dO = prevGreen[i][Math.floorMod(j-1, image.getWidth())] - prevGreen[i][j];
+                            if(lorentz){
+                                green[i][j] = (int) Math.floor(prevGreen[i][j] + 0.25 * ((double)dN * (anisotropic ? loretnzOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? loretnzOperator(dS, sigma) : 1.0)
+                                        + (double)dE * (anisotropic ? loretnzOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? loretnzOperator(dO, sigma) : 1.0)));
+                            } else {
+                                green[i][j] = (int) Math.floor(prevGreen[i][j] + 0.25 * ((double)dN * (anisotropic ? lecrercOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? lecrercOperator(dS, sigma) : 1.0)
+                                        + (double)dE * (anisotropic ? lecrercOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? lecrercOperator(dO, sigma) : 1.0)));
+                            }
+                            dN = prevBlue[Math.floorMod(i-1, image.getHeight())][j] - prevBlue[i][j];
+                            dS = prevBlue[Math.floorMod(i+1, image.getHeight())][j] - prevBlue[i][j];
+                            dE = prevBlue[i][Math.floorMod(j+1, image.getWidth())] - prevBlue[i][j];
+                            dO = prevBlue[i][Math.floorMod(j-1, image.getWidth())] - prevBlue[i][j];
+                            if(lorentz){
+                                blue[i][j] = (int) Math.floor(prevBlue[i][j] + 0.25 * ((double)dN * (anisotropic ? loretnzOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? loretnzOperator(dS, sigma) : 1.0)
+                                        + (double)dE * (anisotropic ? loretnzOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? loretnzOperator(dO, sigma) : 1.0)));
+                            } else {
+                                blue[i][j] = (int) Math.floor(prevBlue[i][j] + 0.25 * ((double)dN * (anisotropic ? lecrercOperator(dN, sigma) : 1.0) + (double)dS * (anisotropic ? lecrercOperator(dS, sigma) : 1.0)
+                                        + (double)dE * (anisotropic ? lecrercOperator(dE, sigma) : 1.0) + (double)dO * (anisotropic ? lecrercOperator(dO, sigma) : 1.0)));
+                            }
+                        }
                 }
             }
+            red = clampAlways(red);
+            if(!greyscale) {
+                green = clampAlways(green);
+                blue = clampAlways(blue);
+            }
             prevRed = red;
+            if(!greyscale){
+                prevGreen = green;
+                prevBlue = blue;
+            }
             t++;
         }
 

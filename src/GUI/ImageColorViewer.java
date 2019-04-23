@@ -95,9 +95,16 @@ public class ImageColorViewer extends ImageViewer{
         laplacianFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).highpassFilter(this.image));
         gaussFilter.setOnAction(e -> new ImageColorTransformer(windowIndex).gaussFilter(this.image));
 
+        MenuItem anisotropic = new MenuItem("Anisotropic Diffusion");
+        anisotropic.setOnAction(e -> new ImageColorTransformer(this.windowIndex).anisotropic(this.image));
+        MenuItem isotropic = new MenuItem("Isotropic Diffusion");
+        isotropic.setOnAction(e -> new ImageColorTransformer(this.windowIndex).isotropic(this.image));
+
+
         transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
                 globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise, saltAndPepper,
-                meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel);
+                meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel,
+                kirsh, mask5a, isotropic, anisotropic);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }
