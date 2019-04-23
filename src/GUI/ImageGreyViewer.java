@@ -67,9 +67,14 @@ public class ImageGreyViewer extends ImageViewer {
 
         MenuItem laplaceMask = new MenuItem("Laplace Mask");
         laplaceMask.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplaceMask(this.image));
-
         MenuItem laplaceEvaluated = new MenuItem("Laplace Evaluated");
         laplaceEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplaceEvaluated(this.image));
+        MenuItem laplacianOfGaussianMask = new MenuItem("Laplacian Of Gaussian");
+        laplacianOfGaussianMask.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianOfGaussian(this.image));
+        MenuItem laplacianOfGaussianMaskEvaluated = new MenuItem("Laplacian Of Gaussian Evaluated");
+        laplacianOfGaussianMaskEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianOfGaussianEvaluated(this.image));
+        MenuItem zeroCross = new MenuItem("Zero Cross");
+        zeroCross.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).zeroCross(this.image));
 
         MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
         MenuItem contrast = new MenuItem("Contrast Improvement");
@@ -110,9 +115,9 @@ public class ImageGreyViewer extends ImageViewer {
 
 
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
-                histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
-                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter,
-                prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated, anisotropic);
+                histogramEqualization, contrast, threshold,gaussNoise,rayleighNoise,expNoise,
+                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, 
+                prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated, laplacianOfGaussianMask, laplacianOfGaussianMaskEvaluated, zeroCross, anisotropic);
 
 
 //        final Menu showMenu = new Menu("Show");

@@ -4,6 +4,7 @@ import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -712,6 +713,24 @@ public class Functions {
         //si es (+,+) no se hace nada
     }
 
+    public ImageInt applyZeroCross(int threshold) {
+        if(greyscale){
+            Integer[][] mi = ((ImageGrey) image).getImage();
+//            DecimalFormat df = new DecimalFormat("0.00");
+//            for (int i = 0; i < mi.length; i++) {
+//                for (int j = 0; j < mi[i].length; j++) {
+//                    System.out.print(df.format(mi[i][j]) + " ");
+//                }
+//                System.out.println();
+//            }
+//            System.out.println();
+            return new ImageGrey( this.zeroCross(mi,threshold), image.getHeight(), image.getWidth());
+        }else{
+
+            return null;
+        }
+    }
+
     public Integer[][] zeroCross(Integer[][] image, int threshold) {
         int height = image.length;
         int width = image[0].length;
@@ -723,8 +742,8 @@ public class Functions {
                 verticals[y][x] = 0;
             }
         }
-        System.out.println(height);
-        System.out.println(width);
+//        System.out.println(height);
+//        System.out.println(width);
         double last;
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
@@ -780,6 +799,62 @@ public class Functions {
         }
 
         return verticals;
+    }
+
+    public ImageInt laplacianOfGaussian(int size, double sigma){
+        double[][] w = new double[size][size];
+        int subValue = size/2;
+        for(int x = 0; x < size; x++) {
+            for(int y = 0; y < size; y++) {
+//                System.out.println("x=" + x + ", y=" + y);
+                double factor = Math.pow(Math.sqrt(2 * Math.PI) * Math.pow(sigma, 3), -1);
+                double term = 2 - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2))/Math.pow(sigma, 2);
+                double exp = - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2)) / (2 * Math.pow(sigma, 2));
+                double pixelValue = -1 * factor * term * Math.pow(Math.E, exp);
+                w[y][x] = pixelValue;
+            }
+        }
+//        DecimalFormat df = new DecimalFormat("0.00");
+//        for (int i = 0; i < w.length; i++) {
+//            for (int j = 0; j < w[i].length; j++) {
+//                System.out.print(df.format(w[i][j]) + " ");
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+        return filter(w, false, true);
+    }
+
+    public ImageInt laplacianOfGaussianEvaluated(int size, double sigma, int threshold){
+        double[][] w = new double[size][size];
+        int subValue = size/2;
+        for(int x = 0; x < size; x++) {
+            for(int y = 0; y < size; y++) {
+//                System.out.println("x=" + x + ", y=" + y);
+                double factor = Math.pow(Math.sqrt(2 * Math.PI) * Math.pow(sigma, 3), -1);
+                double term = 2 - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2))/Math.pow(sigma, 2);
+                double exp = - (Math.pow(x-subValue, 2) + Math.pow(y-subValue, 2)) / (2 * Math.pow(sigma, 2));
+                double pixelValue = -1 * factor * term * Math.pow(Math.E, exp);
+                w[y][x] = pixelValue;
+            }
+        }
+//        DecimalFormat df = new DecimalFormat("0.00");
+//        for (int i = 0; i < w.length; i++) {
+//            for (int j = 0; j < w[i].length; j++) {
+//                System.out.print(df.format(w[i][j]) + " ");
+//            }
+//            System.out.println();
+//        }
+//        System.out.println();
+//        return filter(w, false, true);
+        ImageInt maskedImage = filter(w, false, false);
+        if(greyscale){
+            Integer[][] mi = this.zeroCross(((ImageGrey) maskedImage).getImage(),threshold);
+            return new ImageGrey(mi, image.getHeight(), image.getWidth());
+        }else{
+
+            return null;
+        }
     }
 
     public ImageInt bilateralFilter(int n, double sigmaS, double sigmaR){

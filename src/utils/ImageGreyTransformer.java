@@ -863,6 +863,292 @@ public class ImageGreyTransformer {
         slider.setValue(128);
         slider.setShowTickLabels(true);
         slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(64);
+        slider.setMinorTickCount(8);
+        slider.setBlockIncrement(1);
+//        TextField multField = new TextField();
+//        multField.setMaxWidth(60);
+//        grid.add(multField, 1, 1);
+        grid.add(slider, 1, 1);
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplaceEvaluated(newValue.intValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();    }
+
+    public void laplacianOfGaussian(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(originalImage).laplacianOfGaussian(7, 1.0);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply laplacian of gaussian filter");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply laplacian of gaussian filter");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Mask Size:"), 0, 1);
+        TextField multField = new TextField();
+        multField.setMaxWidth(60);
+        multField.setText("7");
+        grid.add(multField, 1, 1);
+
+        grid.add(new Label("Sigma:"), 0, 2);
+        TextField sigmaField = new TextField();
+        sigmaField.setMaxWidth(60);
+        sigmaField.setText("1");
+        grid.add(sigmaField, 1, 2);
+
+        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                multField.setText(oldValue);
+            } else {
+                int size = 0;
+                try {
+                    size = Integer.parseInt(multField.getText());
+                    if(size<7){
+                        size = 7;
+                    }
+                    if(size>30){
+                        size = 30;
+                    }
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(size >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = new Functions(this.originalImage).laplacianOfGaussian(size, Double.parseDouble(sigmaField.getText()));
+                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+                }
+            }
+        });
+
+        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            double sigma;
+            try {
+                sigma = Double.parseDouble(sigmaField.getText());
+                if(sigma<1){
+                    sigma = 1;
+                }
+            } catch (NumberFormatException | NullPointerException nfe) {
+                return;
+            }
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplacianOfGaussian(Integer.parseInt(multField.getText()), sigma);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 3);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
+        grid.add(new Label("Output Image:"), 1, 3);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+    public void laplacianOfGaussianEvaluated(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(originalImage).laplacianOfGaussianEvaluated(7, 1.0, 128);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply laplacian of gaussian filter");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply laplacian of gaussian filter");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Mask Size:"), 0, 1);
+        TextField multField = new TextField();
+        multField.setMaxWidth(60);
+        multField.setText("7");
+        grid.add(multField, 1, 1);
+
+        grid.add(new Label("Sigma:"), 0, 2);
+        TextField sigmaField = new TextField();
+        sigmaField.setMaxWidth(60);
+        sigmaField.setText("1");
+        grid.add(sigmaField, 1, 2);
+
+        grid.add(new Label("Threshold:"), 0, 3);
+        Slider slider = new Slider();
+        slider.setMin(0);
+        slider.setMax(255);
+        slider.setValue(128);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(64);
+        slider.setMinorTickCount(8);
+        slider.setBlockIncrement(1);
+        grid.add(slider, 1, 3);
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplacianOfGaussianEvaluated(
+                    Integer.parseInt(multField.getText()), Double.parseDouble(sigmaField.getText()),newValue.intValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+        });
+
+        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                multField.setText(oldValue);
+            } else {
+                int size = 0;
+                try {
+                    size = Integer.parseInt(multField.getText());
+                    if(size<7){
+                        size = 7;
+                    }
+                    if(size>30){
+                        size = 30;
+                    }
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(size >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = new Functions(this.originalImage)
+                            .laplacianOfGaussianEvaluated(size, Double.parseDouble(sigmaField.getText()), (int) Math.round(slider.getValue()));
+                    grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+                }
+            }
+        });
+
+        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            System.out.println(newValue);
+                double sigma;
+                try {
+                    sigma = Double.parseDouble(sigmaField.getText());
+                    if(sigma<1){
+                        sigma = 1;
+                    }
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                grid.getChildren().remove(outputImage.getView());
+                this.outputImage = new Functions(this.originalImage)
+                        .laplacianOfGaussianEvaluated(Integer.parseInt(multField.getText()), sigma, (int) Math.round(slider.getValue()));
+                grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 4);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 5);
+        grid.add(new Label("Output Image:"), 1, 4);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 6);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+    public void zeroCross(ImageGrey originalImage) {
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).applyZeroCross(128);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply threshold");
+
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply zero cross with threshold");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Threshold:"), 0, 1);
+        Slider slider = new Slider();
+        slider.setMin(0);
+        slider.setMax(255);
+        slider.setValue(128);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
         slider.setMajorTickUnit(128);
         slider.setMinorTickCount(32);
         slider.setBlockIncrement(1);
@@ -872,7 +1158,7 @@ public class ImageGreyTransformer {
         grid.add(slider, 1, 1);
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).laplaceEvaluated(newValue.intValue());
+            this.outputImage = new Functions(this.originalImage).applyZeroCross(newValue.intValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
         });
 
