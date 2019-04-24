@@ -1209,9 +1209,6 @@ public class ImageGreyTransformer {
                 double sigma;
                 try {
                     sigma = Double.parseDouble(sigmaField.getText());
-                    if(sigma<1){
-                        sigma = 1;
-                    }
                 } catch (NumberFormatException | NullPointerException nfe) {
                     return;
                 }
