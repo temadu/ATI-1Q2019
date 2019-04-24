@@ -738,7 +738,135 @@ public class ImageColorTransformer {
     }
 
     public void bilateralFilter(ImageColor originalImage) {
-        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor) new Functions(originalImage).bilateralFilter(7,2,30),windowIndex));
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).bilateralFilter(3,1,1);
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply bilateral filter");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Mask size:"), 0, 1);
+        TextField nField = new TextField();
+        nField.setMaxWidth(60);
+        grid.add(nField, 1, 1);
+
+        grid.add(new Label("Sigma S:"), 0, 2);
+        TextField ssField = new TextField();
+        ssField.setMaxWidth(60);
+        grid.add(ssField, 1, 2);
+
+
+        grid.add(new Label("Mask size:"), 0, 3);
+        TextField srField = new TextField();
+        srField.setMaxWidth(60);
+        grid.add(srField, 1, 3);
+
+        nField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}")) {
+                nField.setText(oldValue);
+            } else {
+                int n = 0;
+                double sigmaS = 0;
+                double sigmaR = 0;
+                try {
+                    n = Integer.parseInt(newValue);
+                    sigmaS = Float.parseFloat(ssField.getText());
+                    sigmaR = Float.parseFloat(srField.getText());
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(n >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = new Functions(this.originalImage).bilateralFilter(n, sigmaS, sigmaR);
+                    grid.add(new ImageView(outputImage.getRenderer()), 2, 5);
+
+                }
+            }
+        });
+        ssField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}")) {
+                ssField.setText(oldValue);
+            } else {
+                int n = 0;
+                double sigmaS = 0;
+                double sigmaR = 0;
+                try {
+                    n = Integer.parseInt(nField.getText());
+                    sigmaS = Float.parseFloat(newValue);
+                    sigmaR = Float.parseFloat(srField.getText());
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(n >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = new Functions(this.originalImage).bilateralFilter(n, sigmaS, sigmaR);
+                    grid.add(new ImageView(outputImage.getRenderer()), 2, 5);
+
+                }
+            }
+        });
+
+        srField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}")) {
+                srField.setText(oldValue);
+            } else {
+                int n = 0;
+                double sigmaS = 0;
+                double sigmaR = 0;
+                try {
+                    n = Integer.parseInt(nField.getText());
+                    sigmaS = Float.parseFloat(ssField.getText());
+                    sigmaR = Float.parseFloat(newValue);
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(n >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = new Functions(this.originalImage).bilateralFilter(n, sigmaS, sigmaR);
+                    grid.add(new ImageView(outputImage.getRenderer()), 2, 5);
+
+                }
+            }
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 4);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 5, 2, 1);
+        grid.add(new Label("Output Image:"), 2, 4);
+        grid.add(new ImageView(outputImage.getRenderer()), 2, 5);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 2, 6);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)outputImage,windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Apply gamma function");
+        stage.show();
     }
 
 
@@ -1133,29 +1261,6 @@ public class ImageColorTransformer {
         multField.setText("1");
         grid.add(multField, 1, 1);
 
-//        grid.add(new Label("Sigma:"), 0, 2);
-//        Slider sigmaSlider = new Slider();
-//        sigmaSlider.setMin(0);
-//        sigmaSlider.setMax(10);
-//        sigmaSlider.setValue(0.1);
-//        sigmaSlider.setShowTickLabels(true);
-//        sigmaSlider.setShowTickMarks(true);
-//        sigmaSlider.setMajorTickUnit(5);
-//        sigmaSlider.setMinorTickCount(1);
-//        sigmaSlider.setBlockIncrement(1);
-//        grid.add(sigmaSlider, 1, 2);
-//
-//        sigmaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            int multiplier = 0;
-//            try {
-//                multiplier = Integer.parseInt(multField.getText());
-//            } catch (NumberFormatException | NullPointerException nfe) {
-//                return;
-//            }
-//            grid.getChildren().remove(outputImage.getView());
-//            this.outputImage = new Functions(this.originalImage).gaussFilter(multiplier, newValue.doubleValue());
-//            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
-//        });
         multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             if (!newValue.matches("\\d*")) {
                 multField.setText(oldValue);
