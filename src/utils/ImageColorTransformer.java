@@ -2,11 +2,7 @@ package utils;
 
 import GUI.ATIApp;
 import GUI.ImageColorViewer;
-import GUI.ImageColorViewer;
-import GUI.ImageGreyViewer;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -16,15 +12,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
-import models.ImageColor;
-import models.ImageGrey;
 import models.ImageInt;
 import tp1.Functions;
 
@@ -1509,6 +1502,216 @@ public class ImageColorTransformer {
 
         stage.show();
     }
+
+    public void laplaceEvaluated(ImageColor originalImage) {
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).laplaceEvaluated(128, true);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply threshold");
+
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply Laplace with threshold");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Threshold:"), 0, 1);
+        Slider slider = new Slider();
+        slider.setMin(0);
+        slider.setMax(255);
+        slider.setValue(128);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(64);
+        slider.setMinorTickCount(8);
+        slider.setBlockIncrement(1);
+//        TextField multField = new TextField();
+//        multField.setMaxWidth(60);
+//        grid.add(multField, 1, 1);
+        grid.add(slider, 1, 1);
+
+        CheckBox eval = new CheckBox();
+        eval.setSelected(true);
+        grid.add(new Label("Slope Eval:"), 0, 2);
+        grid.add(eval, 1, 2);
+        eval.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplaceEvaluated((int) Math.floor(slider.getValue()), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        }));
+
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplaceEvaluated(newValue.intValue(), eval.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 3);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
+        grid.add(new Label("Output Image:"), 1, 3);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor) outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+
+    public void laplacianOfGaussianEvaluated(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(originalImage).laplacianOfGaussianEvaluated(7, 1.0, 128, true);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply laplacian of gaussian filter");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply laplacian of gaussian filter");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Mask Size:"), 0, 1);
+        TextField multField = new TextField();
+        multField.setMaxWidth(60);
+        multField.setText("7");
+        grid.add(multField, 1, 1);
+
+        grid.add(new Label("Sigma:"), 0, 2);
+        TextField sigmaField = new TextField();
+        sigmaField.setMaxWidth(60);
+        sigmaField.setText("1");
+        grid.add(sigmaField, 1, 2);
+
+        grid.add(new Label("Threshold:"), 0, 3);
+        Slider slider = new Slider();
+        slider.setMin(0);
+        slider.setMax(255);
+        slider.setValue(128);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(64);
+        slider.setMinorTickCount(8);
+        slider.setBlockIncrement(1);
+        grid.add(slider, 1, 3);
+
+        CheckBox eval = new CheckBox();
+        eval.setSelected(true);
+        grid.add(new Label("Slope Eval:"), 0, 4);
+        grid.add(eval, 1, 4);
+        eval.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplacianOfGaussianEvaluated(Integer.parseInt(multField.getText()),
+                    Double.parseDouble(sigmaField.getText()), (int) Math.floor(slider.getValue()), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+        }));
+
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplacianOfGaussianEvaluated(
+                    Integer.parseInt(multField.getText()), Double.parseDouble(sigmaField.getText()),newValue.intValue(), eval.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+        });
+
+        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                multField.setText(oldValue);
+            } else {
+                int size = 0;
+                try {
+                    size = Integer.parseInt(multField.getText());
+                    if(size<7){
+                        size = 7;
+                    }
+                    if(size>30){
+                        size = 30;
+                    }
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(size >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = new Functions(this.originalImage)
+                            .laplacianOfGaussianEvaluated(size, Double.parseDouble(sigmaField.getText()), (int) Math.round(slider.getValue()), eval.isSelected());
+                    grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+                }
+            }
+        });
+
+        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            double sigma;
+            try {
+                sigma = Double.parseDouble(sigmaField.getText());
+            } catch (NumberFormatException | NullPointerException nfe) {
+                return;
+            }
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage)
+                    .laplacianOfGaussianEvaluated(Integer.parseInt(multField.getText()), sigma, (int) Math.round(slider.getValue()), eval.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 5);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 6);
+        grid.add(new Label("Output Image:"), 1, 5);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 7);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor) outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
 
     public void thresholding(ImageColor originalImage){
         this.originalImage = originalImage;

@@ -73,6 +73,11 @@ public class ImageColorViewer extends ImageViewer{
         MenuItem bilateralFilter = new MenuItem("Add Bilateral Filter");
         bilateralFilter.setOnAction(e -> new ImageColorTransformer(this.windowIndex).bilateralFilter(this.image));
 
+        MenuItem laplaceEvaluated = new MenuItem("Laplace Filter");
+        laplaceEvaluated.setOnAction(e -> new ImageColorTransformer(this.windowIndex).laplaceEvaluated(this.image));
+        MenuItem laplacianOfGaussianMaskEvaluated = new MenuItem("Laplacian Of Gaussian Filter");
+        laplacianOfGaussianMaskEvaluated.setOnAction(e -> new ImageColorTransformer(this.windowIndex).laplacianOfGaussianEvaluated(this.image));
+
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
         MenuItem expNoise = new MenuItem("Add Exponential Noise");
@@ -104,7 +109,7 @@ public class ImageColorViewer extends ImageViewer{
         transformMenu.getItems().addAll(painter, cutter, sum,substract, multiply, gamma, rangeCompressor, negative, threshold,
                 globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise, saltAndPepper,
                 meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, prewitt, sobel,
-                kirsh, mask5a, isotropic, anisotropic);
+                kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated, isotropic, anisotropic);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }

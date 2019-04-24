@@ -701,18 +701,13 @@ public class Functions {
         return filter(w, false, true);
     }
 
-    public ImageInt laplaceEvaluated(int threshold) {
+    public ImageInt laplaceEvaluated(int threshold, boolean evaluated) {
         double[][] w = new double[3][3];
         w[0][0] = w[0][2] = w[2][0] = w[2][2] = 0.0;
         w[0][1] = w[1][0] = w[1][2] = w[2][1] = -1.0;
         w[1][1] = 4.0;
 
-        ImageInt maskedImage = filter(w, false, false);
-
-        return zeroCross(maskedImage, threshold);
-        //si hay cambio de signo 255 si hay 0. si hay un 0 checqueo uno mas si es otro 0 pongo como no cambio, se chequea horizontal y dsp verticalmente
-        //el resultado da basura -> se aplica evaluacion de la pendiente -> se calcula la diferencia entre los numeros (+, -), (+, 0, -) etc. Si da > q un umbral se pone 0 y si no 255.
-        //si es (+,+) no se hace nada
+        return evaluated ? zeroCross(filter(w, false, false), threshold) : filter(w, false, true);
     }
 
     public ImageInt applyZeroCross(int threshold) {
@@ -841,7 +836,7 @@ public class Functions {
         return filter(w, false, true);
     }
 
-    public ImageInt laplacianOfGaussianEvaluated(int size, double sigma, int threshold){
+    public ImageInt laplacianOfGaussianEvaluated(int size, double sigma, int threshold, boolean eval){
         double[][] w = new double[size][size];
         int subValue = size/2;
         for(int x = 0; x < size; x++) {
@@ -853,8 +848,7 @@ public class Functions {
                 w[y][x] = pixelValue;
             }
         }
-        ImageInt maskedImage = filter(w, false, false);
-        return zeroCross(maskedImage, threshold);
+        return eval ?  zeroCross(filter(w, false, false), threshold) : filter(w, false, true);
     }
 
     public ImageInt bilateralFilter(int n, double sigmaS, double sigmaR){

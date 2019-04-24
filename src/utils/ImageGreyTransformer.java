@@ -963,12 +963,10 @@ public class ImageGreyTransformer {
         stage.show();
     }
 
-    public void laplaceMask(ImageGrey originalImage) {
-        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).laplaceMask(),windowIndex));
-    }
+
     public void laplaceEvaluated(ImageGrey originalImage) {
         this.originalImage = originalImage;
-        this.outputImage = new Functions(this.originalImage).laplaceEvaluated(128);
+        this.outputImage = new Functions(this.originalImage).laplaceEvaluated(128, true);
 
         Stage stage = new Stage();
         stage.setTitle("Apply threshold");
@@ -998,107 +996,20 @@ public class ImageGreyTransformer {
 //        multField.setMaxWidth(60);
 //        grid.add(multField, 1, 1);
         grid.add(slider, 1, 1);
+
+        CheckBox eval = new CheckBox();
+        eval.setSelected(true);
+        grid.add(new Label("Slope Eval:"), 0, 2);
+        grid.add(eval, 1, 2);
+        eval.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplaceEvaluated((int) Math.floor(slider.getValue()), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        }));
+
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).laplaceEvaluated(newValue.intValue());
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
-        });
-
-        Label firstImageLabel = new Label("First Image:");
-        firstImageLabel.setAlignment(Pos.CENTER);
-        grid.add(firstImageLabel, 0, 2);
-        grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
-        grid.add(new Label("Output Image:"), 1, 2);
-        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
-
-        Button outputBtn = new Button("Output Image");
-        HBox hbBtn = new HBox(10);
-        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
-        hbBtn.getChildren().add(outputBtn);
-        grid.add(hbBtn, 1, 4);
-
-        outputBtn.setOnAction((e) -> {
-            if(outputImage != null){
-                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
-                stage.close();
-            }
-
-        });
-
-        ScrollPane scroller = new ScrollPane();
-        scroller.setContent(grid);
-
-        Scene scene = new Scene(scroller);
-        stage.setScene(scene);
-        stage.setMaximized(true);
-
-        stage.show();    }
-
-    public void laplacianOfGaussian(ImageGrey originalImage){
-        this.originalImage = originalImage;
-        this.outputImage = new Functions(originalImage).laplacianOfGaussian(7, 1.0);
-
-        Stage stage = new Stage();
-        stage.setTitle("Apply laplacian of gaussian filter");
-
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
-
-        Text scenetitle = new Text("Apply laplacian of gaussian filter");
-        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        grid.add(scenetitle, 0, 0, 2, 1);
-
-        grid.add(new Label("Mask Size:"), 0, 1);
-        TextField multField = new TextField();
-        multField.setMaxWidth(60);
-        multField.setText("7");
-        grid.add(multField, 1, 1);
-
-        grid.add(new Label("Sigma:"), 0, 2);
-        TextField sigmaField = new TextField();
-        sigmaField.setMaxWidth(60);
-        sigmaField.setText("1");
-        grid.add(sigmaField, 1, 2);
-
-        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            if (!newValue.matches("\\d*")) {
-                multField.setText(oldValue);
-            } else {
-                int size = 0;
-                try {
-                    size = Integer.parseInt(multField.getText());
-                    if(size<7){
-                        size = 7;
-                    }
-                    if(size>30){
-                        size = 30;
-                    }
-                } catch (NumberFormatException | NullPointerException nfe) {
-                    return;
-                }
-                if(size >= 0){
-                    grid.getChildren().remove(outputImage.getView());
-                    this.outputImage = new Functions(this.originalImage).laplacianOfGaussian(size, Double.parseDouble(sigmaField.getText()));
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
-                }
-            }
-        });
-
-        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            double sigma;
-            try {
-                sigma = Double.parseDouble(sigmaField.getText());
-                if(sigma<1){
-                    sigma = 1;
-                }
-            } catch (NumberFormatException | NullPointerException nfe) {
-                return;
-            }
-            grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).laplacianOfGaussian(Integer.parseInt(multField.getText()), sigma);
+            this.outputImage = new Functions(this.originalImage).laplaceEvaluated(newValue.intValue(), eval.isSelected());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
         });
 
@@ -1132,9 +1043,11 @@ public class ImageGreyTransformer {
 
         stage.show();
     }
+
+
     public void laplacianOfGaussianEvaluated(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.outputImage = new Functions(originalImage).laplacianOfGaussianEvaluated(7, 1.0, 128);
+        this.outputImage = new Functions(originalImage).laplacianOfGaussianEvaluated(7, 1.0, 128, true);
 
         Stage stage = new Stage();
         stage.setTitle("Apply laplacian of gaussian filter");
@@ -1172,11 +1085,23 @@ public class ImageGreyTransformer {
         slider.setMinorTickCount(8);
         slider.setBlockIncrement(1);
         grid.add(slider, 1, 3);
+
+        CheckBox eval = new CheckBox();
+        eval.setSelected(true);
+        grid.add(new Label("Slope Eval:"), 0, 4);
+        grid.add(eval, 1, 4);
+        eval.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).laplacianOfGaussianEvaluated(Integer.parseInt(multField.getText()),
+                    Double.parseDouble(sigmaField.getText()), (int) Math.floor(slider.getValue()), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+        }));
+
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
             this.outputImage = new Functions(this.originalImage).laplacianOfGaussianEvaluated(
-                    Integer.parseInt(multField.getText()), Double.parseDouble(sigmaField.getText()),newValue.intValue());
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+                    Integer.parseInt(multField.getText()), Double.parseDouble(sigmaField.getText()),newValue.intValue(), eval.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });
 
         multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
@@ -1198,14 +1123,13 @@ public class ImageGreyTransformer {
                 if(size >= 0){
                     grid.getChildren().remove(outputImage.getView());
                     this.outputImage = new Functions(this.originalImage)
-                            .laplacianOfGaussianEvaluated(size, Double.parseDouble(sigmaField.getText()), (int) Math.round(slider.getValue()));
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+                            .laplacianOfGaussianEvaluated(size, Double.parseDouble(sigmaField.getText()), (int) Math.round(slider.getValue()), eval.isSelected());
+                    grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
                 }
             }
         });
 
         sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            System.out.println(newValue);
                 double sigma;
                 try {
                     sigma = Double.parseDouble(sigmaField.getText());
@@ -1214,22 +1138,22 @@ public class ImageGreyTransformer {
                 }
                 grid.getChildren().remove(outputImage.getView());
                 this.outputImage = new Functions(this.originalImage)
-                        .laplacianOfGaussianEvaluated(Integer.parseInt(multField.getText()), sigma, (int) Math.round(slider.getValue()));
-                grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+                        .laplacianOfGaussianEvaluated(Integer.parseInt(multField.getText()), sigma, (int) Math.round(slider.getValue()), eval.isSelected());
+                grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });
 
         Label firstImageLabel = new Label("First Image:");
         firstImageLabel.setAlignment(Pos.CENTER);
-        grid.add(firstImageLabel, 0, 4);
-        grid.add(new ImageView(originalImage.getRenderer()), 0, 5);
-        grid.add(new Label("Output Image:"), 1, 4);
-        grid.add(new ImageView(outputImage.getRenderer()), 1, 5);
+        grid.add(firstImageLabel, 0, 5);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 6);
+        grid.add(new Label("Output Image:"), 1, 5);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
 
         Button outputBtn = new Button("Output Image");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(outputBtn);
-        grid.add(hbBtn, 1, 6);
+        grid.add(hbBtn, 1, 7);
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){

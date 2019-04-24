@@ -65,14 +65,11 @@ public class ImageGreyViewer extends ImageViewer {
         mask5a.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).mask5a(this.image));
 
 
-        MenuItem laplaceMask = new MenuItem("Laplace Mask");
-        laplaceMask.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplaceMask(this.image));
-        MenuItem laplaceEvaluated = new MenuItem("Laplace Evaluated");
+        MenuItem laplaceEvaluated = new MenuItem("Laplace Filter");
         laplaceEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplaceEvaluated(this.image));
-        MenuItem laplacianOfGaussianMask = new MenuItem("Laplacian Of Gaussian");
-        laplacianOfGaussianMask.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianOfGaussian(this.image));
-        MenuItem laplacianOfGaussianMaskEvaluated = new MenuItem("Laplacian Of Gaussian Evaluated");
+        MenuItem laplacianOfGaussianMaskEvaluated = new MenuItem("Laplacian Of Gaussian Filter");
         laplacianOfGaussianMaskEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianOfGaussianEvaluated(this.image));
+
         MenuItem zeroCross = new MenuItem("Zero Cross");
         zeroCross.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).zeroCross(this.image));
 
@@ -119,7 +116,7 @@ public class ImageGreyViewer extends ImageViewer {
         transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
                 histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, 
-                prewitt, sobel, kirsh, mask5a, laplaceMask, laplaceEvaluated, laplacianOfGaussianMask, laplacianOfGaussianMaskEvaluated,
+                prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
                 zeroCross, isotropic, anisotropic);
 
 
