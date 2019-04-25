@@ -768,54 +768,55 @@ public class Functions {
                 }
             }
         }
-            for (int y = 0; y < height; y++) {
-                for (int x = 0; x < width; x++) {
-                    double pastR = 0; double pastG = 0; double pastB = 0;
-                    double currentR = 0; double currentG = 0; double currentB = 0;
 
-                    if(greyscale){
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                double pastR = 0; double pastG = 0; double pastB = 0;
+                double currentR = 0; double currentG = 0; double currentB = 0;
 
-                        currentR = ((ImageGrey)image).getImage()[Math.floorMod(y+1, height)][x];
-                        lastR = pastR;
-                        pastR = ((ImageGrey)image).getImage()[y][x];
+                if(greyscale){
 
-                        if (pastR == 0 && x > 0) {
-                            pastR = lastR;
-                        }
+                    currentR = ((ImageGrey)image).getImage()[Math.floorMod(y+1, height)][x];
+                    lastR = pastR;
+                    pastR = ((ImageGrey)image).getImage()[y][x];
 
-                        horizontalsR[y][x] = ((currentR < 0 && pastR > 0) || (currentR > 0 && pastR < 0))
-                                && Math.abs(currentR - pastR) >= threshold ? 255 : horizontalsR[y][x];
-                    } else {
-                        currentR = ((ImageColor)image).getRed()[Math.floorMod(y+1, height)][x];
-                        currentG = ((ImageColor)image).getGreen()[Math.floorMod(y+1, height)][x];
-                        currentB = ((ImageColor)image).getBlue()[Math.floorMod(y+1, height)][x];
-                        lastR = pastR;
-                        lastG = pastG;
-                        lastB = pastB;
-                        pastR = ((ImageColor)image).getRed()[y][x];
-                        pastG = ((ImageColor)image).getGreen()[y][x];
-                        pastB = ((ImageColor)image).getBlue()[y][x];
-
-                        if (pastR == 0 && x > 0) {
-                            pastR = lastR;
-                        }
-                        if (pastG == 0 && x > 0) {
-                            pastG = lastG;
-                        }
-                        if (pastB == 0 && x > 0) {
-                            pastB = lastB;
-                        }
-
-                        horizontalsR[y][x] = ((currentR < 0 && pastR > 0) || (currentR > 0 && pastR < 0))
-                                && Math.abs(currentR - pastR) >= threshold ? 255 : horizontalsR[y][x];
-                        horizontalsG[y][x] = ((currentG < 0 && pastG > 0) || (currentG > 0 && pastG < 0))
-                                && Math.abs(currentG - pastG) >= threshold ? 255 : horizontalsG[y][x];
-                        horizontalsB[y][x] = ((currentB < 0 && pastB > 0) || (currentB > 0 && pastB < 0))
-                                && Math.abs(currentB - pastB) >= threshold ? 255 : horizontalsB[y][x];
+                    if (pastR == 0 && x > 0) {
+                        pastR = lastR;
                     }
 
+                    horizontalsR[y][x] = ((currentR < 0 && pastR > 0) || (currentR > 0 && pastR < 0))
+                            && Math.abs(currentR - pastR) >= threshold ? 255 : horizontalsR[y][x];
+                } else {
+                    currentR = ((ImageColor)image).getRed()[Math.floorMod(y+1, height)][x];
+                    currentG = ((ImageColor)image).getGreen()[Math.floorMod(y+1, height)][x];
+                    currentB = ((ImageColor)image).getBlue()[Math.floorMod(y+1, height)][x];
+                    lastR = pastR;
+                    lastG = pastG;
+                    lastB = pastB;
+                    pastR = ((ImageColor)image).getRed()[y][x];
+                    pastG = ((ImageColor)image).getGreen()[y][x];
+                    pastB = ((ImageColor)image).getBlue()[y][x];
+
+                    if (pastR == 0 && x > 0) {
+                        pastR = lastR;
+                    }
+                    if (pastG == 0 && x > 0) {
+                        pastG = lastG;
+                    }
+                    if (pastB == 0 && x > 0) {
+                        pastB = lastB;
+                    }
+
+                    horizontalsR[y][x] = ((currentR < 0 && pastR > 0) || (currentR > 0 && pastR < 0))
+                            && Math.abs(currentR - pastR) >= threshold ? 255 : horizontalsR[y][x];
+                    horizontalsG[y][x] = ((currentG < 0 && pastG > 0) || (currentG > 0 && pastG < 0))
+                            && Math.abs(currentG - pastG) >= threshold ? 255 : horizontalsG[y][x];
+                    horizontalsB[y][x] = ((currentB < 0 && pastB > 0) || (currentB > 0 && pastB < 0))
+                            && Math.abs(currentB - pastB) >= threshold ? 255 : horizontalsB[y][x];
                 }
+
             }
+        }
 
         return greyscale ? new ImageGrey(horizontalsR, image.getHeight(), image.getWidth())
                 : new ImageColor(horizontalsR, horizontalsG, horizontalsB, image.getHeight(), image.getWidth());

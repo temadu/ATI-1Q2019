@@ -757,7 +757,7 @@ public class ImageColorTransformer {
         grid.add(ssField, 1, 2);
 
 
-        grid.add(new Label("Mask size:"), 0, 3);
+        grid.add(new Label("Sigma R:"), 0, 3);
         TextField srField = new TextField();
         srField.setMaxWidth(60);
         grid.add(srField, 1, 3);
@@ -1316,7 +1316,7 @@ public class ImageColorTransformer {
         this.originalImage = originalImage;
         this.outputImage = originalImage;
         Stage stage = new Stage();
-        stage.setTitle("Anisotropic Difussion");
+        stage.setTitle("Anisotropic Diffusion");
 
 
         GridPane grid = new GridPane();
@@ -1325,7 +1325,7 @@ public class ImageColorTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Apply threshold");
+        Text scenetitle = new Text("Anisotropic Diffusion");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -1412,7 +1412,7 @@ public class ImageColorTransformer {
         this.originalImage = originalImage;
         this.outputImage = originalImage;
         Stage stage = new Stage();
-        stage.setTitle("Anisotropic Difussion");
+        stage.setTitle("Isotropic Diffusion");
 
 
         GridPane grid = new GridPane();
@@ -1421,7 +1421,7 @@ public class ImageColorTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Apply threshold");
+        Text scenetitle = new Text("Isotropic Diffusion");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 

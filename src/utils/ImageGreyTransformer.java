@@ -858,7 +858,7 @@ public class ImageGreyTransformer {
         grid.add(ssField, 1, 2);
 
 
-        grid.add(new Label("Mask size:"), 0, 3);
+        grid.add(new Label("Sigma R:"), 0, 3);
         TextField srField = new TextField();
         srField.setMaxWidth(60);
         grid.add(srField, 1, 3);
@@ -1257,7 +1257,7 @@ public class ImageGreyTransformer {
         this.originalImage = originalImage;
         this.outputImage = originalImage;
         Stage stage = new Stage();
-        stage.setTitle("Anisotropic Difussion");
+        stage.setTitle("Anisotropic Diffusion");
 
 
         GridPane grid = new GridPane();
@@ -1266,7 +1266,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Apply threshold");
+        Text scenetitle = new Text("Anisotropic Diffusion");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -1352,7 +1352,7 @@ public class ImageGreyTransformer {
         this.originalImage = originalImage;
         this.outputImage = originalImage;
         Stage stage = new Stage();
-        stage.setTitle("Anisotropic Difussion");
+        stage.setTitle("Isotropic Diffusion");
 
 
         GridPane grid = new GridPane();
@@ -1361,7 +1361,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Apply threshold");
+        Text scenetitle = new Text("Isotropic Diffusion");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -2261,29 +2261,6 @@ public class ImageGreyTransformer {
         multField.setText("1");
         grid.add(multField, 1, 1);
 
-//        grid.add(new Label("Sigma:"), 0, 2);
-//        Slider sigmaSlider = new Slider();
-//        sigmaSlider.setMin(0);
-//        sigmaSlider.setMax(10);
-//        sigmaSlider.setValue(0.1);
-//        sigmaSlider.setShowTickLabels(true);
-//        sigmaSlider.setShowTickMarks(true);
-//        sigmaSlider.setMajorTickUnit(5);
-//        sigmaSlider.setMinorTickCount(1);
-//        sigmaSlider.setBlockIncrement(1);
-//        grid.add(sigmaSlider, 1, 2);
-//
-//        sigmaSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-//            int multiplier = 0;
-//            try {
-//                multiplier = Integer.parseInt(multField.getText());
-//            } catch (NumberFormatException | NullPointerException nfe) {
-//                return;
-//            }
-//            grid.getChildren().remove(outputImage.getView());
-//            this.outputImage = new Functions(this.originalImage).gaussFilter(multiplier, newValue.doubleValue());
-//            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
-//        });
         multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             if (!newValue.matches("\\d*")) {
                 multField.setText(oldValue);
