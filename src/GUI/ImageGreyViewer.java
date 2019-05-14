@@ -117,7 +117,7 @@ public class ImageGreyViewer extends ImageViewer {
                 histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
                 saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, 
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                zeroCross, isotropic, anisotropic);
+                isotropic, anisotropic);
 
 
 //        final Menu showMenu = new Menu("Show");
