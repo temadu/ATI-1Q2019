@@ -38,6 +38,8 @@ public class ImageGreyViewer extends ImageViewer {
         remove.setOnAction(event -> ATIApp.WINDOWS.get(this.windowIndex).imageViews.getChildren().remove(this.getPane()));
 
         final Menu transformMenu = new Menu("Transform");
+
+        final Menu basicOps = new Menu("Basic");
         MenuItem cutter = new MenuItem("Cut Image");
         cutter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).cutImage(this.image));
         MenuItem painter = new MenuItem("Get and Set Colors");
@@ -54,6 +56,11 @@ public class ImageGreyViewer extends ImageViewer {
         rangeCompressor.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
         negative.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).negative(this.image));
+        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
+        histogramEqualization.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).histogramEqualization(this.image));
+        MenuItem contrast = new MenuItem("Contrast Improvement");
+        contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
+        basicOps.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative, histogramEqualization, contrast);
 
         MenuItem prewitt = new MenuItem("Prewitt");
         prewitt.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).prewitt(this.image));
@@ -70,42 +77,42 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem laplacianOfGaussianMaskEvaluated = new MenuItem("Laplacian Of Gaussian Filter");
         laplacianOfGaussianMaskEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianOfGaussianEvaluated(this.image));
 
-        MenuItem zeroCross = new MenuItem("Zero Cross");
-        zeroCross.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).zeroCross(this.image));
 
-        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
-        MenuItem contrast = new MenuItem("Contrast Improvement");
-        MenuItem threshold = new MenuItem("Thresholding");
+        final Menu thresholdOps = new Menu("Thresholds");
+        MenuItem threshold = new MenuItem("Basic Thresholding");
         MenuItem globalThreshold = new MenuItem("Global Thresholding");
         MenuItem otsuThreshold = new MenuItem("Otsu Thresholding");
+        threshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).threshold(this.image));
+        globalThreshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).globalThreshold(this.image));
+        otsuThreshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).otsuThreshold(this.image));
+        thresholdOps.getItems().addAll(threshold,globalThreshold,otsuThreshold);
+
+        final Menu noiseOps = new Menu("Noise");
         MenuItem gaussNoise = new MenuItem("Add Gauss Noise");
         MenuItem rayleighNoise = new MenuItem("Add Rayleigh Noise");
         MenuItem expNoise = new MenuItem("Add Exponential Noise");
         MenuItem saltAndPepper = new MenuItem("Add Salt and Pepper");
+        gaussNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addGaussianNoise(this.image));
+        rayleighNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addRayleighNoise(this.image));
+        expNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addExponentialNoise(this.image));
+        saltAndPepper.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addSaltAndPepper(this.image));
+        noiseOps.getItems().addAll(gaussNoise,rayleighNoise,expNoise, saltAndPepper);
 
+
+        final Menu filterOps = new Menu("Filters");
         MenuItem meanFilter = new MenuItem("Add Mean Filter");
         MenuItem medianFilter = new MenuItem("Add Median Filter");
         MenuItem weightedMedianFilter = new MenuItem("Add Weighted Median Filter");
         MenuItem laplacianFilter = new MenuItem("Add Highpass Filter");
         MenuItem gaussFilter = new MenuItem("Add Gauss Filter");
         MenuItem bilateralFilter = new MenuItem("Add Bilateral Filter");
-        histogramEqualization.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).histogramEqualization(this.image));
-        contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
-        threshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).threshold(this.image));
-        globalThreshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).globalThreshold(this.image));
-        otsuThreshold.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).otsuThreshold(this.image));
-        gaussNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addGaussianNoise(this.image));
-        rayleighNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addRayleighNoise(this.image));
-        expNoise.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addExponentialNoise(this.image));
-        saltAndPepper.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).addSaltAndPepper(this.image));
         meanFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).meanFilter(this.image));
         medianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).medianFilter(this.image));
         weightedMedianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).weightedMedianFilter(this.image));
         laplacianFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).highpassFilter(this.image));
         gaussFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).gaussFilter(this.image));
         bilateralFilter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).bilateralFilter(this.image));
-//        MenuItem histogramEqualization = new MenuItem("Histogram Equalization");
-//        histogramEqualization.setOnAction(e -> new ImageGreyTransformer().histogramEqualization(this.image));
+        filterOps.getItems().addAll(meanFilter,medianFilter,weightedMedianFilter,laplacianFilter,gaussFilter,bilateralFilter);
 
         MenuItem anisotropic = new MenuItem("Anisotropic Diffusion");
         anisotropic.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).anisotropic(this.image));
@@ -113,9 +120,7 @@ public class ImageGreyViewer extends ImageViewer {
         isotropic.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).isotropic(this.image));
 
 
-        transformMenu.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative,
-                histogramEqualization, contrast, threshold, globalThreshold, otsuThreshold, gaussNoise, rayleighNoise, expNoise,
-                saltAndPepper, meanFilter, medianFilter, weightedMedianFilter, laplacianFilter, gaussFilter, bilateralFilter, 
+        transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
                 isotropic, anisotropic);
 
