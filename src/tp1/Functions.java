@@ -914,31 +914,15 @@ public class Functions {
         DecimalFormat df = new DecimalFormat("#.#");
 
         //1) Aplico gaussiana
-        System.out.println("GAUSS");
         this.image = gaussFilter(n,gamma);
 
         //2) Derivo sobel en x e y
-//        System.out.println("SOBEL");
-//        System.out.println("GX");
         ImageInt gx = sobelOperator(false,false,false,true,false,false,false,false);
-//        for (int i = 0; i < gx.getHeight(); i++) {
-//            for (int j = 0; j < gx.getWidth(); j++) {
-//                System.out.print(gx.getPixel(j,i)+ ",");
-//            }
-//            System.out.print("\n");
-//        }
-//        System.out.println("GY");
         ImageInt gy = sobelOperator(false,false,true,false,false,false,false,false);
-//        for (int i = 0; i < gy.getHeight(); i++) {
-//            for (int j = 0; j < gy.getWidth(); j++) {
-//                System.out.print(gy.getPixel(j,i)+ ",");
-//            }
-//            System.out.print("\n");
-//        }
+
         //3) Angulo de gradiente
         double[][] directionsR = new double[gx.getHeight()][gx.getWidth()];
         double[][] GR = new double[gx.getHeight()][gx.getWidth()];
-
         double[][] directionsG = new double[gx.getHeight()][gx.getWidth()];
         double[][] GG = new double[gx.getHeight()][gx.getWidth()];
         double[][] directionsB = new double[gx.getHeight()][gx.getWidth()];
@@ -958,21 +942,7 @@ public class Functions {
                 }
             }
         }
-//        System.out.println("GRADIENTE");
-//        for (int i = 0; i < G.length; i++) {
-//            for (int j = 0; j < G[0].length; j++) {
-//                System.out.print(df.format(G[i][j]) + ",");
-//            }
-//            System.out.print("\n");
-//        }
 
-//        System.out.println("DIRECTIONS");
-//        for (int i = 0; i < directions.length; i++) {
-//            for (int j = 0; j < directions[0].length; j++) {
-//                System.out.print(df.format(directions[i][j]) + ",");
-//            }
-//            System.out.print("\n");
-//        }
         //4) Supresion no maximos
         List<Integer[][]> rets = new ArrayList<>();
         rets.add(nonMaximumSuppression(GR,directionsR));
@@ -980,13 +950,6 @@ public class Functions {
             rets.add(nonMaximumSuppression(GG,directionsG));
             rets.add(nonMaximumSuppression(GB,directionsB));
         }
-//        System.out.println("NO MAXIMOS");
-//        for (int i = 0; i < supressed.length; i++) {
-//            for (int j = 0; j < supressed[0].length; j++) {
-//                System.out.print(supressed[i][j] + ",");
-//            }
-//            System.out.print("\n");
-//        }
         return greyscale ? new ImageGrey(clamp(rets.get(0)), image.getHeight(), image.getWidth())
                 : new ImageColor(clamp(rets.get(0)),clamp(rets.get(1)), clamp(rets.get(2)), image.getHeight(), image.getWidth());
     }
@@ -1119,22 +1082,16 @@ public class Functions {
                 for (int x = 0; x < this.image.getWidth(); x++) {
                     int n = 0;
                     int N = 0;
-//                System.out.println("Analizing: ("+x+", "+y+")");
                     for (int i = -3; i < 4; i++) {
                         for (int j = -3; j < 4; j++) {
-                            if(y+i<0 || x+j<0 || y+i>=this.image.getHeight() || x+j>=this.image.getWidth() || w[i+3][j+3]==0){
-                                continue;
-                            }
-                            N++;
-                            if(y+i>255) {
-                                System.out.println();
-                            }
-                            if(Math.abs(image[y][x]-image[y+i][x+j])<threshold){
-                                n++;
+                            if(!(y+i<0 || x+j<0 || y+i>=this.image.getHeight() || x+j>=this.image.getWidth() || w[i+3][j+3]==0)){
+                                N++;
+                                if(Math.abs(image[y][x]-image[y+i][x+j])<threshold){
+                                    n++;
+                                }
                             }
                         }
                     }
-//                System.out.println("n:"+n+" N:"+N);
                     if(N == 0){
                         ret[y][x] = 0;
                         continue;
@@ -1153,6 +1110,17 @@ public class Functions {
         return greyscale ? new ImageGrey(rets.get(0), image.getHeight(), image.getWidth())
                 : new ImageColor(rets.get(0), rets.get(1), rets.get(2), image.getHeight(), image.getWidth());
     }
+
+//    public ImageInt houghLineDetector(){
+//        this.image = sobelOperator(false,false,true,true,false,false,false,false);
+//        this.image = globalThresholdization();
+//        int D = Math.max(this.image.getWidth(),this.image.getHeight());
+//        int thetaMin = -90;
+//        int thetaMax = 90;
+//        int pMin = (int) -Math.sqrt(2)*D;
+//        int pMax = (int) Math.sqrt(2)*D;
+//
+//    }
 
     private double[][] rotate(double[][] w) {
         double[][] rot = new double[3][3];

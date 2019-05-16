@@ -59,7 +59,7 @@ public class ATIApp extends Application {
 
         ScrollPane scroller = new ScrollPane();
 //        scroller.setPrefSize(512, 512);
-        scroller.setFitToHeight(true);
+//        scroller.setFitToHeight(true);
         scroller.setFitToWidth(true);
         scroller.setContent(imageViews);
 
