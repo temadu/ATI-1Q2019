@@ -1439,6 +1439,13 @@ public class Functions {
             blue = ((ImageColor)image).getBlue();
         }
 
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                int avg = (int) Math.round((red[i][j] + green[i][j] + blue[i][j]) / 3);
+                System.out.print(avg +"\t");
+            }
+            System.out.println();
+        }
         int half = sqSize/2;
         double rTheta0 =  0, rTheta1 = 0;
         double gTheta0 =  0, gTheta1 = 0;
@@ -1641,6 +1648,10 @@ public class Functions {
             }
             rTheta0 /= pixelCount  - inCounter;
             rTheta1 /= inCounter;
+            gTheta0 /= pixelCount  - inCounter;
+            gTheta1 /= inCounter;
+            bTheta0 /= pixelCount  - inCounter;
+            bTheta1 /= inCounter;
         }
 
         lin.addAll(lout);
