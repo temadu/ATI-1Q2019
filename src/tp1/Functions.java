@@ -1066,6 +1066,53 @@ public class Functions {
         return new ImageGrey(ret,image.length,image[0].length);
     }
 
+    public ImageInt susanDetector(int threshold, boolean borderDetection, boolean cornerDetection){
+        Integer[][] image = ((ImageGrey)this.image).getImage();
+        Integer[][] ret = new Integer[this.image.getHeight()][this.image.getWidth()];
+        int[][] w =  {{0,0,1,1,1,0,0},
+                      {0,1,1,1,1,1,0},
+                      {1,1,1,1,1,1,1},
+                      {1,1,1,1,1,1,1},
+                      {1,1,1,1,1,1,1},
+                      {0,1,1,1,1,1,0},
+                      {0,0,1,1,1,0,0}};
+        for (int y = 0; y < this.image.getHeight(); y++) {
+            for (int x = 0; x < this.image.getWidth(); x++) {
+                int n = 0;
+                int N = 0;
+//                System.out.println("Analizing: ("+x+", "+y+")");
+                for (int i = -3; i < 4; i++) {
+                    for (int j = -3; j < 4; j++) {
+                        if(y+i<0 || x+j<0 || y+i>=this.image.getHeight() || x+j>=this.image.getWidth() || w[i+3][j+3]==0){
+                            continue;
+                        }
+                        N++;
+                        if(y+i>255)
+                        System.out.println();
+                        int a = image[y][x];
+                        int b = image[y+i][x+j];
+                        if(Math.abs(image[y][x]-image[y+i][x+j])<threshold){
+                            n++;
+                        }
+                    }
+                }
+//                System.out.println("n:"+n+" N:"+N);
+                if(N == 0){
+                    ret[y][x] = 0;
+                    continue;
+                }
+                double s = 1-(n/ (double)N);
+                if((borderDetection && s>0.375 && s<0.625) ||
+                    (cornerDetection && s>0.625 && s<0.875 )){
+                    ret[y][x] = 255;
+                }else{
+                    ret[y][x] = 0;
+                }
+            }
+        }
+        return new ImageGrey(ret,this.image.getHeight(),this.image.getWidth());
+    }
+
     private double[][] rotate(double[][] w) {
         double[][] rot = new double[3][3];
 

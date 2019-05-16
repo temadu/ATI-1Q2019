@@ -122,10 +122,13 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem canny = new MenuItem("Canny");
         canny.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).cannyEdgeDetector(this.image));
 
+        MenuItem susan = new MenuItem("Susan");
+        susan.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).susanEdgeCornerDetector(this.image));
+
 
         transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic, canny);
+                isotropic, anisotropic, canny,susan);
 
 
 //        final Menu showMenu = new Menu("Show");

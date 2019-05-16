@@ -2527,7 +2527,7 @@ public class ImageGreyTransformer {
         this.outputImage = new Functions(secondImage).thresholdization(128);
 
         Stage stage = new Stage();
-        stage.setTitle("Apply canny edge detector");
+        stage.setTitle("Apply Canny edge detector");
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -2535,7 +2535,7 @@ public class ImageGreyTransformer {
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Text scenetitle = new Text("Apply laplacian of gaussian filter");
+        Text scenetitle = new Text("Apply Canny edge detector");
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
@@ -2640,6 +2640,97 @@ public class ImageGreyTransformer {
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(outputBtn);
         grid.add(hbBtn, 1, 7);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
+    public void susanEdgeCornerDetector(ImageGrey originalImage) {
+        this.originalImage = originalImage;
+        this.outputImage = new Functions(this.originalImage).susanDetector(27, false,true);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply S.U.S.A.N. Detector");
+
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply S.U.S.A.N. Detector");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Threshold:"), 0, 1);
+        Slider slider = new Slider();
+        slider.setMin(0);
+        slider.setMax(128);
+        slider.setValue(27);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(32);
+        slider.setMinorTickCount(8);
+        slider.setBlockIncrement(1);
+//        TextField multField = new TextField();
+//        multField.setMaxWidth(60);
+//        grid.add(multField, 1, 1);
+        grid.add(slider, 1, 1);
+
+        CheckBox eval = new CheckBox();
+        eval.setSelected(true);
+        grid.add(new Label("Corners:"), 0, 2);
+        grid.add(eval, 1, 2);
+
+        CheckBox eval2 = new CheckBox();
+        eval2.setSelected(false);
+        grid.add(new Label("Borders:"), 2, 2);
+        grid.add(eval2, 3, 2);
+
+        eval.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).susanDetector((int) Math.floor(slider.getValue()), eval2.isSelected() ,newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        }));
+        eval2.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).susanDetector((int) Math.floor(slider.getValue()), newValue, eval.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        }));
+
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.originalImage).susanDetector(newValue.intValue(), eval2.isSelected(),eval.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 3);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
+        grid.add(new Label("Output Image:"), 1, 3);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 5);
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
