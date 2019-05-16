@@ -119,10 +119,13 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem isotropic = new MenuItem("Isotropic Diffusion");
         isotropic.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).isotropic(this.image));
 
+        MenuItem canny = new MenuItem("Canny");
+        canny.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).cannyEdgeDetector(this.image));
+
 
         transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic);
+                isotropic, anisotropic, canny);
 
 
 //        final Menu showMenu = new Menu("Show");
