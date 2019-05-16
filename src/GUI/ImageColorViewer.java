@@ -110,13 +110,17 @@ public class ImageColorViewer extends ImageViewer{
         anisotropic.setOnAction(e -> new ImageColorTransformer(this.windowIndex).anisotropic(this.image));
         MenuItem isotropic = new MenuItem("Isotropic Diffusion");
         isotropic.setOnAction(e -> new ImageColorTransformer(this.windowIndex).isotropic(this.image));
+        MenuItem canny = new MenuItem("Canny");
+        canny.setOnAction(e -> new ImageColorTransformer(this.windowIndex).cannyEdgeDetector(this.image));
+        MenuItem susan = new MenuItem("Susan");
+        susan.setOnAction(e -> new ImageColorTransformer(this.windowIndex).susanEdgeCornerDetector(this.image));
         MenuItem contour = new MenuItem("Contour Tracing");
         contour.setOnAction(e -> new ImageColorTransformer(this.windowIndex).contourTracing(this.image));
 
 
         transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic, contour);
+                isotropic, anisotropic,canny,susan, contour);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }

@@ -7,6 +7,7 @@ import models.ImageInt;
 import java.awt.*;
 import java.text.DecimalFormat;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -919,7 +920,7 @@ public class Functions {
         //2) Derivo sobel en x e y
 //        System.out.println("SOBEL");
 //        System.out.println("GX");
-        ImageGrey gx = (ImageGrey)sobelOperator(false,false,false,true,false,false,false,false);
+        ImageInt gx = sobelOperator(false,false,false,true,false,false,false,false);
 //        for (int i = 0; i < gx.getHeight(); i++) {
 //            for (int j = 0; j < gx.getWidth(); j++) {
 //                System.out.print(gx.getPixel(j,i)+ ",");
@@ -927,7 +928,7 @@ public class Functions {
 //            System.out.print("\n");
 //        }
 //        System.out.println("GY");
-        ImageGrey gy = (ImageGrey)sobelOperator(false,false,true,false,false,false,false,false);
+        ImageInt gy = sobelOperator(false,false,true,false,false,false,false,false);
 //        for (int i = 0; i < gy.getHeight(); i++) {
 //            for (int j = 0; j < gy.getWidth(); j++) {
 //                System.out.print(gy.getPixel(j,i)+ ",");
@@ -935,12 +936,26 @@ public class Functions {
 //            System.out.print("\n");
 //        }
         //3) Angulo de gradiente
-        double[][] directions = new double[gx.getHeight()][gx.getWidth()];
-        double[][] G = new double[gx.getHeight()][gx.getWidth()];
+        double[][] directionsR = new double[gx.getHeight()][gx.getWidth()];
+        double[][] GR = new double[gx.getHeight()][gx.getWidth()];
+
+        double[][] directionsG = new double[gx.getHeight()][gx.getWidth()];
+        double[][] GG = new double[gx.getHeight()][gx.getWidth()];
+        double[][] directionsB = new double[gx.getHeight()][gx.getWidth()];
+        double[][] GB = new double[gx.getHeight()][gx.getWidth()];
         for (int i = 0; i < gx.getHeight(); i++) {
             for (int j = 0; j < gx.getWidth(); j++) {
-                directions[i][j] = Math.atan2(gy.getImage()[i][j],gx.getImage()[i][j]) * (360/Math.PI);
-                G[i][j] = Math.sqrt(Math.pow(gx.getImage()[i][j],2)+ Math.pow(gy.getImage()[i][j],2));
+                if(greyscale){
+                    directionsR[i][j] = Math.atan2(((ImageGrey)gy).getImage()[i][j],((ImageGrey)gx).getImage()[i][j]) * (360/Math.PI);
+                    GR[i][j] = Math.sqrt(Math.pow(((ImageGrey)gx).getImage()[i][j],2)+ Math.pow(((ImageGrey)gy).getImage()[i][j],2));
+                }else{
+                    directionsR[i][j] = Math.atan2(((ImageColor)gy).getRed()[i][j],((ImageColor)gx).getRed()[i][j]) * (360/Math.PI);
+                    GR[i][j] = Math.sqrt(Math.pow(((ImageColor)gx).getRed()[i][j],2)+ Math.pow(((ImageColor)gy).getRed()[i][j],2));
+                    directionsG[i][j] = Math.atan2(((ImageColor)gy).getGreen()[i][j],((ImageColor)gx).getGreen()[i][j]) * (360/Math.PI);
+                    GG[i][j] = Math.sqrt(Math.pow(((ImageColor)gx).getGreen()[i][j],2)+ Math.pow(((ImageColor)gy).getGreen()[i][j],2));
+                    directionsB[i][j] = Math.atan2(((ImageColor)gy).getBlue()[i][j],((ImageColor)gx).getBlue()[i][j]) * (360/Math.PI);
+                    GB[i][j] = Math.sqrt(Math.pow(((ImageColor)gx).getBlue()[i][j],2)+ Math.pow(((ImageColor)gy).getBlue()[i][j],2));
+                }
             }
         }
 //        System.out.println("GRADIENTE");
@@ -959,7 +974,12 @@ public class Functions {
 //            System.out.print("\n");
 //        }
         //4) Supresion no maximos
-        Integer[][] supressed = nonMaximumSuppression(G,directions);
+        List<Integer[][]> rets = new ArrayList<>();
+        rets.add(nonMaximumSuppression(GR,directionsR));
+        if(!greyscale){
+            rets.add(nonMaximumSuppression(GG,directionsG));
+            rets.add(nonMaximumSuppression(GB,directionsB));
+        }
 //        System.out.println("NO MAXIMOS");
 //        for (int i = 0; i < supressed.length; i++) {
 //            for (int j = 0; j < supressed[0].length; j++) {
@@ -967,7 +987,8 @@ public class Functions {
 //            }
 //            System.out.print("\n");
 //        }
-         return new ImageGrey(clamp(supressed),gx.getHeight(),gy.getWidth());
+        return greyscale ? new ImageGrey(clamp(rets.get(0)), image.getHeight(), image.getWidth())
+                : new ImageColor(clamp(rets.get(0)),clamp(rets.get(1)), clamp(rets.get(2)), image.getHeight(), image.getWidth());
     }
 
     private Integer[][] nonMaximumSuppression(double[][] G, double[][] directions){
@@ -1010,104 +1031,127 @@ public class Functions {
     }
 
     public ImageInt hysteresisThreshold(int t1, int t2) {
-        Integer[][] image = ((ImageGrey)this.image).getImage();
+        List<Integer[][]> images = new ArrayList<>();
+        List<Integer[][]> rets = new ArrayList<>();
+        if(greyscale){
+            images.add(((ImageGrey)this.image).getImage());
+        }else{
+            images.add(((ImageColor)this.image).getRed());
+            images.add(((ImageColor)this.image).getGreen());
+            images.add(((ImageColor)this.image).getBlue());
+        }
+
         int tmin =  Math.min(t1,t2);
         int tmax =  Math.max(t1,t2);
 
-        Integer[][] firstPass = new Integer[image.length][image[0].length];
-        for (int i = 0; i < image.length; i++) {
-            for (int j = 0; j < image[0].length; j++) {
-                if(image[i][j] < tmin){
-                    firstPass[i][j] = 0;
-                } else if(image[i][j] > tmax){
-                    firstPass[i][j] = 255;
-                } else {
-                    firstPass[i][j] = image[i][j];
+        for (Integer[][] image: images) {
+            Integer[][] firstPass = new Integer[image.length][image[0].length];
+            for (int i = 0; i < image.length; i++) {
+                for (int j = 0; j < image[0].length; j++) {
+                    if(image[i][j] < tmin){
+                        firstPass[i][j] = 0;
+                    } else if(image[i][j] > tmax){
+                        firstPass[i][j] = 255;
+                    } else {
+                        firstPass[i][j] = image[i][j];
+                    }
                 }
-            }
 
-        }
-        Integer[][] ret = new Integer[image.length][image[0].length];
-        for (int i = 0; i < image.length; i++) {
-            for (int j = 0; j < image[0].length; j++) {
-                if(image[i][j] < tmin){
-                    ret[i][j] = 0;
-                } else if(image[i][j] > tmax){
-                    ret[i][j] = 255;
-                } else {
-                    boolean borderUp = i > 0
-                            && firstPass[i-1][j] == 255;
-                    boolean borderLeft = j > 0
-                            && firstPass[i][j-1] == 255;
-                    boolean borderDown = i < image.length - 1
-                            && firstPass[i+1][j] == 255;
-                    boolean borderRight = j < image[0].length - 1
-                            && firstPass[i][j+1] == 255;
-                    boolean borderLUp = i > 0 && j > 0
-                            && firstPass[i-1][j-1] == 255;
-                    boolean borderRUp = i > 0 && j < image[0].length - 1
-                            && firstPass[i-1][j+1] == 255;
-                    boolean borderLDown = i < image.length - 1 && j > 0
-                            && firstPass[i+1][j-1] == 255;
-                    boolean borderRDown = i < image.length - 1 && j < image[0].length - 1
-                            && firstPass[i+1][j+1] == 255;
-                    if (borderUp || borderLeft || borderDown|| borderRight || borderLUp || borderRUp || borderLDown || borderRDown) {
+            }
+            Integer[][] ret = new Integer[image.length][image[0].length];
+            for (int i = 0; i < image.length; i++) {
+                for (int j = 0; j < image[0].length; j++) {
+                    if(image[i][j] < tmin){
+                        ret[i][j] = 0;
+                    } else if(image[i][j] > tmax){
                         ret[i][j] = 255;
                     } else {
-                        ret[i][j] = 0;
+                        boolean borderUp = i > 0
+                                && firstPass[i-1][j] == 255;
+                        boolean borderLeft = j > 0
+                                && firstPass[i][j-1] == 255;
+                        boolean borderDown = i < image.length - 1
+                                && firstPass[i+1][j] == 255;
+                        boolean borderRight = j < image[0].length - 1
+                                && firstPass[i][j+1] == 255;
+                        boolean borderLUp = i > 0 && j > 0
+                                && firstPass[i-1][j-1] == 255;
+                        boolean borderRUp = i > 0 && j < image[0].length - 1
+                                && firstPass[i-1][j+1] == 255;
+                        boolean borderLDown = i < image.length - 1 && j > 0
+                                && firstPass[i+1][j-1] == 255;
+                        boolean borderRDown = i < image.length - 1 && j < image[0].length - 1
+                                && firstPass[i+1][j+1] == 255;
+                        if (borderUp || borderLeft || borderDown|| borderRight || borderLUp || borderRUp || borderLDown || borderRDown) {
+                            ret[i][j] = 255;
+                        } else {
+                            ret[i][j] = 0;
+                        }
                     }
                 }
-            }
 
+            }
+            rets.add(ret);
         }
-        return new ImageGrey(ret,image.length,image[0].length);
-    }
+        return greyscale ? new ImageGrey(rets.get(0), image.getHeight(), image.getWidth())
+                : new ImageColor(rets.get(0), rets.get(1), rets.get(2), image.getHeight(), image.getWidth());    }
 
     public ImageInt susanDetector(int threshold, boolean borderDetection, boolean cornerDetection){
-        Integer[][] image = ((ImageGrey)this.image).getImage();
-        Integer[][] ret = new Integer[this.image.getHeight()][this.image.getWidth()];
+        List<Integer[][]> images = new ArrayList<>();
+        List<Integer[][]> rets = new ArrayList<>();
+        if(greyscale){
+            images.add(((ImageGrey)this.image).getImage());
+        }else{
+            images.add(((ImageColor)this.image).getRed());
+            images.add(((ImageColor)this.image).getGreen());
+            images.add(((ImageColor)this.image).getBlue());
+        }
         int[][] w =  {{0,0,1,1,1,0,0},
-                      {0,1,1,1,1,1,0},
-                      {1,1,1,1,1,1,1},
-                      {1,1,1,1,1,1,1},
-                      {1,1,1,1,1,1,1},
-                      {0,1,1,1,1,1,0},
-                      {0,0,1,1,1,0,0}};
-        for (int y = 0; y < this.image.getHeight(); y++) {
-            for (int x = 0; x < this.image.getWidth(); x++) {
-                int n = 0;
-                int N = 0;
+                {0,1,1,1,1,1,0},
+                {1,1,1,1,1,1,1},
+                {1,1,1,1,1,1,1},
+                {1,1,1,1,1,1,1},
+                {0,1,1,1,1,1,0},
+                {0,0,1,1,1,0,0}};
+        for (Integer[][] image: images) {
+            Integer[][] ret = new Integer[this.image.getHeight()][this.image.getWidth()];
+            for (int y = 0; y < this.image.getHeight(); y++) {
+                for (int x = 0; x < this.image.getWidth(); x++) {
+                    int n = 0;
+                    int N = 0;
 //                System.out.println("Analizing: ("+x+", "+y+")");
-                for (int i = -3; i < 4; i++) {
-                    for (int j = -3; j < 4; j++) {
-                        if(y+i<0 || x+j<0 || y+i>=this.image.getHeight() || x+j>=this.image.getWidth() || w[i+3][j+3]==0){
-                            continue;
-                        }
-                        N++;
-                        if(y+i>255)
-                        System.out.println();
-                        int a = image[y][x];
-                        int b = image[y+i][x+j];
-                        if(Math.abs(image[y][x]-image[y+i][x+j])<threshold){
-                            n++;
+                    for (int i = -3; i < 4; i++) {
+                        for (int j = -3; j < 4; j++) {
+                            if(y+i<0 || x+j<0 || y+i>=this.image.getHeight() || x+j>=this.image.getWidth() || w[i+3][j+3]==0){
+                                continue;
+                            }
+                            N++;
+                            if(y+i>255) {
+                                System.out.println();
+                            }
+                            if(Math.abs(image[y][x]-image[y+i][x+j])<threshold){
+                                n++;
+                            }
                         }
                     }
-                }
 //                System.out.println("n:"+n+" N:"+N);
-                if(N == 0){
-                    ret[y][x] = 0;
-                    continue;
-                }
-                double s = 1-(n/ (double)N);
-                if((borderDetection && s>0.375 && s<0.625) ||
-                    (cornerDetection && s>0.625 && s<0.875 )){
-                    ret[y][x] = 255;
-                }else{
-                    ret[y][x] = 0;
+                    if(N == 0){
+                        ret[y][x] = 0;
+                        continue;
+                    }
+                    double s = 1-(n/ (double)N);
+                    if((borderDetection && s>0.375 && s<0.625) ||
+                            (cornerDetection && s>0.625 && s<0.875 )){
+                        ret[y][x] = 255;
+                    }else{
+                        ret[y][x] = 0;
+                    }
                 }
             }
+            rets.add(ret);
         }
-        return new ImageGrey(ret,this.image.getHeight(),this.image.getWidth());
+        return greyscale ? new ImageGrey(rets.get(0), image.getHeight(), image.getWidth())
+                : new ImageColor(rets.get(0), rets.get(1), rets.get(2), image.getHeight(), image.getWidth());
     }
 
     private double[][] rotate(double[][] w) {

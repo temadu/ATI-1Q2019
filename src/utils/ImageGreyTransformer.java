@@ -2529,7 +2529,7 @@ public class ImageGreyTransformer {
     public void cannyEdgeDetector(ImageGrey originalImage){
         this.originalImage = originalImage;
         this.secondImage = new Functions(originalImage).cannyAlgorithm(7, 1.0);
-        this.outputImage = new Functions(secondImage).thresholdization(128);
+        this.outputImage = new Functions(secondImage).hysteresisThreshold(128,158);
 
         Stage stage = new Stage();
         stage.setTitle("Apply Canny edge detector");
@@ -2588,7 +2588,6 @@ public class ImageGreyTransformer {
 
         slider2.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.secondImage).thresholdization(newValue.intValue());
             this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),newValue.intValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });
