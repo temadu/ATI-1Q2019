@@ -1312,6 +1312,10 @@ public class ImageColorTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer(new Functions(originalImage).otsuThresholdColor(),windowIndex));
     }
 
+    public void contourTracing(ImageColor originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)new Functions(originalImage).activeContorns(280,280,10,1000),windowIndex));
+    }
+
     public void anisotropic(ImageColor originalImage) {
         this.originalImage = originalImage;
         this.outputImage = originalImage;

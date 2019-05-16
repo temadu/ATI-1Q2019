@@ -1448,7 +1448,7 @@ public class Functions {
         //paso inicial, setea los theta y phi inicial
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
-                newRed[i][i] = red[i][j];
+                newRed[i][j] = red[i][j];
                 if(!greyscale){
                     newGreen[i][j] = green[i][j];
                     newBlue[i][j] = blue[i][j];
@@ -1491,25 +1491,51 @@ public class Functions {
             //recorro lout
             ArrayList<Point> prevLout = new ArrayList<>(lout);
             for (Point p : prevLout){
-                if(Math.abs(rTheta0 - red[p.x][p.y]) > Math.abs(rTheta1 - red[p.x][p.y])) { //fd(x) > 0
-                    lout.remove(p);
-                    lin.add(p);
-                    phi[p.x][p.y] = -1;
-                    if(p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == 3){
-                        lout.add(new Point(p.x + 1, p.y));
-                        phi[p.x + 1][p.y] = 1;
+                if(greyscale){
+                    if(Math.abs(rTheta0 - red[p.x][p.y]) > Math.abs(rTheta1 - red[p.x][p.y])) { //fd(x) > 0
+                        lout.remove(p);
+                        lin.add(p);
+                        phi[p.x][p.y] = -1;
+                        if (p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == 3) {
+                            lout.add(new Point(p.x + 1, p.y));
+                            phi[p.x + 1][p.y] = 1;
+                        }
+                        if (p.x > 0 && phi[p.x - 1][p.y] == 3) {
+                            lout.add(new Point(p.x - 1, p.y));
+                            phi[p.x - 1][p.y] = 1;
+                        }
+                        if (p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == 3) {
+                            lout.add(new Point(p.x, p.y + 1));
+                            phi[p.x][p.y + 1] = 1;
+                        }
+                        if (p.y > 0 && phi[p.x][p.y - 1] == 3) {
+                            lout.add(new Point(p.x, p.y - 1));
+                            phi[p.x][p.y - 1] = 1;
+                        }
                     }
-                    if(p.x > 0 && phi[p.x - 1][p.y] == 3){
-                        lout.add(new Point(p.x - 1, p.y));
-                        phi[p.x - 1][p.y] = 1;
-                    }
-                    if(p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == 3){
-                        lout.add(new Point(p.x, p.y + 1));
-                        phi[p.x][p.y + 1] = 1;
-                    }
-                    if(p.y > 0 && phi[p.x][p.y - 1] == 3){
-                        lout.add(new Point(p.x, p.y - 1));
-                        phi[p.x][p.y - 1] = 1;
+                } else {
+                    if(Math.abs(rTheta0 - red[p.x][p.y]) > Math.abs(rTheta1 - red[p.x][p.y]) &&
+                            Math.abs(gTheta0 - green[p.x][p.y]) > Math.abs(gTheta1 - green[p.x][p.y]) &&
+                            Math.abs(bTheta0 - blue[p.x][p.y]) > Math.abs(bTheta1 - blue[p.x][p.y])) { //fd(x) > 0
+                        lout.remove(p);
+                        lin.add(p);
+                        phi[p.x][p.y] = -1;
+                        if (p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == 3) {
+                            lout.add(new Point(p.x + 1, p.y));
+                            phi[p.x + 1][p.y] = 1;
+                        }
+                        if (p.x > 0 && phi[p.x - 1][p.y] == 3) {
+                            lout.add(new Point(p.x - 1, p.y));
+                            phi[p.x - 1][p.y] = 1;
+                        }
+                        if (p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == 3) {
+                            lout.add(new Point(p.x, p.y + 1));
+                            phi[p.x][p.y + 1] = 1;
+                        }
+                        if (p.y > 0 && phi[p.x][p.y - 1] == 3) {
+                            lout.add(new Point(p.x, p.y - 1));
+                            phi[p.x][p.y - 1] = 1;
+                        }
                     }
                 }
             }
@@ -1529,25 +1555,51 @@ public class Functions {
             //recorro lin
             prevLin = new ArrayList<>(lin);
             for (Point p : prevLin) {
-                if(Math.abs(rTheta0 - red[p.x][p.y]) < Math.abs(rTheta1 - red[p.x][p.y])) { //fd(x) < 0
-                    lin.remove(p);
-                    lout.add(p);
-                    phi[p.x][p.y] = 1;
-                    if(p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == -3){
-                        lin.add(new Point(p.x + 1, p.y));
-                        phi[p.x + 1][p.y] = -1;
+                if(greyscale){
+                    if(Math.abs(rTheta0 - red[p.x][p.y]) < Math.abs(rTheta1 - red[p.x][p.y])) { //fd(x) < 0
+                        lin.remove(p);
+                        lout.add(p);
+                        phi[p.x][p.y] = 1;
+                        if(p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == -3){
+                            lin.add(new Point(p.x + 1, p.y));
+                            phi[p.x + 1][p.y] = -1;
+                        }
+                        if(p.x > 0 && phi[p.x - 1][p.y] == -3){
+                            lin.add(new Point(p.x - 1, p.y));
+                            phi[p.x - 1][p.y] = -1;
+                        }
+                        if(p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == -3){
+                            lin.add(new Point(p.x, p.y + 1));
+                            phi[p.x][p.y + 1] = -1;
+                        }
+                        if(p.y > 0 && phi[p.x][p.y - 1] == -3){
+                            lin.add(new Point(p.x, p.y - 1));
+                            phi[p.x][p.y - 1] = -1;
+                        }
                     }
-                    if(p.x > 0 && phi[p.x - 1][p.y] == -3){
-                        lin.add(new Point(p.x - 1, p.y));
-                        phi[p.x - 1][p.y] = -1;
-                    }
-                    if(p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == -3){
-                        lin.add(new Point(p.x, p.y + 1));
-                        phi[p.x][p.y + 1] = -1;
-                    }
-                    if(p.y > 0 && phi[p.x][p.y - 1] == -3){
-                        lin.add(new Point(p.x, p.y - 1));
-                        phi[p.x][p.y - 1] = -1;
+                } else {
+                    if(Math.abs(rTheta0 - red[p.x][p.y]) < Math.abs(rTheta1 - red[p.x][p.y]) &&
+                            Math.abs(gTheta0 - green[p.x][p.y]) < Math.abs(gTheta1 - green[p.x][p.y]) &&
+                            Math.abs(bTheta0 - blue[p.x][p.y]) < Math.abs(bTheta1 - blue[p.x][p.y])) { //fd(x) < 0
+                        lin.remove(p);
+                        lout.add(p);
+                        phi[p.x][p.y] = 1;
+                        if(p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == -3){
+                            lin.add(new Point(p.x + 1, p.y));
+                            phi[p.x + 1][p.y] = -1;
+                        }
+                        if(p.x > 0 && phi[p.x - 1][p.y] == -3){
+                            lin.add(new Point(p.x - 1, p.y));
+                            phi[p.x - 1][p.y] = -1;
+                        }
+                        if(p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == -3){
+                            lin.add(new Point(p.x, p.y + 1));
+                            phi[p.x][p.y + 1] = -1;
+                        }
+                        if(p.y > 0 && phi[p.x][p.y - 1] == -3){
+                            lin.add(new Point(p.x, p.y - 1));
+                            phi[p.x][p.y - 1] = -1;
+                        }
                     }
                 }
             }
@@ -1573,9 +1625,17 @@ public class Functions {
                 for (int j = 0; j < image.getWidth(); j++) {
                     if(phi[i][j] < 0){
                         rTheta1 += red[i][j];
+                        if(!greyscale){
+                            gTheta1 += green[i][j];
+                            bTheta1 += blue[i][j];
+                        }
                         inCounter++;
                     } else {
                         rTheta0 += red[i][j];
+                        if(!greyscale){
+                            gTheta0 += green[i][j];
+                            bTheta0 += blue[i][j];
+                        }
                     }
                 }
             }
@@ -1585,11 +1645,15 @@ public class Functions {
 
         lin.addAll(lout);
         for (Point p : lin) {
-            red[p.x][p.y] = 255;
+            newRed[p.x][p.y] = 255;
+            if(!greyscale){
+                newGreen[p.x][p.y] = 255;
+                newBlue[p.x][p.y] = 255;
+            }
         }
 
-        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
-                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+        return greyscale ? new ImageGrey(newRed, image.getHeight(), image.getWidth())
+                : new ImageColor(newRed, newGreen, newBlue, image.getHeight(), image.getWidth());
     }
 
     private double loretnzOperator(double x, double sigma) {
