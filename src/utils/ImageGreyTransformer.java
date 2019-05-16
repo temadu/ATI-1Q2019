@@ -296,6 +296,11 @@ public class ImageGreyTransformer {
     public void dynamicRangeCompression(ImageGrey originalImage){
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).rangeCompressor(), windowIndex));
     }
+
+    public void contourTracing(ImageGrey originalImage){
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)new Functions(originalImage).activeContorns(80, 64, 12,500), windowIndex));
+    }
+
     public void gammaFunction(ImageGrey originalImage){
         this.originalImage = originalImage;
         this.outputImage = (ImageGrey) new Functions(this.originalImage).imageProd(1);

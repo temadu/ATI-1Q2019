@@ -6,10 +6,7 @@ import models.ImageInt;
 
 import java.awt.*;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -1421,11 +1418,217 @@ public class Functions {
                 : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
+    //para color q los 3 colores sean coherentes con lo de theta0 - theta / theta1 - theta?
+    public ImageInt activeContorns(double x, double y, int sqSize, int counter) {
+        Integer[][] red;
+        Integer[][] green = null;
+        Integer[][] blue = null;
+        Integer[][] newRed = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] newGreen = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] newBlue = new Integer[image.getHeight()][image.getWidth()];
+        Integer[][] phi = new Integer[image.getHeight()][image.getWidth()];
+
+        ArrayList<Point> lin = new ArrayList<>();
+        ArrayList<Point> lout = new ArrayList<>();
+        int pixelCount = image.getHeight() * image.getWidth();
+        if(greyscale) {
+            red = ((ImageGrey)image).getImage();
+        } else {
+            red = ((ImageColor)image).getRed();
+            green = ((ImageColor)image).getGreen();
+            blue = ((ImageColor)image).getBlue();
+        }
+
+        int half = sqSize/2;
+        double rTheta0 =  0, rTheta1 = 0;
+        double gTheta0 =  0, gTheta1 = 0;
+        double bTheta0 =  0, bTheta1 = 0;
+
+
+        //paso inicial, setea los theta y phi inicial
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                newRed[i][i] = red[i][j];
+                if(!greyscale){
+                    newGreen[i][j] = green[i][j];
+                    newBlue[i][j] = blue[i][j];
+                }
+                if(i > y - half && i < y + half && j > x - half && j < x + half){
+                    phi[i][j] = -3;
+                    rTheta1 += red[i][j];
+                    if(!greyscale){
+                        gTheta1 += green[i][j];
+                        bTheta1 += blue[i][j];
+                    }
+                } else {
+                    phi[i][j] = 3;
+                    rTheta0 += red[i][j];
+                    if(!greyscale){
+                        gTheta0 += green[i][j];
+                        bTheta0 += blue[i][j];
+                    }
+                }
+                if(((i == y - half || i == y + half) && (j > x - half && j < x + half))
+                        || ((j == x - half || j == x + half) && (i > y - half && i < y + half)) ){
+                    lout.add(new Point(i, j));
+                    phi[i][j] = 1;
+                } else if(((i == y - half + 1 || i == y + half - 1) && (j > x - half && j < x + half))
+                        || ((j == x - half + 1 || j == x + half - 1) && (i > y - half + 1&& i < y + half - 1)) ){
+                    lin.add(new Point(i, j));
+                    phi[i][j] = -1;
+                }
+            }
+        }
+        rTheta0 /= pixelCount - (sqSize * sqSize);
+        gTheta0 /= pixelCount - (sqSize * sqSize);
+        bTheta0 /= pixelCount - (sqSize * sqSize);
+        rTheta1 /= sqSize * sqSize;
+        gTheta1 /= sqSize * sqSize;
+        bTheta1 /= sqSize * sqSize;
+
+        //tengo lin, lout, thetas, phis
+        while( counter-- > 0){
+            //recorro lout
+            ArrayList<Point> prevLout = new ArrayList<>(lout);
+            for (Point p : prevLout){
+                if(Math.abs(rTheta0 - red[p.x][p.y]) > Math.abs(rTheta1 - red[p.x][p.y])) { //fd(x) > 0
+                    lout.remove(p);
+                    lin.add(p);
+                    phi[p.x][p.y] = -1;
+                    if(p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == 3){
+                        lout.add(new Point(p.x + 1, p.y));
+                        phi[p.x + 1][p.y] = 1;
+                    }
+                    if(p.x > 0 && phi[p.x - 1][p.y] == 3){
+                        lout.add(new Point(p.x - 1, p.y));
+                        phi[p.x - 1][p.y] = 1;
+                    }
+                    if(p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == 3){
+                        lout.add(new Point(p.x, p.y + 1));
+                        phi[p.x][p.y + 1] = 1;
+                    }
+                    if(p.y > 0 && phi[p.x][p.y - 1] == 3){
+                        lout.add(new Point(p.x, p.y - 1));
+                        phi[p.x][p.y - 1] = 1;
+                    }
+                }
+            }
+
+            //recorro lin
+            ArrayList<Point> prevLin = new ArrayList<>(lin);
+            for (Point p : prevLin) {
+                if(   !((p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] > 0) ||
+                        (p.x > 0 && phi[p.x - 1][p.y] > 0) ||
+                        (p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] > 0) ||
+                        (p.y > 0 && phi[p.x][p.y - 1] > 0))) { //si ningun vecino es >0 => es interior
+                    lin.remove(p);
+                    phi[p.x][p.y] = -3;
+                }
+            }
+
+            //recorro lin
+            prevLin = new ArrayList<>(lin);
+            for (Point p : prevLin) {
+                if(Math.abs(rTheta0 - red[p.x][p.y]) < Math.abs(rTheta1 - red[p.x][p.y])) { //fd(x) < 0
+                    lin.remove(p);
+                    lout.add(p);
+                    phi[p.x][p.y] = 1;
+                    if(p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == -3){
+                        lin.add(new Point(p.x + 1, p.y));
+                        phi[p.x + 1][p.y] = -1;
+                    }
+                    if(p.x > 0 && phi[p.x - 1][p.y] == -3){
+                        lin.add(new Point(p.x - 1, p.y));
+                        phi[p.x - 1][p.y] = -1;
+                    }
+                    if(p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == -3){
+                        lin.add(new Point(p.x, p.y + 1));
+                        phi[p.x][p.y + 1] = -1;
+                    }
+                    if(p.y > 0 && phi[p.x][p.y - 1] == -3){
+                        lin.add(new Point(p.x, p.y - 1));
+                        phi[p.x][p.y - 1] = -1;
+                    }
+                }
+            }
+
+            //recorro lout
+            prevLout= new ArrayList<>(lout);
+            for (Point p : prevLout) {
+                if(   !((p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] < 0) ||
+                        (p.x > 0 && phi[p.x - 1][p.y] < 0) ||
+                        (p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] < 0) ||
+                        (p.y > 0 && phi[p.x][p.y - 1] < 0))) { //si ningun vecino es <0 => es exterior
+                    lout.remove(p);
+                    phi[p.x][p.y] = 3;
+                }
+            }
+
+            //recalc thetas
+            rTheta0 =  0; rTheta1 = 0;
+            gTheta0 =  0; gTheta1 = 0;
+            bTheta0 =  0; bTheta1 = 0;
+            int inCounter = 0;
+            for (int i = 0; i < image.getHeight(); i++) {
+                for (int j = 0; j < image.getWidth(); j++) {
+                    if(phi[i][j] < 0){
+                        rTheta1 += red[i][j];
+                        inCounter++;
+                    } else {
+                        rTheta0 += red[i][j];
+                    }
+                }
+            }
+            rTheta0 /= pixelCount  - inCounter;
+            rTheta1 /= inCounter;
+        }
+
+        lin.addAll(lout);
+        for (Point p : lin) {
+            red[p.x][p.y] = 255;
+        }
+
+        return greyscale ? new ImageGrey(red, image.getHeight(), image.getWidth())
+                : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
+    }
+
     private double loretnzOperator(double x, double sigma) {
         return 1.0 / ((x * x) / (sigma * sigma) + 1.0);
     }
 
     private double lecrercOperator(double x, double sigma) {
         return Math.exp(-(x * x)/(sigma * sigma));
+    }
+
+    private class Point {
+        private int x;
+        private int y;
+
+        public Point(int x, int y){
+            this.x = x;
+            this.y = y;
+        }
+
+        public int getX() {
+            return x;
+        }
+
+        public int getY() {
+            return y;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Point point = (Point) o;
+            return x == point.x &&
+                    y == point.y;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(x, y);
+        }
     }
 }
