@@ -125,12 +125,15 @@ public class ImageGreyViewer extends ImageViewer {
         MenuItem susan = new MenuItem("Susan");
         susan.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).susanEdgeCornerDetector(this.image));
 
+        MenuItem houghLines = new MenuItem("Hough Lines");
+        houghLines.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).houghLineDetector(this.image));
+
         MenuItem contour = new MenuItem("Contour Tracing");
         contour.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).contourTracing(this.image));
 
         transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic, canny,susan, contour);
+                isotropic, anisotropic, canny,susan, houghLines, contour);
 
 
 //        final Menu showMenu = new Menu("Show");

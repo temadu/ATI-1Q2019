@@ -1,5 +1,6 @@
 package tp1;
 
+import javafx.collections.transformation.SortedList;
 import models.ImageColor;
 import models.ImageGrey;
 import models.ImageInt;
@@ -1111,16 +1112,92 @@ public class Functions {
                 : new ImageColor(rets.get(0), rets.get(1), rets.get(2), image.getHeight(), image.getWidth());
     }
 
-//    public ImageInt houghLineDetector(){
-//        this.image = sobelOperator(false,false,true,true,false,false,false,false);
-//        this.image = globalThresholdization();
-//        int D = Math.max(this.image.getWidth(),this.image.getHeight());
-//        int thetaMin = -90;
-//        int thetaMax = 90;
-//        int pMin = (int) -Math.sqrt(2)*D;
-//        int pMax = (int) Math.sqrt(2)*D;
-//
-//    }
+    public ImageInt houghLineDetector(double e){
+//        1)Find borders
+        this.image = sobelOperator(false,false,true,true,false,false,false,false);
+
+//        2)Binary image
+        this.image = globalThresholdization();
+
+//        3)Matriz acumuladora
+        int D = Math.max(this.image.getWidth(),this.image.getHeight());
+        int thetaMin = -90;
+        int thetaMax = 90;
+        int thetaSize = (int)(thetaMax-thetaMin);
+        int pMin = (int) (-Math.sqrt(2)*D);
+        int pMax = (int) (Math.sqrt(2)*D);
+        int pSize = (int)(pMax-pMin);
+        int[][] A = new int[pSize][thetaSize];
+
+
+//        4)Para cada pixel blanco que cumple la normal de la recta, acumulador++
+        for (int i = 0; i < this.image.getHeight(); i++) {
+            for (int j = 0; j < this.image.getWidth(); j++) {
+                if (((ImageGrey)this.image).getImage()[j][i] == 255) {
+                    for (int theta = 0; theta < thetaSize; theta++) {
+                        int thetaj = thetaMin + theta;
+                        for (int p = 0; p < pSize; p++) {
+                            int pi = pMin + p;
+                            if (Math.abs(pi - j*Math.cos(thetaj*Math.PI/180) - i*Math.sin(thetaj*Math.PI/180)) < e) {
+                                A[p][theta]++;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+//        Integer[][] AVisu = new Integer[pSize][thetaSize];
+//        for (int i = 0; i < pSize; i++) {
+//            for (int j = 0; j < thetaSize; j++) {
+//                AVisu[i][j] = A[i][j];
+//            }
+//        }
+//        if(true)
+//            return new ImageGrey(clamp(AVisu),pSize,thetaSize);
+
+
+//        5)
+        List<HoughAcumulatorElement> elements = new ArrayList<>();
+        for (int p = 0; p < pSize; p++) {
+            for (int theta = 0; theta < thetaSize; theta++) {
+                elements.add(new HoughAcumulatorElement(p, theta, A[p][theta]));
+            }
+        }
+        Collections.sort(elements);
+
+
+        Integer[][] newImage = new Integer[image.getHeight()][image.getWidth()];
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                newImage[i][j] = 0;
+            }
+        }
+        int maxVotes = elements.get(0).votes;
+        System.out.println(maxVotes);
+        int lines = 0;
+        if (maxVotes > 1) {
+            for (HoughAcumulatorElement b : elements) {
+                if (b.votes < maxVotes)
+                    break;
+                lines++;
+                int pi = pMin + b.p;
+                int thetaj = thetaMin + b.theta;
+                for (int i = 0; i < image.getHeight(); i++) {
+                    for (int j = 0; j < image.getWidth(); j++) {
+                        if (Math.abs(pi - j*Math.sin(thetaj*Math.PI/180) - i*Math.cos(thetaj*Math.PI/180)) < e) {
+                            newImage[i][j] = 255;
+                        }
+                    }
+                }
+
+            }
+        }
+        System.out.println(lines);
+        return new ImageGrey(newImage,image.getHeight(),image.getWidth());
+
+    }
+
 
     private double[][] rotate(double[][] w) {
         double[][] rot = new double[3][3];
@@ -1716,6 +1793,34 @@ public class Functions {
         @Override
         public int hashCode() {
             return Objects.hash(x, y);
+        }
+    }
+
+    private class HoughAcumulatorElement implements Comparable<HoughAcumulatorElement>  {
+        public int p;
+        public int theta;
+        public int votes;
+
+        public HoughAcumulatorElement(int p, int theta, int votes) {
+            this.p = p;
+            this.theta = theta;
+            this.votes = votes;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return p == ((HoughAcumulatorElement) obj).p
+                    && theta == ((HoughAcumulatorElement) obj).theta;
+        }
+
+        @Override
+        public int hashCode() {
+            return (int) (3 * p + 5 * theta);
+        }
+
+        @Override
+        public int compareTo(HoughAcumulatorElement obj) {
+            return obj.votes - votes;
         }
     }
 }

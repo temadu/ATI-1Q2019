@@ -2754,6 +2754,146 @@ public class ImageGreyTransformer {
         stage.show();
     }
 
+//    public void houghLineDetector(ImageGrey originalImage){
+//        this.originalImage = originalImage;
+//        this.outputImage = new Functions(this.originalImage).houghLineDetector(0.75);
+//
+//        Stage stage = new Stage();
+//        stage.setTitle("Apply Hough Line Detector");
+//
+//
+//        GridPane grid = new GridPane();
+//        grid.setAlignment(Pos.CENTER);
+//        grid.setHgap(10);
+//        grid.setVgap(10);
+//        grid.setPadding(new Insets(25, 25, 25, 25));
+//
+//        Text scenetitle = new Text("Apply Hough Line Detector");
+//        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+//        grid.add(scenetitle, 0, 0, 2, 1);
+//
+//        grid.add(new Label("epsilon:"), 0, 1);
+//        Slider slider = new Slider();
+//        slider.setMin(0);
+//        slider.setMax(2);
+//        slider.setValue(0.75);
+//        slider.setShowTickLabels(true);
+//        slider.setShowTickMarks(true);
+//        slider.setMajorTickUnit(0.5);
+//        slider.setBlockIncrement(0.05);
+////        TextField multField = new TextField();
+////        multField.setMaxWidth(60);
+////        grid.add(multField, 1, 1);
+//        grid.add(slider, 1, 1);
+//        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+//            grid.getChildren().remove(outputImage.getView());
+//            this.outputImage = new Functions(this.originalImage).houghLineDetector(newValue.doubleValue());
+//            grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+//        });
+//
+//        Label firstImageLabel = new Label("First Image:");
+//        firstImageLabel.setAlignment(Pos.CENTER);
+//        grid.add(firstImageLabel, 0, 2);
+//        grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
+//        grid.add(new Label("Output Image:"), 1, 2);
+//        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+//
+//        Button outputBtn = new Button("Output Image");
+//        HBox hbBtn = new HBox(10);
+//        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+//        hbBtn.getChildren().add(outputBtn);
+//        grid.add(hbBtn, 1, 4);
+//
+//        outputBtn.setOnAction((e) -> {
+//            if(outputImage != null){
+//                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+//                stage.close();
+//            }
+//
+//        });
+//
+//        ScrollPane scroller = new ScrollPane();
+//        scroller.setContent(grid);
+//
+//        Scene scene = new Scene(scroller);
+//        stage.setScene(scene);
+//        stage.setMaximized(true);
+//
+//        stage.show();
+//    }
+
+    public void houghLineDetector(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = (ImageGrey) new Functions(this.originalImage).houghLineDetector(0.1);
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Multiply image by scalar");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Multiplier:"), 0, 1);
+        TextField multField = new TextField();
+        multField.setMaxWidth(60);
+        multField.setText("0.1");
+        grid.add(multField, 1, 1);
+        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                multField.setText(oldValue);
+            } else {
+                float multiplier = 0;
+                try {
+                    multiplier = Float.parseFloat(multField.getText());
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(multiplier >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = (ImageGrey) new Functions(this.originalImage).houghLineDetector(multiplier);
+                    grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+                }
+            }
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Multiply image by scalar");
+        stage.show();
+    }
+
 
     class Region{
         public int x1;
