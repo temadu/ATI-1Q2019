@@ -26,7 +26,8 @@ public class ImageColorViewer extends ImageViewer{
         this.image = image;
         this.imageView = new ImageView(image.getRenderer());
         this.pane.getChildren().add(this.imageView);
-        this.addColorContextMenu();
+        if(windowIndex >=0)
+            this.addColorContextMenu();
     }
 
     private void addColorContextMenu(){

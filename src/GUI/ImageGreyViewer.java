@@ -23,7 +23,8 @@ public class ImageGreyViewer extends ImageViewer {
         this.imageView = new ImageView(image.getRenderer());
         this.pane.getChildren().add(this.imageView);
         this.pane.getStylesheets().add("GUI/black_histogram.css");
-        this.addGreyContextMenu();
+        if(windowIndex >= 0)
+            this.addGreyContextMenu();
     }
 
     private void addGreyContextMenu(){

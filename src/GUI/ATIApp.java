@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
@@ -84,6 +85,11 @@ public class ATIApp extends Application {
             this.openImage();
 //            this.testZone();
         });
+        MenuItem openVideo = new MenuItem("Open video...");
+        openVideo.setOnAction(e -> {
+            this.openVideo();
+//            this.testZone();
+        });
         MenuItem removeAll = new MenuItem("Remove All");
         removeAll.setOnAction(e -> {
             this.imageViews.getChildren().clear();
@@ -93,7 +99,7 @@ public class ATIApp extends Application {
         MenuItem exit = new MenuItem("Exit");
         exit.setOnAction(e-> stage.close());
 
-        fileMenu.getItems().addAll(openItem, removeAll,exit);
+        fileMenu.getItems().addAll(openItem, openVideo,removeAll,exit);
 
         final Menu generateMenu = new Menu("Generate");
         MenuItem generateSquare = new MenuItem("Square");
@@ -180,6 +186,19 @@ public class ATIApp extends Application {
                 this.addImageViewer(new ImageGreyViewer(openedImage, this.windowIndex));
 //            this.stage.close();
             }
+        }
+    }
+
+    private void openVideo(){
+        DirectoryChooser dirChooser = new DirectoryChooser();
+        dirChooser.setInitialDirectory(new File("./images"));
+        File directory = dirChooser.showDialog(stage);
+
+        if(directory != null){
+            System.out.println(directory.getAbsolutePath());
+            new VideoViewer(directory.getAbsolutePath());
+
+
         }
     }
 
