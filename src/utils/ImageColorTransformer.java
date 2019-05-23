@@ -1312,9 +1312,78 @@ public class ImageColorTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer(new Functions(originalImage).otsuThresholdColor(),windowIndex));
     }
 
-    public void contourTracing(ImageColor originalImage) {
-        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)new Functions(originalImage).activeContorns(227,179,20,100),windowIndex));
+    public void contourTracing(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new ImageColor(originalImage.getRed().clone(),originalImage.getGreen().clone(),originalImage.getBlue().clone(), originalImage.getHeight(), originalImage.getWidth());
+        Region cutRegion = new Region();
+        cutRegion.x1 = 0;
+        cutRegion.y1 = 0;
+        cutRegion.x2 = originalImage.getWidth()-1;
+        cutRegion.y2 = originalImage.getHeight()-1;
+
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Cut image");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Text text = new Text("");
+        grid.add(text, 0, 1, 2, 1);
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        ImageView input = new ImageView(originalImage.getRenderer());
+
+        grid.add(input, 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(outputImage.getView(), 1, 3);
+
+        EventHandler<MouseEvent> mousePress = e -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(originalImage).activeContorns((int) e.getX(), (int) e.getY(), 12,500);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+//            text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+//            System.out.println("X1: " + cutRegion.x1 + ", Y1: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+
+        };
+        //Registering the event filter
+        input.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Contour tracing");
+        stage.show();
     }
+//    public void contourTracing(ImageColor originalImage) {
+//        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)new Functions(originalImage).activeContorns(227,179,20,100),windowIndex));
+//    }
 
     public void anisotropic(ImageColor originalImage) {
         this.originalImage = originalImage;

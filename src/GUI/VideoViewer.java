@@ -154,12 +154,27 @@ public class VideoViewer {
                 int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2, Math.min(w,h)/4,500), -1));
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500), -1));
             }else{
                 int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2, Math.min(w,h)/4,500), -1));
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500), -1));
+            }
+        });
+
+        Button analyzeOneStepBtn = new Button("Analyze one step");
+        analyzeOneStepBtn.setOnAction(e -> {
+            if(this.images.get(this.currentFrame) instanceof ImageGreyViewer){
+                int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
+                int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
+                this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1), -1));
+            }else{
+                int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
+                int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
+                this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1), -1));
             }
         });
 
@@ -170,7 +185,7 @@ public class VideoViewer {
 
 
 
-        this.mediaButtons = new HBox(openItem,prevBtn,playBtn,nextBtn, loopBtn, analyzeBtn,fpsLabel,multField);
+        this.mediaButtons = new HBox(openItem,prevBtn,playBtn,nextBtn, loopBtn, analyzeOneStepBtn, analyzeBtn,fpsLabel,multField);
 
         return this.mediaButtons;
     }
