@@ -42,6 +42,10 @@ public class ImageGreyViewer extends ImageViewer {
         final Menu basicOps = new Menu("Basic");
         MenuItem cutter = new MenuItem("Cut Image");
         cutter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).cutImage(this.image));
+        MenuItem drawCircle = new MenuItem("Draw Circle");
+        drawCircle.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).drawCircle(this.image));
+        MenuItem drawSquare = new MenuItem("Draw Square");
+        drawSquare.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).drawSquare(this.image));
         MenuItem painter = new MenuItem("Get and Set Colors");
         painter.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).painter(this.image));
         MenuItem sum = new MenuItem("Sum");
@@ -60,7 +64,7 @@ public class ImageGreyViewer extends ImageViewer {
         histogramEqualization.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).histogramEqualization(this.image));
         MenuItem contrast = new MenuItem("Contrast Improvement");
         contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
-        basicOps.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative, histogramEqualization, contrast);
+        basicOps.getItems().addAll( painter, cutter, drawSquare, drawCircle, sum, substract, multiply, gamma, rangeCompressor, negative, histogramEqualization, contrast);
 
         MenuItem prewitt = new MenuItem("Prewitt");
         prewitt.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).prewitt(this.image));

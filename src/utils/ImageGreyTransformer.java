@@ -2411,6 +2411,213 @@ public class ImageGreyTransformer {
         stage.show();
     }
 
+    public void drawSquare(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new ImageGrey(originalImage.getImage().clone(), originalImage.getHeight(), originalImage.getWidth());
+        Region cutRegion = new Region();
+        cutRegion.x1 = 0;
+        cutRegion.y1 = 0;
+        cutRegion.x2 = originalImage.getWidth()-1;
+        cutRegion.y2 = originalImage.getHeight()-1;
+
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Draw square");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Text text = new Text("");
+        grid.add(text, 0, 1, 2, 1);
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        ImageView input = new ImageView(originalImage.getRenderer());
+
+        grid.add(input, 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(outputImage.getView(), 1, 3);
+
+        EventHandler<MouseEvent> mousePress = e -> {
+            cutRegion.x1 = (int) e.getX();
+            cutRegion.y1 = (int) e.getY();
+//            text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+            System.out.println("X1: " + cutRegion.x1 + ", Y1: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+
+        };
+        EventHandler<MouseEvent> mouseRelease = e -> {
+            cutRegion.x2 = (int) e.getX();
+            cutRegion.y2 = (int) e.getY();
+            System.out.println("X2: " + cutRegion.x2 + ", Y2: " + cutRegion.y2);
+
+            int minX = Math.max(Math.min(cutRegion.x1,cutRegion.x2),0);
+            int maxX = Math.min(Math.max(cutRegion.x1,cutRegion.x2),originalImage.getWidth()-1);
+            int minY = Math.max(Math.min(cutRegion.y1,cutRegion.y2),0);
+            int maxY = Math.min(Math.max(cutRegion.y1,cutRegion.y2),originalImage.getHeight()-1);
+            System.out.println("X: [" + minX + ", " + maxX + "]");
+            System.out.println("Y: [" + minY + ", " + maxY + "]");
+
+            grid.getChildren().remove(outputImage.getView());
+//            int width = (maxX-minX)+1;
+//            int height = (maxY-minY)+1;
+//            System.out.println("Width:" + width + ", Height:" + height);
+            Integer[][] cutImage = new Integer[originalImage.getHeight()][originalImage.getWidth()];
+            for (int i = 0; i < originalImage.getHeight(); i++) {
+                for (int j = 0; j < originalImage.getWidth(); j++) {
+                    if(minY <= i && i < maxY && minX <= j && j < maxX)
+                        cutImage[i][j] = 255;
+                    else
+                        cutImage[i][j] = originalImage.getPixel(j,i);
+                }
+            }
+            this.outputImage = new ImageGrey(cutImage, originalImage.getHeight(), originalImage.getWidth());
+            grid.add(outputImage.getView(), 1, 3);
+
+        };
+        //Registering the event filter
+        input.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
+        input.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseRelease);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Cut image");
+        stage.show();
+    }
+
+    public void drawCircle(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = new ImageGrey(originalImage.getImage().clone(), originalImage.getHeight(), originalImage.getWidth());
+        Region cutRegion = new Region();
+        cutRegion.x1 = 0;
+        cutRegion.y1 = 0;
+        cutRegion.x2 = originalImage.getWidth()-1;
+        cutRegion.y2 = originalImage.getHeight()-1;
+
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Draw circle");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Text text = new Text("");
+        grid.add(text, 0, 1, 2, 1);
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        ImageView input = new ImageView(originalImage.getRenderer());
+
+        grid.add(input, 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(outputImage.getView(), 1, 3);
+
+        EventHandler<MouseEvent> mousePress = e -> {
+            cutRegion.x1 = (int) e.getX();
+            cutRegion.y1 = (int) e.getY();
+//            text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+            System.out.println("X1: " + cutRegion.x1 + ", Y1: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
+
+        };
+        EventHandler<MouseEvent> mouseRelease = e -> {
+            cutRegion.x2 = (int) e.getX();
+            cutRegion.y2 = (int) e.getY();
+            System.out.println("X2: " + cutRegion.x2 + ", Y2: " + cutRegion.y2);
+
+            int minX = Math.max(Math.min(cutRegion.x1,cutRegion.x2),0);
+            int maxX = Math.min(Math.max(cutRegion.x1,cutRegion.x2),originalImage.getWidth()-1);
+            int minY = Math.max(Math.min(cutRegion.y1,cutRegion.y2),0);
+            int maxY = Math.min(Math.max(cutRegion.y1,cutRegion.y2),originalImage.getHeight()-1);
+            System.out.println("X: [" + minX + ", " + maxX + "]");
+            System.out.println("Y: [" + minY + ", " + maxY + "]");
+
+            grid.getChildren().remove(outputImage.getView());
+            int width = (maxX-minX)+1;
+            int height = (maxY-minY)+1;
+            double r = Math.min(width,height)/2;
+//            System.out.println("Width:" + width + ", Height:" + height);
+
+
+
+            Integer[][] cutImage = new Integer[originalImage.getHeight()][originalImage.getWidth()];
+            for (int i = 0; i < originalImage.getHeight(); i++) {
+                for (int j = 0; j < originalImage.getWidth(); j++) {
+                    cutImage[i][j] = originalImage.getPixel(j,i);
+                }
+            }
+            System.out.println("Coppied image");
+
+            for (int x = minX; x < maxX; x++) {
+                for (int y=minY; y<maxY; y++) {
+                    if (Math.hypot(x-(minX+r),y-(minY+r))<=r)
+                        cutImage[y][x] = 255;
+                }
+            }
+            this.outputImage = new ImageGrey(cutImage, originalImage.getHeight(), originalImage.getWidth());
+            grid.add(outputImage.getView(), 1, 3);
+
+        };
+        //Registering the event filter
+        input.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
+        input.addEventFilter(MouseEvent.MOUSE_RELEASED, mouseRelease);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Cut image");
+        stage.show();
+    }
+
 
     public void painter(ImageGrey originalImage){
         this.outputImage = new ImageGrey(originalImage.getImage(), originalImage.getHeight(), originalImage.getWidth());
@@ -2528,8 +2735,8 @@ public class ImageGreyTransformer {
 
     public void cannyEdgeDetector(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.secondImage = new Functions(originalImage).cannyAlgorithm(7, 1.0);
-        this.outputImage = new Functions(secondImage).hysteresisThreshold(128,158);
+        this.secondImage = new Functions(originalImage).cannyAlgorithm(7);
+        this.outputImage = new Functions(secondImage).hysteresisThreshold(100,200);
 
         Stage stage = new Stage();
         stage.setTitle("Apply Canny edge detector");
@@ -2554,9 +2761,9 @@ public class ImageGreyTransformer {
         TextField sigmaField = new TextField();
         sigmaField.setMaxWidth(60);
         sigmaField.setText("1");
-        grid.add(sigmaField, 1, 2);
-
-        grid.add(new Label("Threshold 1:"), 0, 3);
+//        grid.add(sigmaField, 1, 2);
+        Label threshold1 = new Label("Threshold 1: " + 100);
+        grid.add(threshold1, 0, 3);
         Slider slider = new Slider();
         slider.setMin(0);
         slider.setMax(255);
@@ -2568,11 +2775,12 @@ public class ImageGreyTransformer {
         slider.setBlockIncrement(1);
         grid.add(slider, 1, 3);
 
-        grid.add(new Label("Threshold 2:"), 0, 4);
+        Label threshold2 = new Label("Threshold 2: " + 200);
+        grid.add(threshold2, 0, 4);
         Slider slider2 = new Slider();
         slider2.setMin(0);
         slider2.setMax(255);
-        slider2.setValue(158);
+        slider2.setValue(200);
         slider2.setShowTickLabels(true);
         slider2.setShowTickMarks(true);
         slider2.setMajorTickUnit(64);
@@ -2581,14 +2789,18 @@ public class ImageGreyTransformer {
         grid.add(slider2, 1, 4);
 
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            threshold1.setText("Threshold 1: " + newValue.intValue());
+            threshold2.setText("Threshold 2: " + (int) slider2.getValue());
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold(newValue.intValue(),(int) Math.round(slider2.getValue()));
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold(newValue.intValue(),(int) slider2.getValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });
 
         slider2.valueProperty().addListener((observable, oldValue, newValue) -> {
+            threshold1.setText("Threshold 1: " + (int) slider.getValue());
+            threshold2.setText("Threshold 2: " + newValue.intValue());
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),newValue.intValue());
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)slider.getValue(),newValue.intValue());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });
 
@@ -2611,7 +2823,7 @@ public class ImageGreyTransformer {
                 if(size >= 0){
                     grid.getChildren().remove(outputImage.getView());
                     this.secondImage = new Functions(this.originalImage)
-                            .cannyAlgorithm(size, Double.parseDouble(sigmaField.getText()));
+                            .cannyAlgorithm(size);
                     this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
                     grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
                 }
@@ -2627,7 +2839,7 @@ public class ImageGreyTransformer {
             }
             grid.getChildren().remove(outputImage.getView());
             this.secondImage = new Functions(this.originalImage)
-                    .cannyAlgorithm(Integer.parseInt(multField.getText()),sigma);
+                    .cannyAlgorithm(Integer.parseInt(multField.getText()));
             this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
             grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });

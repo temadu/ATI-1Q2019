@@ -2340,7 +2340,7 @@ public class ImageColorTransformer {
 
     public void cannyEdgeDetector(ImageColor originalImage){
         this.originalImage = originalImage;
-        this.secondImage = new Functions(originalImage).cannyAlgorithm(7, 1.0);
+        this.secondImage = new Functions(originalImage).cannyAlgorithm(7);
         this.outputImage = new Functions(secondImage).hysteresisThreshold(128,158);
 
         Stage stage = new Stage();
@@ -2423,7 +2423,7 @@ public class ImageColorTransformer {
                 if(size >= 0){
                     grid.getChildren().remove(outputImage.getView());
                     this.secondImage = new Functions(this.originalImage)
-                            .cannyAlgorithm(size, Double.parseDouble(sigmaField.getText()));
+                            .cannyAlgorithm(size);
                     this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
                     grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
                 }
@@ -2439,7 +2439,7 @@ public class ImageColorTransformer {
             }
             grid.getChildren().remove(outputImage.getView());
             this.secondImage = new Functions(this.originalImage)
-                    .cannyAlgorithm(Integer.parseInt(multField.getText()),sigma);
+                    .cannyAlgorithm(Integer.parseInt(multField.getText()));
             this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
             grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });

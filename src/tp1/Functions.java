@@ -911,11 +911,11 @@ public class Functions {
             : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
-    public ImageInt cannyAlgorithm(int n, double gamma){
+    public ImageInt cannyAlgorithm(int n){
         DecimalFormat df = new DecimalFormat("#.#");
 
         //1) Aplico gaussiana
-        this.image = gaussFilter(n,gamma);
+        this.image = gaussFilter(n,(n-1)/2);
 
         //2) Derivo sobel en x e y
         ImageInt gx = sobelOperator(false,false,false,true,false,false,false,false);
@@ -1025,10 +1025,11 @@ public class Functions {
             Integer[][] ret = new Integer[image.length][image[0].length];
             for (int i = 0; i < image.length; i++) {
                 for (int j = 0; j < image[0].length; j++) {
-                    if(image[i][j] < tmin){
+                    if(image[i][j] <= tmin){
                         ret[i][j] = 0;
                     } else if(image[i][j] > tmax){
                         ret[i][j] = 255;
+//                        ret[i][j] = image[i][j];
                     } else {
                         boolean borderUp = i > 0
                                 && firstPass[i-1][j] == 255;
@@ -1038,15 +1039,17 @@ public class Functions {
                                 && firstPass[i+1][j] == 255;
                         boolean borderRight = j < image[0].length - 1
                                 && firstPass[i][j+1] == 255;
-                        boolean borderLUp = i > 0 && j > 0
-                                && firstPass[i-1][j-1] == 255;
-                        boolean borderRUp = i > 0 && j < image[0].length - 1
-                                && firstPass[i-1][j+1] == 255;
-                        boolean borderLDown = i < image.length - 1 && j > 0
-                                && firstPass[i+1][j-1] == 255;
-                        boolean borderRDown = i < image.length - 1 && j < image[0].length - 1
-                                && firstPass[i+1][j+1] == 255;
-                        if (borderUp || borderLeft || borderDown|| borderRight || borderLUp || borderRUp || borderLDown || borderRDown) {
+//                        boolean borderLUp = i > 0 && j > 0
+//                                && firstPass[i-1][j-1] == 255;
+//                        boolean borderRUp = i > 0 && j < image[0].length - 1
+//                                && firstPass[i-1][j+1] == 255;
+//                        boolean borderLDown = i < image.length - 1 && j > 0
+//                                && firstPass[i+1][j-1] == 255;
+//                        boolean borderRDown = i < image.length - 1 && j < image[0].length - 1
+//                                && firstPass[i+1][j+1] == 255;
+//                        if (borderUp || borderLeft || borderDown|| borderRight || borderLUp || borderRUp || borderLDown || borderRDown) {
+                        if (borderUp || borderLeft || borderDown|| borderRight) {
+//                            ret[i][j] = image[i][j];
                             ret[i][j] = 255;
                         } else {
                             ret[i][j] = 0;
@@ -1119,28 +1122,37 @@ public class Functions {
         this.image = this.sobelOperator(false,false,true,true,false,false,false,false);
 
 //        2)Binary image
-        this.image = globalThresholdization();
+        Integer[][] thresholded = globalThresholdization().getImage();
 
 //        3)Matriz acumuladora
         int D = Math.max(this.image.getWidth(),this.image.getHeight());
         int thetaMin = -90;
         int thetaMax = 90;
-        int thetaSize = (int)(thetaMax-thetaMin);
+        int thetaSize = thetaMax-thetaMin;
         int pMin = (int) (-Math.sqrt(2)*D);
         int pMax = (int) (Math.sqrt(2)*D);
-        int pSize = (int)(pMax-pMin);
+        int pSize = pMax-pMin;
         int[][] A = new int[pSize][thetaSize];
+
+        double[] sinTable = new double[thetaSize];
+        double[] cosTable = new double[thetaSize];
+        for (int theta = 0; theta < thetaSize; theta++) {
+            double thetaRadians = (thetaMin+theta) * Math.PI / thetaSize;
+            sinTable[theta] = Math.sin(thetaRadians);
+            cosTable[theta] = Math.cos(thetaRadians);
+        }
 
 
 //        4)Para cada pixel blanco que cumple la normal de la recta, acumulador++
         for (int i = 0; i < this.image.getHeight(); i++) {
             for (int j = 0; j < this.image.getWidth(); j++) {
-                if (((ImageGrey)this.image).getImage()[j][i] == 255) {
+                if (thresholded[i][j] != 0) {
                     for (int theta = 0; theta < thetaSize; theta++) {
-                        int thetaj = thetaMin + theta;
+                        double r = cosTable[theta] * j + sinTable[theta] * i;
+//                        int p = (int)Math.round(r * pMax / pSize) + pMax;
+//                        A[p][theta]++;
                         for (int p = 0; p < pSize; p++) {
-                            int pi = pMin + p;
-                            if (Math.abs(pi - j*Math.cos(thetaj*Math.PI/180) - i*Math.sin(thetaj*Math.PI/180)) < e) {
+                            if (Math.abs((pMin+p) - r) < e) {
                                 A[p][theta]++;
                             }
                         }
@@ -1149,17 +1161,8 @@ public class Functions {
             }
         }
 
-//        Integer[][] AVisu = new Integer[pSize][thetaSize];
-//        for (int i = 0; i < pSize; i++) {
-//            for (int j = 0; j < thetaSize; j++) {
-//                AVisu[i][j] = A[i][j];
-//            }
-//        }
-//        if(true)
-//            return new ImageGrey(clamp(AVisu),pSize,thetaSize);
 
-
-//        5)
+//        5) Ordeno las coordenadas en una lista
         List<HoughAcumulatorElement> elements = new ArrayList<>();
         for (int p = 0; p < pSize; p++) {
             for (int theta = 0; theta < thetaSize; theta++) {
@@ -1175,19 +1178,17 @@ public class Functions {
                 newImage[i][j] = 0;
             }
         }
+
         int maxVotes = elements.get(0).votes;
-        System.out.println(maxVotes);
-        int lines = 0;
         if (maxVotes > 1) {
-            for (HoughAcumulatorElement b : elements) {
-                if (b.votes < maxVotes)
+            for (HoughAcumulatorElement elem : elements) {
+                if (elem.votes < maxVotes/2)
                     break;
-                lines++;
-                int pi = pMin + b.coordinates[0];
-                int thetaj = thetaMin + b.coordinates[1];
+                int pi = pMin + elem.coordinates[0];
+                int theta = elem.coordinates[1];
                 for (int i = 0; i < image.getHeight(); i++) {
                     for (int j = 0; j < image.getWidth(); j++) {
-                        if (Math.abs(pi - j*Math.sin(thetaj*Math.PI/180) - i*Math.cos(thetaj*Math.PI/180)) < e) {
+                        if (Math.abs(pi - (cosTable[theta]*j + sinTable[theta]*i)) < e) {
                             newImage[i][j] = 255;
                         }
                     }
@@ -1195,7 +1196,6 @@ public class Functions {
 
             }
         }
-        System.out.println(lines);
         return new ImageGrey(newImage,image.getHeight(),image.getWidth());
 
     }
@@ -1207,7 +1207,7 @@ public class Functions {
         this.image = this.sobelOperator(false,false,true,true,false,false,false,false);
 
 //        2)Binary image
-        this.image = globalThresholdization();
+        Integer[][] thresholded = globalThresholdization().getImage();
 
 //        3)Matriz acumuladora
         int D = Math.max(this.image.getWidth(),this.image.getHeight());
@@ -1220,11 +1220,13 @@ public class Functions {
 //        4)Para cada pixel blanco que cumple la normal de la recta, acumulador++
         for (int i = 0; i < this.image.getHeight(); i++) {
             for (int j = 0; j < this.image.getWidth(); j++) {
-                if (((ImageGrey)this.image).getImage()[j][i] == 255) {
+                if (thresholded[i][j] != 0) {
                     for (int cy = 0; cy < cyMax; cy++) {
+                        double cyPow = Math.pow(i - cy, 2);
                         for (int cx = 0; cx < cxMax; cx++) {
+                            double cxPow = Math.pow(j - cx, 2);
                             for (int r = 0; r < rMax; r++) {
-                                if (Math.abs(Math.pow(r, 2) - Math.pow(i - cy, 2) -  Math.pow(j - cx, 2)) < e) {
+                                if (Math.abs(Math.pow(r,2) - (cyPow+cxPow)) < e) {
                                     A[cy][cx][r]++;
                                 }
                             }
@@ -1253,13 +1255,11 @@ public class Functions {
             }
         }
         int maxVotes = elements.get(0).votes;
-        System.out.println(maxVotes);
-        int lines = 0;
+        int votesCutOff = maxVotes/2;
         if (maxVotes > 1) {
             for (HoughAcumulatorElement b : elements) {
-                if (b.votes < maxVotes)
+                if (b.votes < votesCutOff)
                     break;
-                lines++;
                 double cy = b.coordinates[0];
                 double cx = b.coordinates[1];
                 double r = b.coordinates[2];
@@ -1268,15 +1268,13 @@ public class Functions {
                         double aTerm = Math.pow(j - cx, 2);
                         double bTerm = Math.pow(i - cy, 2);
                         double rTerm = Math.pow(r, 2);
-                        double total = rTerm - aTerm - bTerm;
-                        if (Math.abs(Math.pow(r, 2) - Math.pow(i - cy, 2) -  Math.pow(j - cx, 2)) < e) {
+                        if (Math.abs(rTerm - (aTerm+bTerm)) < e) {
                             newImage[i][j] = 255;
                         }
                     }
                 }
             }
         }
-        System.out.println(lines);
         return new ImageGrey(newImage,image.getHeight(),image.getWidth());
 
     }
