@@ -3,6 +3,8 @@ package utils;
 import models.ImageColor;
 import models.ImageGrey;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -209,5 +211,32 @@ public class IOManager {
             e.printStackTrace();
         }
     }
+
+    public static ImageColor loadJPG(String filePath) throws IOException {
+
+        File input_file = new File(filePath);
+        // Reading input file
+        BufferedImage image = ImageIO.read(input_file);
+
+        int picWidth = image.getWidth();
+        int picHeight = image.getHeight();
+        Integer[][] red = new Integer[picHeight][picWidth];
+        Integer[][] green = new Integer[picHeight][picWidth];
+        Integer[][] blue = new Integer[picHeight][picWidth];
+
+        // read the image data
+        for (int row = 0; row < picHeight; row++) {
+            for (int col = 0; col < picWidth; col++) {
+                int p = image.getRGB(col,row);
+                // get alpha
+                int a = (p>>24) & 0xff;
+                red[row][col] = (p>>16) & 0xff;
+                green[row][col] = (p>>8) & 0xff;
+                blue[row][col] = p & 0xff;
+            }
+        }
+        return new ImageColor(red, green, blue, picHeight, picWidth);
+    }
+
 
 }

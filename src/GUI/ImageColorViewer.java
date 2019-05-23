@@ -115,13 +115,15 @@ public class ImageColorViewer extends ImageViewer{
         canny.setOnAction(e -> new ImageColorTransformer(this.windowIndex).cannyEdgeDetector(this.image));
         MenuItem susan = new MenuItem("Susan");
         susan.setOnAction(e -> new ImageColorTransformer(this.windowIndex).susanEdgeCornerDetector(this.image));
+        MenuItem houghLines = new MenuItem("Hough Lines");
+        houghLines.setOnAction(e -> new ImageColorTransformer(this.windowIndex).houghLineDetector(this.image));
         MenuItem contour = new MenuItem("Contour Tracing");
         contour.setOnAction(e -> new ImageColorTransformer(this.windowIndex).contourTracing(this.image));
 
 
         transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic,canny,susan, contour);
+                isotropic, anisotropic,canny,susan, houghLines, contour);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }

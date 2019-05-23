@@ -140,7 +140,7 @@ public class ATIApp extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./images"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw")
+                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw","*.jpg","*.jpeg")
         );
         File file = fileChooser.showOpenDialog(stage);
 
@@ -156,6 +156,17 @@ public class ATIApp extends Application {
                 ImageColor openedImage;
                 try {
                     openedImage = IOManager.loadPPM(file.getPath());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+                this.addImageViewer(new ImageColorViewer(openedImage, this.windowIndex));
+
+//            this.stage.close();
+            }else if(extension.toLowerCase().equals("jpg") || extension.toLowerCase().equals("jpeg")){
+                ImageColor openedImage;
+                try {
+                    openedImage = IOManager.loadJPG(file.getPath());
                 } catch (IOException e1) {
                     e1.printStackTrace();
                     return;

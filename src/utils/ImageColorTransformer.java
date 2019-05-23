@@ -2362,11 +2362,11 @@ public class ImageColorTransformer {
         multField.setText("7");
         grid.add(multField, 1, 1);
 
-        grid.add(new Label("Sigma:"), 0, 2);
-        TextField sigmaField = new TextField();
-        sigmaField.setMaxWidth(60);
-        sigmaField.setText("1");
-        grid.add(sigmaField, 1, 2);
+//        grid.add(new Label("Sigma:"), 0, 2);
+//        TextField sigmaField = new TextField();
+//        sigmaField.setMaxWidth(60);
+//        sigmaField.setText("1");
+//        grid.add(sigmaField, 1, 2);
 
         grid.add(new Label("Threshold 1:"), 0, 3);
         Slider slider = new Slider();
@@ -2430,19 +2430,19 @@ public class ImageColorTransformer {
             }
         });
 
-        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            double sigma;
-            try {
-                sigma = Double.parseDouble(sigmaField.getText());
-            } catch (NumberFormatException | NullPointerException nfe) {
-                return;
-            }
-            grid.getChildren().remove(outputImage.getView());
-            this.secondImage = new Functions(this.originalImage)
-                    .cannyAlgorithm(Integer.parseInt(multField.getText()));
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
-        });
+//        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            double sigma;
+//            try {
+//                sigma = Double.parseDouble(sigmaField.getText());
+//            } catch (NumberFormatException | NullPointerException nfe) {
+//                return;
+//            }
+//            grid.getChildren().remove(outputImage.getView());
+//            this.secondImage = new Functions(this.originalImage)
+//                    .cannyAlgorithm(Integer.parseInt(multField.getText()));
+//            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
+//            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+//        });
 
         Label firstImageLabel = new Label("First Image:");
         firstImageLabel.setAlignment(Pos.CENTER);
@@ -2566,6 +2566,79 @@ public class ImageColorTransformer {
 
         stage.show();
     }
+
+    public void houghLineDetector(ImageColor originalImage){
+        this.originalImage = originalImage;
+        this.outputImage = (ImageColor) new Functions(this.originalImage).houghLineDetector(0.1);
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Multiply image by scalar");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        grid.add(new Label("Multiplier:"), 0, 1);
+        TextField multField = new TextField();
+        multField.setMaxWidth(60);
+        multField.setText("0.1");
+        grid.add(multField, 1, 1);
+        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                multField.setText(oldValue);
+            } else {
+                float multiplier = 0;
+                try {
+                    multiplier = Float.parseFloat(multField.getText());
+                } catch (NumberFormatException | NullPointerException nfe) {
+                    return;
+                }
+                if(multiplier >= 0){
+                    grid.getChildren().remove(outputImage.getView());
+                    this.outputImage = (ImageColor) new Functions(this.originalImage).houghLineDetector(multiplier);
+                    grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+                }
+            }
+        });
+
+        Label firstImageLabel = new Label("First Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
+        grid.add(new Label("Output Image:"), 1, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 4);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("Multiply image by scalar");
+        stage.show();
+    }
+
 
 
     class Region{

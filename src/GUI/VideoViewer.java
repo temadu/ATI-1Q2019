@@ -2,6 +2,7 @@ package GUI;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -63,7 +64,7 @@ public class VideoViewer {
         this.stage = new Stage();
         this.imageViews = new HBox();
         this.images = new ArrayList<>();
-        
+
         this.videoDir = videoDir;
         try (Stream<Path> walk = Files.walk(Paths.get(videoDir))) {
 
@@ -104,43 +105,61 @@ public class VideoViewer {
             this.openImageFile();
         });
 
+        Label fpsLabel = new Label("FPS:");
+        TextField multField = new TextField();
+        multField.setMaxWidth(60);
+        multField.setText("1");
+        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
+                multField.setText(oldValue);
+            }
+        });
 
-        Button playBtn = new Button("►");
+
+        Button playBtn = new Button("\u23F5");
         playBtn.setOnAction(e -> {
             this.play = !this.play;
             if(this.play){
-                playBtn.setText("❚❚");
+                int fps = Integer.parseInt(multField.getText());
+                if(fps <= 0){
+                    fps = 1;
+                }
+                playBtn.setText("\u23F8");
                 this.playThread = Executors.newSingleThreadScheduledExecutor();
                 this.playThread.scheduleAtFixedRate(() -> {
                     if(this.play){
                         Platform.runLater(() -> this.nextFrame());
                     }
-                }, 0, 1000, TimeUnit.MILLISECONDS);
+                }, 0, 1000/fps, TimeUnit.MILLISECONDS);
             }else{
-                playBtn.setText("►");
+                playBtn.setText("\u23F5");
                 this.playThread.shutdown();
             }
         });
 
 
-        Button nextBtn = new Button("❚►");
+        Button nextBtn = new Button("\u23F8\u23F5");
         nextBtn.setOnAction(e -> {
             this.nextFrame();
         });
-        Button prevBtn = new Button("<❚");
+        Button prevBtn = new Button("\u23F4\u23F8");
         prevBtn.setOnAction(e -> {
             this.previousFrame();
         });
-        Button loopBtn = new Button("Loop");
+        Button loopBtn = new Button("Loop ⟳");
         loopBtn.setOnAction(e -> this.loop = !this.loop);
         Button analyzeBtn = new Button("Analyze frame");
         analyzeBtn.setOnAction(e -> {
             if(this.images.get(this.currentFrame) instanceof ImageGreyViewer){
+                int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
+                int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(80, 64, 12,500), -1));
+                        .activeContorns(w/2, h/2, Math.min(w,h)/4,500), -1));
             }else{
+                int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
+                int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(80, 64, 12,500), -1));
+                        .activeContorns(w/2, h/2, Math.min(w,h)/4,500), -1));
             }
         });
 
@@ -148,7 +167,10 @@ public class VideoViewer {
 
 
 
-        this.mediaButtons = new HBox(openItem,prevBtn,playBtn,nextBtn, loopBtn, analyzeBtn);
+
+
+
+        this.mediaButtons = new HBox(openItem,prevBtn,playBtn,nextBtn, loopBtn, analyzeBtn,fpsLabel,multField);
 
         return this.mediaButtons;
     }
@@ -219,6 +241,17 @@ public class VideoViewer {
                 ImageColor openedImage;
                 try {
                     openedImage = IOManager.loadPPM(file.getPath());
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                    return;
+                }
+                this.addImageViewer(new ImageColorViewer(openedImage, -1));
+
+//            this.stage.close();
+            }else if(extension.toLowerCase().equals("jpg") || extension.toLowerCase().equals("jpeg")){
+                ImageColor openedImage;
+                try {
+                    openedImage = IOManager.loadJPG(file.getPath());
                 } catch (IOException e1) {
                     e1.printStackTrace();
                     return;
