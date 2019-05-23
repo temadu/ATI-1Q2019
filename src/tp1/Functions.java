@@ -1611,13 +1611,6 @@ public class Functions {
             blue = ((ImageColor)image).getBlue();
         }
 
-        for (int i = 0; i < image.getHeight(); i++) {
-            for (int j = 0; j < image.getWidth(); j++) {
-                int avg = (int) Math.round((red[i][j] + green[i][j] + blue[i][j]) / 3);
-                System.out.print(avg +"\t");
-            }
-            System.out.println();
-        }
         int half = sqSize/2;
         double rTheta0 =  0, rTheta1 = 0;
         double gTheta0 =  0, gTheta1 = 0;
@@ -1669,6 +1662,7 @@ public class Functions {
         while( counter-- > 0){
             //recorro lout
             ArrayList<Point> prevLout = new ArrayList<>(lout);
+            int changes = 0;
             for (Point p : prevLout){
                 if(greyscale){
                     if(Math.abs(rTheta0 - red[p.x][p.y]) > Math.abs(rTheta1 - red[p.x][p.y])) { //fd(x) > 0
@@ -1678,18 +1672,22 @@ public class Functions {
                         if (p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == 3) {
                             lout.add(new Point(p.x + 1, p.y));
                             phi[p.x + 1][p.y] = 1;
+                            changes++;
                         }
                         if (p.x > 0 && phi[p.x - 1][p.y] == 3) {
                             lout.add(new Point(p.x - 1, p.y));
                             phi[p.x - 1][p.y] = 1;
+                            changes++;
                         }
                         if (p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == 3) {
                             lout.add(new Point(p.x, p.y + 1));
                             phi[p.x][p.y + 1] = 1;
+                            changes++;
                         }
                         if (p.y > 0 && phi[p.x][p.y - 1] == 3) {
                             lout.add(new Point(p.x, p.y - 1));
                             phi[p.x][p.y - 1] = 1;
+                            changes++;
                         }
                     }
                 } else {
@@ -1702,21 +1700,28 @@ public class Functions {
                         if (p.x + 1 < image.getHeight() && phi[p.x + 1][p.y] == 3) {
                             lout.add(new Point(p.x + 1, p.y));
                             phi[p.x + 1][p.y] = 1;
+                            changes++;
                         }
                         if (p.x > 0 && phi[p.x - 1][p.y] == 3) {
                             lout.add(new Point(p.x - 1, p.y));
                             phi[p.x - 1][p.y] = 1;
+                            changes++;
                         }
                         if (p.y + 1 < image.getWidth() && phi[p.x][p.y + 1] == 3) {
                             lout.add(new Point(p.x, p.y + 1));
                             phi[p.x][p.y + 1] = 1;
+                            changes++;
                         }
                         if (p.y > 0 && phi[p.x][p.y - 1] == 3) {
                             lout.add(new Point(p.x, p.y - 1));
                             phi[p.x][p.y - 1] = 1;
+                            changes++;
                         }
                     }
                 }
+            }
+            if(changes == 0){
+                break;
             }
 
             //recorro lin
@@ -1834,7 +1839,6 @@ public class Functions {
                 newBlue[p.x][p.y] = 255;
             }
         }
-
         return greyscale ? new ImageGrey(newRed, image.getHeight(), image.getWidth())
                 : new ImageColor(newRed, newGreen, newBlue, image.getHeight(), image.getWidth());
     }
