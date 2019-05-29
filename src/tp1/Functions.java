@@ -15,6 +15,10 @@ import java.util.stream.IntStream;
 public class Functions {
     public ImageInt image;
     private boolean greyscale;
+    private ArrayList<Point> classLin;
+    private ArrayList<Point> classLout;
+    private Integer[][] classPhi;
+
 
     public Functions(ImageInt image) {
         this.image = image;
@@ -1610,7 +1614,7 @@ public class Functions {
     }
 
     //para color q los 3 colores sean coherentes con lo de theta0 - theta / theta1 - theta?
-    public ImageInt activeContorns(double x, double y, int sqSize, int counter) {
+    public ImageInt activeContorns(double x, double y, int sqSize, int counter, boolean fromPrev) {
         Integer[][] red;
         Integer[][] green = null;
         Integer[][] blue = null;
@@ -1635,7 +1639,7 @@ public class Functions {
         double gTheta0 =  0, gTheta1 = 0;
         double bTheta0 =  0, bTheta1 = 0;
 
-
+        int caca = 0;
         //paso inicial, setea los theta y phi inicial
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
@@ -1644,29 +1648,46 @@ public class Functions {
                     newGreen[i][j] = green[i][j];
                     newBlue[i][j] = blue[i][j];
                 }
-                if(i > y - half && i < y + half && j > x - half && j < x + half){
-                    phi[i][j] = -3;
-                    rTheta1 += red[i][j];
-                    if(!greyscale){
-                        gTheta1 += green[i][j];
-                        bTheta1 += blue[i][j];
+                if(!fromPrev){
+                    if(i >= y - half && i < y + half && j >= x - half && j < x + half){
+                        phi[i][j] = -3;
+                        rTheta1 += red[i][j];
+                        if(!greyscale){
+                            gTheta1 += green[i][j];
+                            bTheta1 += blue[i][j];
+                        }
+                        caca++;
+                    } else {
+                        phi[i][j] = 3;
+                        rTheta0 += red[i][j];
+                        if(!greyscale){
+                            gTheta0 += green[i][j];
+                            bTheta0 += blue[i][j];
+                        }
+                    }
+                    if(((i == y - half || i == y + half) && (j > x - half && j < x + half))
+                            || ((j == x - half || j == x + half) && (i > y - half && i < y + half)) ){
+                        lout.add(new Point(i, j));
+                        phi[i][j] = 1;
+                    } else if(((i == y - half + 1 || i == y + half - 1) && (j > x - half && j < x + half))
+                            || ((j == x - half + 1 || j == x + half - 1) && (i > y - half + 1&& i < y + half - 1)) ){
+                        lin.add(new Point(i, j));
+                        phi[i][j] = -1;
                     }
                 } else {
-                    phi[i][j] = 3;
-                    rTheta0 += red[i][j];
-                    if(!greyscale){
-                        gTheta0 += green[i][j];
-                        bTheta0 += blue[i][j];
+                    if(classPhi[i][j] < 0){
+                        rTheta1 += red[i][j];
+                        if(!greyscale){
+                            gTheta1 += green[i][j];
+                            bTheta1 += blue[i][j];
+                        }
+                    } else {
+                        rTheta0 += red[i][j];
+                        if(!greyscale){
+                            gTheta0 += green[i][j];
+                            bTheta0 += blue[i][j];
+                        }
                     }
-                }
-                if(((i == y - half || i == y + half) && (j > x - half && j < x + half))
-                        || ((j == x - half || j == x + half) && (i > y - half && i < y + half)) ){
-                    lout.add(new Point(i, j));
-                    phi[i][j] = 1;
-                } else if(((i == y - half + 1 || i == y + half - 1) && (j > x - half && j < x + half))
-                        || ((j == x - half + 1 || j == x + half - 1) && (i > y - half + 1&& i < y + half - 1)) ){
-                    lin.add(new Point(i, j));
-                    phi[i][j] = -1;
                 }
             }
         }
@@ -1676,7 +1697,11 @@ public class Functions {
         rTheta1 /= sqSize * sqSize;
         gTheta1 /= sqSize * sqSize;
         bTheta1 /= sqSize * sqSize;
-
+        if(fromPrev){
+            phi = classPhi;
+            lin = classLin;
+            lout = classLout;
+        }
         //tengo lin, lout, thetas, phis
         while( counter-- > 0){
             //recorro lout
@@ -1710,9 +1735,11 @@ public class Functions {
                         }
                     }
                 } else {
-                    if(Math.abs(rTheta0 - red[p.x][p.y]) > Math.abs(rTheta1 - red[p.x][p.y]) &&
+                    if(/*Math.abs(rTheta0 - red[p.x][p.y]) > Math.abs(rTheta1 - red[p.x][p.y]) &&
                             Math.abs(gTheta0 - green[p.x][p.y]) > Math.abs(gTheta1 - green[p.x][p.y]) &&
-                            Math.abs(bTheta0 - blue[p.x][p.y]) > Math.abs(bTheta1 - blue[p.x][p.y])) { //fd(x) > 0
+                            Math.abs(bTheta0 - blue[p.x][p.y]) > Math.abs(bTheta1 - blue[p.x][p.y])*/
+                            Math.sqrt(Math.pow(rTheta0 - red[p.x][p.y],2) + Math.pow(gTheta0 - green[p.x][p.y],2) + Math.pow(bTheta0 - blue[p.x][p.y],2)) >
+                                    Math.sqrt(Math.pow(rTheta1 - red[p.x][p.y],2) + Math.pow(gTheta1 - green[p.x][p.y],2) + Math.pow(bTheta1 - blue[p.x][p.y],2))) { //fd(x) > 0
                         lout.remove(p);
                         lin.add(p);
                         phi[p.x][p.y] = -1;
@@ -1781,9 +1808,10 @@ public class Functions {
                         }
                     }
                 } else {
-                    if(Math.abs(rTheta0 - red[p.x][p.y]) < Math.abs(rTheta1 - red[p.x][p.y]) &&
-                            Math.abs(gTheta0 - green[p.x][p.y]) < Math.abs(gTheta1 - green[p.x][p.y]) &&
-                            Math.abs(bTheta0 - blue[p.x][p.y]) < Math.abs(bTheta1 - blue[p.x][p.y])) { //fd(x) < 0
+                    if(/*Math.abs(rTheta0 - red[p.x][p.y]) + Math.abs(gTheta0 - green[p.x][p.y]) + Math.abs(bTheta0 - blue[p.x][p.y]) <
+                            Math.abs(rTheta1 - red[p.x][p.y]) + Math.abs(gTheta1 - green[p.x][p.y]) + Math.abs(bTheta1 - blue[p.x][p.y])*/
+                            Math.sqrt(Math.pow(rTheta0 - red[p.x][p.y],2) + Math.pow(gTheta0 - green[p.x][p.y],2) + Math.pow(bTheta0 - blue[p.x][p.y],2)) <
+                                    Math.sqrt(Math.pow(rTheta1 - red[p.x][p.y],2) + Math.pow(gTheta1 - green[p.x][p.y],2) + Math.pow(bTheta1 - blue[p.x][p.y],2))) { //fd(x) < 0
                         lin.remove(p);
                         lout.add(p);
                         phi[p.x][p.y] = 1;
@@ -1820,36 +1848,38 @@ public class Functions {
             }
 
             //recalc thetas
-            rTheta0 =  0; rTheta1 = 0;
-            gTheta0 =  0; gTheta1 = 0;
-            bTheta0 =  0; bTheta1 = 0;
-            int inCounter = 0;
-            for (int i = 0; i < image.getHeight(); i++) {
-                for (int j = 0; j < image.getWidth(); j++) {
-                    if(phi[i][j] < 0){
-                        rTheta1 += red[i][j];
-                        if(!greyscale){
-                            gTheta1 += green[i][j];
-                            bTheta1 += blue[i][j];
-                        }
-                        inCounter++;
-                    } else {
-                        rTheta0 += red[i][j];
-                        if(!greyscale){
-                            gTheta0 += green[i][j];
-                            bTheta0 += blue[i][j];
-                        }
-                    }
-                }
-            }
-            rTheta0 /= pixelCount  - inCounter;
-            rTheta1 /= inCounter;
-            gTheta0 /= pixelCount  - inCounter;
-            gTheta1 /= inCounter;
-            bTheta0 /= pixelCount  - inCounter;
-            bTheta1 /= inCounter;
+//            rTheta0 =  0; rTheta1 = 0;
+//            gTheta0 =  0; gTheta1 = 0;
+//            bTheta0 =  0; bTheta1 = 0;
+//            int inCounter = 0;
+//            for (int i = 0; i < image.getHeight(); i++) {
+//                for (int j = 0; j < image.getWidth(); j++) {
+//                    if(phi[i][j] < 0){
+//                        rTheta1 += red[i][j];
+//                        if(!greyscale){
+//                            gTheta1 += green[i][j];
+//                            bTheta1 += blue[i][j];
+//                        }
+//                        inCounter++;
+//                    } else {
+//                        rTheta0 += red[i][j];
+//                        if(!greyscale){
+//                            gTheta0 += green[i][j];
+//                            bTheta0 += blue[i][j];
+//                        }
+//                    }
+//                }
+//            }
+//            rTheta0 /= pixelCount  - inCounter;
+//            rTheta1 /= inCounter;
+//            gTheta0 /= pixelCount  - inCounter;
+//            gTheta1 /= inCounter;
+//            bTheta0 /= pixelCount  - inCounter;
+//            bTheta1 /= inCounter;
         }
 
+        classLin = (ArrayList<Point>) lin.clone();
+        classLout = lout;
         lin.addAll(lout);
         for (Point p : lin) {
             newRed[p.x][p.y] = 255;
@@ -1868,6 +1898,10 @@ public class Functions {
 
     private double lecrercOperator(double x, double sigma) {
         return Math.exp(-(x * x)/(sigma * sigma));
+    }
+
+    public void setImage(ImageInt image) {
+        this.image = image;
     }
 
     private class Point {
