@@ -12,7 +12,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -2864,7 +2866,8 @@ public class ImageGreyTransformer {
             threshold2.setText("Threshold 2: " + (int) slider2.getValue());
             grid.getChildren().remove(outputImage.getView());
             this.outputImage = new Functions(this.secondImage).hysteresisThreshold(newValue.intValue(),(int) slider2.getValue());
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
         });
 
         slider2.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -2872,7 +2875,8 @@ public class ImageGreyTransformer {
             threshold2.setText("Threshold 2: " + newValue.intValue());
             grid.getChildren().remove(outputImage.getView());
             this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)slider.getValue(),newValue.intValue());
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
         });
 
         multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
@@ -2896,7 +2900,9 @@ public class ImageGreyTransformer {
                     this.secondImage = new Functions(this.originalImage)
                             .cannyAlgorithm(size);
                     this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+                    grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+                    grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+
                 }
             }
         });
@@ -2912,15 +2918,22 @@ public class ImageGreyTransformer {
             this.secondImage = new Functions(this.originalImage)
                     .cannyAlgorithm(Integer.parseInt(multField.getText()));
             this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+
         });
 
-        Label firstImageLabel = new Label("First Image:");
+        Label firstImageLabel = new Label("Original:");
         firstImageLabel.setAlignment(Pos.CENTER);
         grid.add(firstImageLabel, 0, 5);
         grid.add(new ImageView(originalImage.getRenderer()), 0, 6);
-        grid.add(new Label("Output Image:"), 1, 5);
-        grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+
+        grid.add(new Label("Output:"), 2, 5);
+        grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+
+        grid.add(new Label("Overlay:"), 1, 5);
+        grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+
 
         Button outputBtn = new Button("Output Image");
         HBox hbBtn = new HBox(10);
@@ -2953,9 +2966,7 @@ public class ImageGreyTransformer {
         Stage stage = new Stage();
         stage.setTitle("Apply S.U.S.A.N. Detector");
 
-
         GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
@@ -2979,45 +2990,58 @@ public class ImageGreyTransformer {
 //        grid.add(multField, 1, 1);
         grid.add(slider, 1, 1);
 
-        CheckBox eval = new CheckBox();
-        eval.setSelected(true);
-        grid.add(new Label("Corners:"), 0, 2);
-        grid.add(eval, 1, 2);
+        HBox corners = new HBox();
+        CheckBox cornersCB = new CheckBox();
+        cornersCB.setSelected(true);
+        corners.getChildren().addAll(new Label("Corners:"),cornersCB);
+        corners.setSpacing(15);
+        grid.add(corners, 0, 2);
 
-        CheckBox eval2 = new CheckBox();
-        eval2.setSelected(false);
-        grid.add(new Label("Borders:"), 2, 2);
-        grid.add(eval2, 3, 2);
+        HBox borders = new HBox();
+        CheckBox bordersCB = new CheckBox();
+        bordersCB.setSelected(false);
+        borders.getChildren().addAll(new Label("Borders:"),bordersCB);
+        borders.setSpacing(15);
+        grid.add(borders, 1, 2);
 
-        eval.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+        cornersCB.selectedProperty().addListener(((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).susanDetector((int) Math.floor(slider.getValue()), eval2.isSelected() ,newValue);
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+            this.outputImage = new Functions(this.originalImage).susanDetector((int) Math.floor(slider.getValue()), bordersCB.isSelected() ,newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 4);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 4);
         }));
-        eval2.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+        bordersCB.selectedProperty().addListener(((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).susanDetector((int) Math.floor(slider.getValue()), newValue, eval.isSelected());
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+            this.outputImage = new Functions(this.originalImage).susanDetector((int) Math.floor(slider.getValue()), newValue, cornersCB.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 4);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 4);
         }));
 
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.originalImage).susanDetector(newValue.intValue(), eval2.isSelected(),eval.isSelected());
-            grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+            this.outputImage = new Functions(this.originalImage).susanDetector(newValue.intValue(), bordersCB.isSelected(),cornersCB.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 4);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 4);
         });
 
-        Label firstImageLabel = new Label("First Image:");
+        Label firstImageLabel = new Label("Original:");
         firstImageLabel.setAlignment(Pos.CENTER);
         grid.add(firstImageLabel, 0, 3);
+        grid.setAlignment(Pos.CENTER);
         grid.add(new ImageView(originalImage.getRenderer()), 0, 4);
-        grid.add(new Label("Output Image:"), 1, 3);
-        grid.add(new ImageView(outputImage.getRenderer()), 1, 4);
+
+        grid.add(new Label("Overlay:"), 1, 4);
+        grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 4);
+
+        grid.add(new Label("Output:"), 2, 4);
+        grid.add(new ImageView(outputImage.getRenderer()), 2, 4);
+
 
         Button outputBtn = new Button("Output Image");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(outputBtn);
-        grid.add(hbBtn, 1, 5);
+        grid.add(hbBtn, 2, 5);
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
@@ -3058,6 +3082,7 @@ public class ImageGreyTransformer {
         multField.setMaxWidth(60);
         multField.setText("0.1");
         grid.add(multField, 1, 1);
+
         multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             if (!newValue.matches("\\d{0,7}([\\.]\\d{0,4})?")) {
                 multField.setText(oldValue);
@@ -3071,24 +3096,31 @@ public class ImageGreyTransformer {
                 if(multiplier >= 0){
                     grid.getChildren().remove(outputImage.getView());
                     this.outputImage = (ImageGrey) new Functions(this.originalImage).houghLineDetector(multiplier);
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+                    grid.add(new ImageView(outputImage.getRenderer()), 2, 3);
+                    grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 3);
+
 
                 }
             }
         });
 
-        Label firstImageLabel = new Label("First Image:");
+        Label firstImageLabel = new Label("Original:");
         firstImageLabel.setAlignment(Pos.CENTER);
         grid.add(firstImageLabel, 0, 2);
         grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
-        grid.add(new Label("Output Image:"), 1, 2);
-        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+        grid.add(new Label("Output:"), 2, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 2, 3);
+
+        grid.add(new Label("Overlay:"), 1, 2);
+        grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 3);
+
 
         Button outputBtn = new Button("Output Image");
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
         hbBtn.getChildren().add(outputBtn);
-        grid.add(hbBtn, 1, 4);
+        grid.add(hbBtn, 2, 4);
 
         outputBtn.setOnAction((e) -> {
             if(outputImage != null){
@@ -3143,18 +3175,24 @@ public class ImageGreyTransformer {
                 if(multiplier >= 0){
                     grid.getChildren().remove(outputImage.getView());
                     this.outputImage = (ImageGrey) new Functions(this.originalImage).houghCircleDetector(multiplier);
-                    grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+                    grid.add(new ImageView(outputImage.getRenderer()), 2, 3);
+                    grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 3);
 
                 }
             }
         });
 
-        Label firstImageLabel = new Label("First Image:");
+        Label firstImageLabel = new Label("Original:");
         firstImageLabel.setAlignment(Pos.CENTER);
         grid.add(firstImageLabel, 0, 2);
         grid.add(new ImageView(originalImage.getRenderer()), 0, 3);
-        grid.add(new Label("Output Image:"), 1, 2);
-        grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
+
+        grid.add(new Label("Output:"), 2, 2);
+        grid.add(new ImageView(outputImage.getRenderer()), 2, 3);
+
+        grid.add(new Label("Overlay:"), 1, 2);
+        grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 3);
+
 
         Button outputBtn = new Button("Output Image");
         HBox hbBtn = new HBox(10);
@@ -3181,6 +3219,19 @@ public class ImageGreyTransformer {
         stage.show();
     }
 
+
+    public WritableImage overlayImage(WritableImage original, Integer[][] marker, boolean r, boolean g, boolean b){
+        WritableImage ret = new WritableImage(marker[0].length,marker.length);
+        for (int i = 0; i < marker.length; i++) {
+            for (int j = 0; j < marker[0].length; j++) {
+                if(marker[i][j]>0)
+                    ret.getPixelWriter().setColor(j,i, Color.rgb(r?marker[i][j]:0,g?marker[i][j]:0,b?marker[i][j]:0));
+                else
+                    ret.getPixelWriter().setColor(j,i,original.getPixelReader().getColor(j,i));
+            }
+        }
+        return ret;
+    }
 
     class Region{
         public int x1;
