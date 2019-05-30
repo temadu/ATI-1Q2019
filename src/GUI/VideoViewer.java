@@ -56,6 +56,7 @@ public class VideoViewer {
     public boolean play = false;
     public boolean loop = false;
     public int currentFrame = 0;
+    private Functions f;
 
 
     private ScheduledExecutorService playThread;
@@ -69,8 +70,7 @@ public class VideoViewer {
         try (Stream<Path> walk = Files.walk(Paths.get(videoDir))) {
 
             List<String> result = walk.filter(Files::isRegularFile)
-                    .map(x -> x.toString()).collect(Collectors.toList());
-            Collections.sort(result);
+                    .map(x -> x.toString()).sorted(Comparator.comparingLong(a -> Long.parseLong(a.replaceAll("\\D+", "")))).collect(Collectors.toList());
             result.forEach(s -> openImageFile(new File(s)));
 
         } catch (IOException e) {
@@ -83,7 +83,11 @@ public class VideoViewer {
 //        scroller.setFitToHeight(true);
         scroller.setFitToWidth(true);
         scroller.setContent(imageViews);
+        int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
+        int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
 
+        f = new Functions((((ImageColorViewer) this.images.get(this.currentFrame)).image));
+        f.activeContorns(226,172,20,100,false);
         VBox root = new VBox();
         root.getChildren().addAll(generateMediaBtns(stage), scroller);
 
@@ -154,12 +158,12 @@ public class VideoViewer {
                 int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500), -1));
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500, false), -1));
             }else{
                 int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500), -1));
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500, false), -1));
             }
         });
 
@@ -169,12 +173,12 @@ public class VideoViewer {
                 int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1), -1));
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1,false), -1));
             }else{
                 int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1), -1));
+                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1,false), -1));
             }
         });
 
@@ -304,44 +308,47 @@ public class VideoViewer {
         DirectoryChooser dirChooser = new DirectoryChooser();
         dirChooser.setInitialDirectory(new File("./images"));
         File directory = dirChooser.showDialog(stage);
-
-        if(directory != null){
-            System.out.println(directory.getAbsolutePath());
-
-
-        }
     }
 
     public void addImageViewer(ImageViewer imageViewer){
         this.images.add(imageViewer);
         if(this.imageViews.getChildren().size() == 0)
             this.imageViews.getChildren().add(imageViewer.imageView);
-        System.out.println(this.images.size());
     }
 
     public synchronized void nextFrame(){
+        int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
+        int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
         if(this.images.size()>0){
             if(currentFrame < this.images.size()-1){
                 this.imageViews.getChildren().clear();
                 this.currentFrame++;
-                this.imageViews.getChildren().add(this.images.get(this.currentFrame).imageView);
+                f.setImage((((ImageColorViewer) this.images.get(this.currentFrame)).image));
+                this.showImage(new ImageColorViewer((ImageColor) f.activeContorns(w/2, h/2, 20,20,true), -1));
+//                this.imageViews.getChildren().add(this.images.get(this.currentFrame).imageView);
             }else if(loop){
                 this.currentFrame = 0;
                 this.imageViews.getChildren().clear();
-                this.imageViews.getChildren().add(this.images.get(this.currentFrame).imageView);
+                f.setImage((((ImageColorViewer) this.images.get(this.currentFrame)).image));
+                this.showImage(new ImageColorViewer((ImageColor) f.activeContorns(w/2, h/2, 20,20,true), -1));
             }
         }
     }
     public synchronized void previousFrame(){
+        int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
+        int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
+
         if(this.images.size()>0){
             if(currentFrame > 0){
                 this.imageViews.getChildren().clear();
                 this.currentFrame--;
-                this.imageViews.getChildren().add(this.images.get(this.currentFrame).imageView);
+                f.setImage((((ImageColorViewer) this.images.get(this.currentFrame)).image));
+                this.showImage(new ImageColorViewer((ImageColor) f.activeContorns(w/2, h/2, 20,20,true), -1));
             }else if(loop){
                 this.currentFrame = this.images.size()-1;
                 this.imageViews.getChildren().clear();
-                this.imageViews.getChildren().add(this.images.get(this.currentFrame).imageView);
+                f.setImage((((ImageColorViewer) this.images.get(this.currentFrame)).image));
+                this.showImage(new ImageColorViewer((ImageColor) f.activeContorns(w/2, h/2, 20,20,true), -1));
             }
         }
     }

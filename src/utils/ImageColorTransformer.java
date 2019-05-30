@@ -1348,7 +1348,7 @@ public class ImageColorTransformer {
 
         EventHandler<MouseEvent> mousePress = e -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(originalImage).activeContorns((int) e.getX(), (int) e.getY(), 12,500);
+            this.outputImage = new Functions(originalImage).activeContorns((int) e.getX(), (int) e.getY(), 12,500, false);
             grid.add(new ImageView(outputImage.getRenderer()), 1, 3);
 //            text.setText("X: " + cutRegion.x1 + ", Y: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);
 //            System.out.println("X1: " + cutRegion.x1 + ", Y1: " + cutRegion.y1 + ", Color: " + originalImage.getImage()[cutRegion.y1][cutRegion.x1]);

@@ -1681,6 +1681,7 @@ public class Functions {
                             gTheta1 += green[i][j];
                             bTheta1 += blue[i][j];
                         }
+                        caca++;
                     } else {
                         rTheta0 += red[i][j];
                         if(!greyscale){
@@ -1691,16 +1692,23 @@ public class Functions {
                 }
             }
         }
-        rTheta0 /= pixelCount - (sqSize * sqSize);
-        gTheta0 /= pixelCount - (sqSize * sqSize);
-        bTheta0 /= pixelCount - (sqSize * sqSize);
-        rTheta1 /= sqSize * sqSize;
-        gTheta1 /= sqSize * sqSize;
-        bTheta1 /= sqSize * sqSize;
         if(fromPrev){
             phi = classPhi;
             lin = classLin;
             lout = classLout;
+            rTheta0 /= pixelCount - caca;
+            gTheta0 /= pixelCount - caca;
+            bTheta0 /= pixelCount - caca;
+            rTheta1 /= caca;
+            gTheta1 /= caca;
+            bTheta1 /= caca;
+        } else {
+            rTheta0 /= pixelCount - (sqSize * sqSize);
+            gTheta0 /= pixelCount - (sqSize * sqSize);
+            bTheta0 /= pixelCount - (sqSize * sqSize);
+            rTheta1 /= sqSize * sqSize;
+            gTheta1 /= sqSize * sqSize;
+            bTheta1 /= sqSize * sqSize;
         }
         //tengo lin, lout, thetas, phis
         while( counter-- > 0){
@@ -1880,6 +1888,7 @@ public class Functions {
 
         classLin = (ArrayList<Point>) lin.clone();
         classLout = lout;
+        classPhi = phi;
         lin.addAll(lout);
         for (Point p : lin) {
             newRed[p.x][p.y] = 255;
