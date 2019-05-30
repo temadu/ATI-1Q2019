@@ -3161,7 +3161,7 @@ public class ImageGreyTransformer {
 
     public void houghCircleDetector(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.outputImage = (ImageGrey) new Functions(this.originalImage).houghCircleDetector(10);
+        this.outputImage = (ImageGrey) new Functions(this.originalImage).houghCircleDetector(0.1);
 
         Stage stage = new Stage();
 
