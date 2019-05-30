@@ -2409,8 +2409,8 @@ public class ImageColorTransformer {
 
     public void cannyEdgeDetector(ImageColor originalImage){
         this.originalImage = originalImage;
-        this.secondImage = new Functions(originalImage).cannyAlgorithm(7);
-        this.outputImage = new Functions(secondImage).hysteresisThreshold(128,158);
+        this.secondImage = new Functions(originalImage).cannyAlgorithm(7,1);
+        this.outputImage = new Functions(secondImage).hysteresisThreshold(128,158, false);
 
         Stage stage = new Stage();
         stage.setTitle("Apply Canny edge detector");
@@ -2431,11 +2431,11 @@ public class ImageColorTransformer {
         multField.setText("7");
         grid.add(multField, 1, 1);
 
-//        grid.add(new Label("Sigma:"), 0, 2);
-//        TextField sigmaField = new TextField();
-//        sigmaField.setMaxWidth(60);
-//        sigmaField.setText("1");
-//        grid.add(sigmaField, 1, 2);
+        grid.add(new Label("Sigma:"), 0, 2);
+        TextField sigmaField = new TextField();
+        sigmaField.setMaxWidth(60);
+        sigmaField.setText("1");
+        grid.add(sigmaField, 1, 2);
 
         grid.add(new Label("Threshold 1:"), 0, 3);
         Slider slider = new Slider();
@@ -2461,15 +2461,22 @@ public class ImageColorTransformer {
         slider2.setBlockIncrement(1);
         grid.add(slider2, 1, 4);
 
+        HBox corners = new HBox();
+        CheckBox cornersCB = new CheckBox();
+        cornersCB.setSelected(false);
+        corners.getChildren().addAll(new Label("8-connected:"),cornersCB);
+        corners.setSpacing(15);
+        grid.add(corners, 2, 3);
+
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold(newValue.intValue(),(int) Math.round(slider2.getValue()));
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold(newValue.intValue(),(int) Math.round(slider2.getValue()), cornersCB.isSelected());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });
 
         slider2.valueProperty().addListener((observable, oldValue, newValue) -> {
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),newValue.intValue());
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),newValue.intValue(), cornersCB.isSelected());
             grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
         });
 
@@ -2492,26 +2499,34 @@ public class ImageColorTransformer {
                 if(size >= 0){
                     grid.getChildren().remove(outputImage.getView());
                     this.secondImage = new Functions(this.originalImage)
-                            .cannyAlgorithm(size);
-                    this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
+                            .cannyAlgorithm(size,Double.parseDouble(sigmaField.getText()));
+                    this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), cornersCB.isSelected());
                     grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
                 }
             }
         });
 
-//        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-//            double sigma;
-//            try {
-//                sigma = Double.parseDouble(sigmaField.getText());
-//            } catch (NumberFormatException | NullPointerException nfe) {
-//                return;
-//            }
-//            grid.getChildren().remove(outputImage.getView());
-//            this.secondImage = new Functions(this.originalImage)
-//                    .cannyAlgorithm(Integer.parseInt(multField.getText()));
-//            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
-//            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
-//        });
+        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            double sigma;
+            try {
+                sigma = Double.parseDouble(sigmaField.getText());
+            } catch (NumberFormatException | NullPointerException nfe) {
+                return;
+            }
+            grid.getChildren().remove(outputImage.getView());
+            this.secondImage = new Functions(this.originalImage)
+                    .cannyAlgorithm(Integer.parseInt(multField.getText()),sigma);
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), cornersCB.isSelected());
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+        });
+
+        cornersCB.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.secondImage = new Functions(this.originalImage)
+                    .cannyAlgorithm(Integer.parseInt(multField.getText()),Double.parseDouble(sigmaField.getText()));
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 1, 6);
+        }));
 
         Label firstImageLabel = new Label("First Image:");
         firstImageLabel.setAlignment(Pos.CENTER);

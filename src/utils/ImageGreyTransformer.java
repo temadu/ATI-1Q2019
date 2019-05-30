@@ -2808,8 +2808,8 @@ public class ImageGreyTransformer {
 
     public void cannyEdgeDetector(ImageGrey originalImage){
         this.originalImage = originalImage;
-        this.secondImage = new Functions(originalImage).cannyAlgorithm(7);
-        this.outputImage = new Functions(secondImage).hysteresisThreshold(100,200);
+        this.secondImage = new Functions(originalImage).cannyAlgorithm(7, 0.5);
+        this.outputImage = new Functions(secondImage).hysteresisThreshold(100,200, false);
 
         Stage stage = new Stage();
         stage.setTitle("Apply Canny edge detector");
@@ -2833,8 +2833,9 @@ public class ImageGreyTransformer {
         grid.add(new Label("Sigma:"), 0, 2);
         TextField sigmaField = new TextField();
         sigmaField.setMaxWidth(60);
-        sigmaField.setText("1");
-//        grid.add(sigmaField, 1, 2);
+        sigmaField.setText("0.5");
+        grid.add(sigmaField, 1, 2);
+
         Label threshold1 = new Label("Threshold 1: " + 100);
         grid.add(threshold1, 0, 3);
         Slider slider = new Slider();
@@ -2861,11 +2862,18 @@ public class ImageGreyTransformer {
         slider2.setBlockIncrement(1);
         grid.add(slider2, 1, 4);
 
+        HBox corners = new HBox();
+        CheckBox cornersCB = new CheckBox();
+        cornersCB.setSelected(false);
+        corners.getChildren().addAll(new Label("8-connected:"),cornersCB);
+        corners.setSpacing(15);
+        grid.add(corners, 2, 3);
+
         slider.valueProperty().addListener((observable, oldValue, newValue) -> {
             threshold1.setText("Threshold 1: " + newValue.intValue());
             threshold2.setText("Threshold 2: " + (int) slider2.getValue());
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold(newValue.intValue(),(int) slider2.getValue());
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold(newValue.intValue(),(int) slider2.getValue(), cornersCB.isSelected());
             grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
             grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
         });
@@ -2874,7 +2882,7 @@ public class ImageGreyTransformer {
             threshold1.setText("Threshold 1: " + (int) slider.getValue());
             threshold2.setText("Threshold 2: " + newValue.intValue());
             grid.getChildren().remove(outputImage.getView());
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)slider.getValue(),newValue.intValue());
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)slider.getValue(),newValue.intValue(), cornersCB.isSelected());
             grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
             grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
         });
@@ -2886,8 +2894,8 @@ public class ImageGreyTransformer {
                 int size = 0;
                 try {
                     size = Integer.parseInt(multField.getText());
-                    if(size<7){
-                        size = 7;
+                    if(size<3){
+                        size = 3;
                     }
                     if(size>30){
                         size = 30;
@@ -2898,8 +2906,8 @@ public class ImageGreyTransformer {
                 if(size >= 0){
                     grid.getChildren().remove(outputImage.getView());
                     this.secondImage = new Functions(this.originalImage)
-                            .cannyAlgorithm(size);
-                    this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
+                            .cannyAlgorithm(size,Double.parseDouble(sigmaField.getText()));
+                    this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), cornersCB.isSelected());
                     grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
                     grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
 
@@ -2916,12 +2924,22 @@ public class ImageGreyTransformer {
             }
             grid.getChildren().remove(outputImage.getView());
             this.secondImage = new Functions(this.originalImage)
-                    .cannyAlgorithm(Integer.parseInt(multField.getText()));
-            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()));
+                    .cannyAlgorithm(Integer.parseInt(multField.getText()),sigma);
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), cornersCB.isSelected());
             grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
             grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
 
         });
+
+        cornersCB.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+            grid.getChildren().remove(outputImage.getView());
+            this.secondImage = new Functions(this.originalImage)
+                    .cannyAlgorithm(Integer.parseInt(multField.getText()),Double.parseDouble(sigmaField.getText()));
+            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), newValue);
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+
+        }));
 
         Label firstImageLabel = new Label("Original:");
         firstImageLabel.setAlignment(Pos.CENTER);

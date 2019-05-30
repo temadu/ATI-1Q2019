@@ -915,15 +915,22 @@ public class Functions {
             : new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
 
-    public ImageInt cannyAlgorithm(int n){
+    public ImageInt cannyAlgorithm(int n, double sigma){
         DecimalFormat df = new DecimalFormat("#.#");
 
         //1) Aplico gaussiana
-        this.image = gaussFilter(n,(n-1)/2);
+        this.image = gaussFilter(n,sigma);
 
         //2) Derivo sobel en x e y
-        ImageInt gx = sobelOperator(false,false,false,true,false,false,false,false);
-        ImageInt gy = sobelOperator(false,false,true,false,false,false,false,false);
+//        ImageInt gx = sobelOperator(false,false,false,true,false,false,false,false);
+//        ImageInt gy = sobelOperator(false,false,true,false,false,false,false,false);
+        double[][] wE = {{-1,0,1},
+                        {-2,0,2},
+                        {-1,0,1}};
+        double[][] wS = rotate(rotate(wE));
+
+        ImageInt gx = filter(wE,false,false);
+        ImageInt gy = filter(wS,false,false);
 
         //3) Angulo de gradiente
         double[][] directionsR = new double[gx.getHeight()][gx.getWidth()];
@@ -932,18 +939,24 @@ public class Functions {
         double[][] GG = new double[gx.getHeight()][gx.getWidth()];
         double[][] directionsB = new double[gx.getHeight()][gx.getWidth()];
         double[][] GB = new double[gx.getHeight()][gx.getWidth()];
+        double piRad = 180/Math.PI;
         for (int i = 0; i < gx.getHeight(); i++) {
             for (int j = 0; j < gx.getWidth(); j++) {
                 if(greyscale){
-                    directionsR[i][j] = Math.atan2(((ImageGrey)gy).getImage()[i][j],((ImageGrey)gx).getImage()[i][j]) * (360/Math.PI);
-                    GR[i][j] = Math.sqrt(Math.pow(((ImageGrey)gx).getImage()[i][j],2)+ Math.pow(((ImageGrey)gy).getImage()[i][j],2));
+                    directionsR[i][j] = Math.atan2(((ImageGrey)gy).getImage()[i][j],((ImageGrey)gx).getImage()[i][j]) * piRad;
+                    if (directionsR[i][j] < 0) {
+                        directionsR[i][j] += 360.;
+                    }
+                    GR[i][j] = Math.hypot(((ImageGrey)gx).getImage()[i][j],((ImageGrey)gy).getImage()[i][j]);
                 }else{
-                    directionsR[i][j] = Math.atan2(((ImageColor)gy).getRed()[i][j],((ImageColor)gx).getRed()[i][j]) * (360/Math.PI);
-                    GR[i][j] = Math.sqrt(Math.pow(((ImageColor)gx).getRed()[i][j],2)+ Math.pow(((ImageColor)gy).getRed()[i][j],2));
-                    directionsG[i][j] = Math.atan2(((ImageColor)gy).getGreen()[i][j],((ImageColor)gx).getGreen()[i][j]) * (360/Math.PI);
-                    GG[i][j] = Math.sqrt(Math.pow(((ImageColor)gx).getGreen()[i][j],2)+ Math.pow(((ImageColor)gy).getGreen()[i][j],2));
-                    directionsB[i][j] = Math.atan2(((ImageColor)gy).getBlue()[i][j],((ImageColor)gx).getBlue()[i][j]) * (360/Math.PI);
-                    GB[i][j] = Math.sqrt(Math.pow(((ImageColor)gx).getBlue()[i][j],2)+ Math.pow(((ImageColor)gy).getBlue()[i][j],2));
+                    directionsR[i][j] = Math.atan2(((ImageColor)gy).getRed()[i][j], ((ImageColor)gx).getRed()[i][j]) * piRad;
+                    GR[i][j] = Math.hypot(((ImageColor)gx).getRed()[i][j],((ImageColor)gy).getRed()[i][j]);
+
+                    directionsG[i][j] = Math.atan2(((ImageColor)gy).getGreen()[i][j], ((ImageColor)gx).getGreen()[i][j]) * piRad;
+                    GG[i][j] = Math.hypot(((ImageColor)gx).getGreen()[i][j],((ImageColor)gy).getGreen()[i][j]);
+
+                    directionsB[i][j] = Math.atan2(((ImageColor)gy).getBlue()[i][j], ((ImageColor)gx).getBlue()[i][j]) * piRad;
+                    GB[i][j] = Math.hypot(((ImageColor)gx).getBlue()[i][j],((ImageColor)gy).getBlue()[i][j]);
                 }
             }
         }
@@ -969,25 +982,41 @@ public class Functions {
             ret[0][j] = 0;
             ret[G.length-1][j] = 0;
         }
+        int ver = 0;
+        int hor = 0;
+        int ne = 0;
+        int nw = 0;
+        int menos = 0;
+        int mas = 0;
+        double minDir = 360;
+        double maxDir = -360;
+
         for (int i = 1; i < G.length-1; i++) {
             for (int j = 1; j < G[0].length-1; j++) {
                 double direction = directions[i][j];
                 double current = G[i][j];
                 double prev = 0;
                 double next = 0;
-                if ((direction >= 0 && direction < 22.5) || (direction >= 157.5 && direction <= 180)) {
+                minDir = Math.min(direction,minDir);
+                maxDir = Math.max(direction,maxDir);
+                if (direction <= 22.5 || (direction >= 157.5 && direction <= 202.5) || direction >= 337.5) {
                     prev = G[i][j-1];
                     next = G[i][j+1];
-                } else if (direction >= 22.5 && direction < 67.5) {
+                    hor++;
+                } else if ((direction >= 22.5 && direction <= 67.5) || (direction >= 202.5 && direction <= 247.5)) {
                     prev = G[i-1][j+1];
                     next = G[i+1][j-1];
-                } else if (direction >= 67.5 && direction < 112.5) {
+                    ne++;
+                } else if ((direction >= 67.5 && direction <= 112.5) || (direction >= 247.5 && direction <= 292.5)) {
                     prev = G[i-1][j];
                     next = G[i+1][j];
-                } else if (direction >= 112.5 && direction < 157.5) {
+                    ver++;
+                } else {
                     prev = G[i-1][j-1];
                     next = G[i+1][j+1];
+                    nw++;
                 }
+
                 if (prev > current || next > current) {
                     ret[i][j] = 0;
                 }else{
@@ -995,10 +1024,19 @@ public class Functions {
                 }
             }
         }
+        System.out.println("HOR: " + hor);
+        System.out.println("NE: " + ne);
+        System.out.println("VER: " + ver);
+        System.out.println("NW: " + nw);
+        System.out.println("Menos: " + menos);
+        System.out.println("Mas: " + mas);
+        System.out.println("MinDir: " + minDir);
+        System.out.println("MaxDir: " + maxDir);
+        System.out.println();
         return ret;
     }
 
-    public ImageInt hysteresisThreshold(int t1, int t2) {
+    public ImageInt hysteresisThreshold(int t1, int t2, boolean eightConnected) {
         List<Integer[][]> images = new ArrayList<>();
         List<Integer[][]> rets = new ArrayList<>();
         if(greyscale){
@@ -1043,16 +1081,16 @@ public class Functions {
                                 && firstPass[i+1][j] == 255;
                         boolean borderRight = j < image[0].length - 1
                                 && firstPass[i][j+1] == 255;
-//                        boolean borderLUp = i > 0 && j > 0
-//                                && firstPass[i-1][j-1] == 255;
-//                        boolean borderRUp = i > 0 && j < image[0].length - 1
-//                                && firstPass[i-1][j+1] == 255;
-//                        boolean borderLDown = i < image.length - 1 && j > 0
-//                                && firstPass[i+1][j-1] == 255;
-//                        boolean borderRDown = i < image.length - 1 && j < image[0].length - 1
-//                                && firstPass[i+1][j+1] == 255;
+                        boolean borderLUp = i > 0 && j > 0
+                                && firstPass[i-1][j-1] == 255;
+                        boolean borderRUp = i > 0 && j < image[0].length - 1
+                                && firstPass[i-1][j+1] == 255;
+                        boolean borderLDown = i < image.length - 1 && j > 0
+                                && firstPass[i+1][j-1] == 255;
+                        boolean borderRDown = i < image.length - 1 && j < image[0].length - 1
+                                && firstPass[i+1][j+1] == 255;
 //                        if (borderUp || borderLeft || borderDown|| borderRight || borderLUp || borderRUp || borderLDown || borderRDown) {
-                        if (borderUp || borderLeft || borderDown|| borderRight) {
+                        if (borderUp || borderLeft || borderDown|| borderRight || (eightConnected && (borderLUp || borderRUp || borderLDown || borderRDown))) {
 //                            ret[i][j] = image[i][j];
                             ret[i][j] = 255;
                         } else {
@@ -1338,7 +1376,7 @@ public class Functions {
 
     public ImageInt sobelOperator(boolean n, boolean w, boolean s, boolean e, boolean nw, boolean ne, boolean sw, boolean se) {
         double[][] wS = new double[3][3];
-        ArrayList<ImageInt> imgs = new ArrayList<>();
+//        ArrayList<ImageInt> imgs = new ArrayList<>();
 //        int half = (int) Math.floor(n/2);
         wS[0][0] = wS[0][2] = -1.0;                 // -1  -2  -1
         wS[1][0] = wS[1][1] = wS[1][2] = 0.0;       //  0   0   0
