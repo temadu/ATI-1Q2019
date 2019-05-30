@@ -18,6 +18,9 @@ public class Functions {
     private ArrayList<Point> classLin;
     private ArrayList<Point> classLout;
     private Integer[][] classPhi;
+    private double thetaR;
+    private double thetaG;
+    private double thetaB;
 
 
     public Functions(ImageInt image) {
@@ -1677,7 +1680,7 @@ public class Functions {
         double gTheta0 =  0, gTheta1 = 0;
         double bTheta0 =  0, bTheta1 = 0;
 
-        int caca = 0;
+        int inCounter = 0;
         //paso inicial, setea los theta y phi inicial
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
@@ -1694,7 +1697,7 @@ public class Functions {
                             gTheta1 += green[i][j];
                             bTheta1 += blue[i][j];
                         }
-                        caca++;
+                        inCounter++;
                     } else {
                         phi[i][j] = 3;
                         rTheta0 += red[i][j];
@@ -1719,7 +1722,7 @@ public class Functions {
                             gTheta1 += green[i][j];
                             bTheta1 += blue[i][j];
                         }
-                        caca++;
+                        inCounter++;
                     } else {
                         rTheta0 += red[i][j];
                         if(!greyscale){
@@ -1734,12 +1737,12 @@ public class Functions {
             phi = classPhi;
             lin = classLin;
             lout = classLout;
-            rTheta0 /= pixelCount - caca;
-            gTheta0 /= pixelCount - caca;
-            bTheta0 /= pixelCount - caca;
-            rTheta1 /= caca;
-            gTheta1 /= caca;
-            bTheta1 /= caca;
+            rTheta0 /= pixelCount - inCounter;
+            gTheta0 /= pixelCount - inCounter;
+            bTheta0 /= pixelCount - inCounter;
+            rTheta1 = thetaR;
+            gTheta1 = thetaG;
+            bTheta1 = thetaB;
         } else {
             rTheta0 /= pixelCount - (sqSize * sqSize);
             gTheta0 /= pixelCount - (sqSize * sqSize);
@@ -1927,6 +1930,9 @@ public class Functions {
         classLin = (ArrayList<Point>) lin.clone();
         classLout = lout;
         classPhi = phi;
+        thetaR = rTheta1;
+        thetaG = gTheta1;
+        thetaB = bTheta1;
         lin.addAll(lout);
         for (Point p : lin) {
             newRed[p.x][p.y] = 255;

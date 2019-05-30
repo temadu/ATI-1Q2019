@@ -366,13 +366,13 @@ public class VideoViewer {
         if(this.images.get(this.currentFrame) instanceof ImageGreyViewer){
             int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
             int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
-            this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
-                    .activeContorns(e.getX(), e.getY(), Math.min(w,h)/8,1, false), -1));
+            this.showImage(new ImageGreyViewer((ImageGrey)f
+                    .activeContorns(e.getX(), e.getY(), 20,1, false), -1));
         }else{
             int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
             int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
-            this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
-                    .activeContorns(e.getX(), e.getY(), Math.min(w,h)/8,1, false), -1));
+            this.showImage(new ImageColorViewer((ImageColor)f
+                    .activeContorns(e.getX(), e.getY(), 20,1, false), -1));
         }
     };
 
