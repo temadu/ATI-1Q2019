@@ -1160,8 +1160,9 @@ public class Functions {
     public ImageInt houghLineDetector(double e){
 //        1)Find borders
 //        this.image = cannyAlgorithm(5,1.4);
-//        this.image = hysteresisThreshold(50,200);
-        this.image = this.sobelOperator(false,false,true,true,false,false,false,false);
+//        this.image = this.sobelOperator(false,false,true,true,false,false,false,false);
+        this.image = cannyAlgorithm(7,0.1);
+        this.image = hysteresisThreshold(5,10,false);
 
 //        2)Binary image
         List<Integer[][]> thresholdeds = new ArrayList<>();

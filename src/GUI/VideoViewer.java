@@ -58,6 +58,7 @@ public class VideoViewer {
     public int currentFrame = 0;
     private Functions f;
 
+    private double[] originCoords = {100.,100.};
 
     private ScheduledExecutorService playThread;
 
@@ -158,12 +159,12 @@ public class VideoViewer {
                 int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500, false), -1));
+                        .activeContorns(originCoords[0], originCoords[1], Math.min(w,h)/8,500, false), -1));
             }else{
                 int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
                 this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,500, false), -1));
+                        .activeContorns(originCoords[0], originCoords[1], Math.min(w,h)/8,500, false), -1));
             }
         });
 
@@ -172,13 +173,17 @@ public class VideoViewer {
             if(this.images.get(this.currentFrame) instanceof ImageGreyViewer){
                 int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
-                this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1,false), -1));
+                f.setImage((((ImageGreyViewer) this.images.get(this.currentFrame)).image));
+                this.showImage(new ImageGreyViewer((ImageGrey) f.activeContorns(originCoords[0], originCoords[1], 20,1,true), -1));
+//                this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
+//                        .activeContorns(originCoords[0], originCoords[1], Math.min(w,h)/8,1,true), -1));
             }else{
                 int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
                 int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
-                this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
-                        .activeContorns(w/2, h/2-100, Math.min(w,h)/8,1,false), -1));
+                f.setImage((((ImageColorViewer) this.images.get(this.currentFrame)).image));
+                this.showImage(new ImageColorViewer((ImageColor) f.activeContorns(originCoords[0], originCoords[1], 20,1,true), -1));
+//                this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
+//                        .activeContorns(originCoords[0], originCoords[1], Math.min(w,h)/8,1,true), -1));
             }
         });
 
@@ -312,8 +317,10 @@ public class VideoViewer {
 
     public void addImageViewer(ImageViewer imageViewer){
         this.images.add(imageViewer);
-        if(this.imageViews.getChildren().size() == 0)
+        if(this.imageViews.getChildren().size() == 0){
             this.imageViews.getChildren().add(imageViewer.imageView);
+            imageViewer.imageView.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
+        }
     }
 
     public synchronized void nextFrame(){
@@ -352,9 +359,27 @@ public class VideoViewer {
             }
         }
     }
+
+    EventHandler<MouseEvent> mousePress = e -> {
+        originCoords[0] = e.getX();
+        originCoords[1] = e.getY();
+        if(this.images.get(this.currentFrame) instanceof ImageGreyViewer){
+            int w = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getWidth();
+            int h = ((ImageGreyViewer) this.images.get(this.currentFrame)).image.getHeight();
+            this.showImage(new ImageGreyViewer((ImageGrey)new Functions(((ImageGreyViewer) this.images.get(this.currentFrame)).image)
+                    .activeContorns(e.getX(), e.getY(), Math.min(w,h)/8,1, false), -1));
+        }else{
+            int w = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getWidth();
+            int h = ((ImageColorViewer) this.images.get(this.currentFrame)).image.getHeight();
+            this.showImage(new ImageColorViewer((ImageColor)new Functions(((ImageColorViewer) this.images.get(this.currentFrame)).image)
+                    .activeContorns(e.getX(), e.getY(), Math.min(w,h)/8,1, false), -1));
+        }
+    };
+
     public void showImage(ImageViewer imageViewer){
         this.imageViews.getChildren().clear();
         this.imageViews.getChildren().add(imageViewer.imageView);
+        imageViewer.imageView.addEventFilter(MouseEvent.MOUSE_PRESSED, mousePress);
     }
 
 }
