@@ -1295,7 +1295,6 @@ public class Functions {
                             }
                         }
                     }
-
                 }
             }
         }
@@ -1318,7 +1317,7 @@ public class Functions {
             }
         }
         int maxVotes = elements.get(0).votes;
-        int votesCutOff = maxVotes/2;
+        int votesCutOff = 5*maxVotes/6;
         if (maxVotes > 1) {
             for (HoughAcumulatorElement b : elements) {
                 if (b.votes < votesCutOff)
