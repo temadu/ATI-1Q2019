@@ -171,7 +171,6 @@ public class Functions {
                 : new ImageColor(newRed, newGreen, newBlue, image.getHeight(), image.getWidth());
     }
 
-
     public ImageInt rangeCompressor() {
         Integer[][] red = new Integer[image.getHeight()][image.getWidth()];
         Integer[][] green = new Integer[image.getHeight()][image.getWidth()];
@@ -240,7 +239,6 @@ public class Functions {
         return greyscale ?  new ImageGrey(red, image.getHeight(), image.getWidth())
                 :  new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
-
 
     public double[] greyHistogram() {
         double[] hist = new double[256];
@@ -571,6 +569,7 @@ public class Functions {
 
         return new ImageColor(red, green, blue, image.getHeight(), image.getWidth());
     }
+
     public ImageGrey addExponentialNoise(double density, double lamda) {
         RandomExpGenerator reg = new RandomExpGenerator(lamda);
         Random r = new Random();
@@ -1344,7 +1343,6 @@ public class Functions {
         return new ImageGrey(newImage,image.getHeight(),image.getWidth());
 
     }
-
 
     private double[][] rotate(double[][] w) {
         double[][] rot = new double[3][3];
