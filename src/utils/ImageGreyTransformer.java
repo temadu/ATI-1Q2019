@@ -1331,6 +1331,10 @@ public class ImageGreyTransformer {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).otsuThreshold(),windowIndex));
     }
 
+    public void harrisMethod(ImageGrey originalImage) {
+        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).harrisMethod(20),windowIndex));
+    }
+
     public void anisotropic(ImageGrey originalImage) {
         this.originalImage = originalImage;
         this.outputImage = originalImage;

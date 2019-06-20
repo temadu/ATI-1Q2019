@@ -698,6 +698,25 @@ public class Functions {
         return filter(w, false, true);
     }
 
+    public ImageInt gaussFilterFalse(int n, double sigma) {
+        double[][] w = new double[n][n];
+        int half = (int) Math.floor(n/2);
+        double pre = 1/(2 * Math.PI * sigma * sigma);
+        double total = 0;
+        for (int i = -half; i < n - half; i++) {
+            for (int j = -half; j < n - half; j++) {
+                w[i + half][j + half] = pre * Math.exp(-(double)(i*i + j*j)/(sigma*sigma));
+                total += w[i + half][j + half];
+            }
+        }
+        for (int i = -half; i < n - half; i++) {
+            for (int j = -half; j < n - half; j++) {
+                w[i + half][j + half] *= (1.0/total);
+            }
+        }
+        return filter(w, false, false);
+    }
+
     public ImageInt laplaceMask() {
         double[][] w = new double[3][3];
         w[0][0] = w[0][2] = w[2][0] = w[2][2] = 0.0;
@@ -1941,6 +1960,47 @@ public class Functions {
         }
         return greyscale ? new ImageGrey(newRed, image.getHeight(), image.getWidth())
                 : new ImageColor(newRed, newGreen, newBlue, image.getHeight(), image.getWidth());
+    }
+
+    public ImageGrey harrisMethod(int threshold) {
+        double[][] wE = {{-1,0,1},
+                {-2,0,2},
+                {-1,0,1}};
+        double[][] wS = rotate(rotate(wE));
+        ImageGrey aux = (ImageGrey) this.image;
+        ImageGrey gx = (ImageGrey) filter(wE,false,false);
+        ImageGrey gy = (ImageGrey) filter(wS,false,false);
+
+        Integer[][] gx2 = Arrays.stream(gx.getImage()).parallel().map(a-> Arrays.stream(a).parallel().map(p->p*p).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        this.image = new ImageGrey(gx2, image.getHeight(), image.getWidth(), false);
+        gx2 = ((ImageGrey) gaussFilter(7, 2)).getImage();
+        Integer[][] gy2 = Arrays.stream(gy.getImage()).parallel().map(a-> Arrays.stream(a).parallel().map(p->p*p).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        this.image = new ImageGrey(gy2, image.getHeight(), image.getWidth(), false);
+        gy2 = ((ImageGrey) gaussFilter(7, 2)).getImage();
+
+        Integer[][] gxy = new Integer[image.getHeight()][image.getWidth()];
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+                gxy[i][j] = gx.getImage()[i][j] * gy.getImage()[i][j];
+            }
+        }
+        this.image = new ImageGrey(gxy, image.getHeight(), image.getWidth(), false);
+        gxy = ((ImageGrey) gaussFilter(7, 2)).getImage();
+
+        this.image = aux;
+
+        Integer[][] cim = new Integer[image.getHeight()][image.getWidth()];
+        for (int i = 0; i < image.getHeight(); i++) {
+            for (int j = 0; j < image.getWidth(); j++) {
+//                cim[i][j] = (int) Math.floor((gx2[i][j]*gy2[i][j] - gxy[i][j]*gxy[i][j]) - 0.04*Math.pow(gx2[i][j] + gy2[i][j], 2)) /*> threshold? 255: 0*/;
+                cim[i][j] = (int) Math.abs(Math.floor((gx2[i][j]*gy2[i][j] - Math.pow(gxy[i][j],4)) - 0.04*Math.pow(gx2[i][j] + gy2[i][j],2)));
+
+            }
+
+        }
+        cim = clamp(cim);
+//        cim = clamp(cim);
+        return new ImageGrey(cim, image.getHeight(), image.getWidth());
     }
 
     private double loretnzOperator(double x, double sigma) {
