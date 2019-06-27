@@ -1962,7 +1962,7 @@ public class Functions {
                 : new ImageColor(newRed, newGreen, newBlue, image.getHeight(), image.getWidth());
     }
 
-    public ImageGrey harrisMethod(int threshold) {
+    public ImageGrey harrisMethod(double k) {
         double[][] wE = {{-1,0,1},
                 {-2,0,2},
                 {-1,0,1}};
@@ -1992,11 +1992,9 @@ public class Functions {
         Integer[][] cim = new Integer[image.getHeight()][image.getWidth()];
         for (int i = 0; i < image.getHeight(); i++) {
             for (int j = 0; j < image.getWidth(); j++) {
-//                cim[i][j] = (int) Math.floor((gx2[i][j]*gy2[i][j] - gxy[i][j]*gxy[i][j]) - 0.04*Math.pow(gx2[i][j] + gy2[i][j], 2)) /*> threshold? 255: 0*/;
-                cim[i][j] = (int) Math.abs(Math.floor((gx2[i][j]*gy2[i][j] - Math.pow(gxy[i][j],4)) - 0.04*Math.pow(gx2[i][j] + gy2[i][j],2)));
-
+//                cim[i][j] = (int) Math.floor((gx2[i][j]*gy2[i][j] - gxy[i][j]*gxy[i][j]) - k*Math.pow(gx2[i][j] + gy2[i][j], 2)) /*> threshold? 255: 0*/;
+                cim[i][j] = (int) Math.abs(Math.floor((gx2[i][j]*gy2[i][j] - Math.pow(gxy[i][j],4)) - k*Math.pow(gx2[i][j] + gy2[i][j],2)));
             }
-
         }
         cim = clamp(cim);
 //        cim = clamp(cim);

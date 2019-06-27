@@ -31,6 +31,7 @@ import tp1.Functions;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.function.Function;
 
 public class ImageGreyTransformer {
@@ -42,6 +43,8 @@ public class ImageGreyTransformer {
     ImageInt outputImage;
     ImageView outputImageView;
     int windowIndex;
+
+    private static DecimalFormat df2 = new DecimalFormat("#.##");
 
     public ImageGreyTransformer(int windowIndex) {
         this.windowIndex = windowIndex;
@@ -1329,10 +1332,6 @@ public class ImageGreyTransformer {
 
     public void otsuThreshold(ImageGrey originalImage) {
         ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).otsuThreshold(),windowIndex));
-    }
-
-    public void harrisMethod(ImageGrey originalImage) {
-        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).harrisMethod(20),windowIndex));
     }
 
     public void anisotropic(ImageGrey originalImage) {
@@ -3240,6 +3239,183 @@ public class ImageGreyTransformer {
         stage.setTitle("Multiply image by scalar");
         stage.show();
     }
+
+//    public void harrisMethod(ImageGrey originalImage) {
+//        ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer(new Functions(originalImage).harrisMethod(20),windowIndex));
+//    }
+
+
+    public void harrisMethod(ImageGrey originalImage){
+        this.originalImage = originalImage;
+        this.secondImage = new Functions(originalImage).harrisMethod(0.04);
+        this.outputImage = new Functions(secondImage).thresholdization(100);
+
+        Stage stage = new Stage();
+        stage.setTitle("Apply Harris corner detector");
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Apply Harris corner detector");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+//        grid.add(new Label("Mask Size:"), 0, 1);
+//        TextField multField = new TextField();
+//        multField.setMaxWidth(60);
+//        multField.setText("7");
+//        grid.add(multField, 1, 1);
+//
+//        grid.add(new Label("Sigma:"), 0, 2);
+//        TextField sigmaField = new TextField();
+//        sigmaField.setMaxWidth(60);
+//        sigmaField.setText("0.5");
+//        grid.add(sigmaField, 1, 2);
+
+        Label threshold1 = new Label("k: " + 0.04);
+        grid.add(threshold1, 0, 3);
+        Slider slider = new Slider();
+        slider.setMin(0.04);
+        slider.setMax(0.06);
+        slider.setValue(0.04);
+        slider.setShowTickLabels(true);
+        slider.setShowTickMarks(true);
+        slider.setMajorTickUnit(0.01);
+        slider.setBlockIncrement(0.001);
+        grid.add(slider, 1, 3);
+
+        Label threshold2 = new Label("Threshold: " + 100);
+        grid.add(threshold2, 0, 4);
+        Slider slider2 = new Slider();
+        slider2.setMin(0);
+        slider2.setMax(255);
+        slider2.setValue(100);
+        slider2.setShowTickLabels(true);
+        slider2.setShowTickMarks(true);
+        slider2.setMajorTickUnit(64);
+        slider2.setMinorTickCount(8);
+        slider2.setBlockIncrement(1);
+        grid.add(slider2, 1, 4);
+
+//        HBox corners = new HBox();
+//        CheckBox cornersCB = new CheckBox();
+//        cornersCB.setSelected(false);
+//        corners.getChildren().addAll(new Label("8-connected:"),cornersCB);
+//        corners.setSpacing(15);
+//        grid.add(corners, 2, 3);
+
+        slider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            threshold1.setText("k: " + df2.format(newValue.doubleValue()));
+            grid.getChildren().remove(originalImage.getView());
+            this.secondImage = new Functions(originalImage).harrisMethod(newValue.doubleValue());
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.secondImage).thresholdization((int) slider2.getValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+        });
+
+        slider2.valueProperty().addListener((observable, oldValue, newValue) -> {
+            threshold2.setText("Threshold: " + newValue.intValue());
+//            threshold2.setText("Threshold 2: " + (int) slider2.getValue());
+            grid.getChildren().remove(outputImage.getView());
+            this.outputImage = new Functions(this.secondImage).thresholdization(newValue.intValue());
+            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+        });
+
+//        multField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            if (!newValue.matches("\\d*")) {
+//                multField.setText(oldValue);
+//            } else {
+//                int size = 0;
+//                try {
+//                    size = Integer.parseInt(multField.getText());
+//                    if(size<3){
+//                        size = 3;
+//                    }
+//                    if(size>30){
+//                        size = 30;
+//                    }
+//                } catch (NumberFormatException | NullPointerException nfe) {
+//                    return;
+//                }
+//                if(size >= 0){
+//                    grid.getChildren().remove(outputImage.getView());
+//                    this.secondImage = new Functions(this.originalImage)
+//                            .cannyAlgorithm(size,Double.parseDouble(sigmaField.getText()));
+//                    this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), cornersCB.isSelected());
+//                    grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+//                    grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+//
+//                }
+//            }
+//        });
+//
+//        sigmaField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+//            double sigma;
+//            try {
+//                sigma = Double.parseDouble(sigmaField.getText());
+//            } catch (NumberFormatException | NullPointerException nfe) {
+//                return;
+//            }
+//            grid.getChildren().remove(outputImage.getView());
+//            this.secondImage = new Functions(this.originalImage)
+//                    .cannyAlgorithm(Integer.parseInt(multField.getText()),sigma);
+//            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), cornersCB.isSelected());
+//            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+//            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+//
+//        });
+//
+//        cornersCB.selectedProperty().addListener(((observable, oldValue, newValue) -> {
+//            grid.getChildren().remove(outputImage.getView());
+//            this.secondImage = new Functions(this.originalImage)
+//                    .cannyAlgorithm(Integer.parseInt(multField.getText()),Double.parseDouble(sigmaField.getText()));
+//            this.outputImage = new Functions(this.secondImage).hysteresisThreshold((int)Math.round(slider.getValue()),(int)Math.round(slider2.getValue()), newValue);
+//            grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+//            grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+//
+//        }));
+
+        Label firstImageLabel = new Label("Original:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 5);
+        grid.add(new ImageView(originalImage.getRenderer()), 0, 6);
+
+        grid.add(new Label("Output:"), 2, 5);
+        grid.add(new ImageView(outputImage.getRenderer()), 2, 6);
+
+        grid.add(new Label("Overlay:"), 1, 5);
+        grid.add(new ImageView(this.overlayImage(originalImage.getRenderer(),((ImageGrey)this.outputImage).getImage(),true,false,false)), 1, 6);
+
+
+        Button outputBtn = new Button("Output Image");
+        HBox hbBtn = new HBox(10);
+        hbBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbBtn.getChildren().add(outputBtn);
+        grid.add(hbBtn, 1, 7);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImage != null){
+                ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageGreyViewer((ImageGrey)outputImage, windowIndex));
+                stage.close();
+            }
+
+        });
+
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(grid);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.show();
+    }
+
 
 
     public WritableImage overlayImage(WritableImage original, Integer[][] marker, boolean r, boolean g, boolean b){
