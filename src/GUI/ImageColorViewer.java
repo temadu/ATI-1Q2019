@@ -119,11 +119,13 @@ public class ImageColorViewer extends ImageViewer{
         houghLines.setOnAction(e -> new ImageColorTransformer(this.windowIndex).houghLineDetector(this.image));
         MenuItem contour = new MenuItem("Contour Tracing");
         contour.setOnAction(e -> new ImageColorTransformer(this.windowIndex).contourTracing(this.image));
+        MenuItem siftDetector = new MenuItem("SIFT Detector");
+        siftDetector.setOnAction(e -> new ImageColorTransformer(this.windowIndex).siftDetector(this.image));
 
 
         transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
                 prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic,canny,susan, houghLines, contour);
+                isotropic, anisotropic,canny,susan, houghLines, contour, siftDetector);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }

@@ -184,4 +184,18 @@ public class ImageColor implements ImageInt{
         }
         return null;
     }
+
+    public static ImageColor blankImage(int height, int width){
+        Integer[][] r = new Integer[height][width];
+        Integer[][] g = new Integer[height][width];
+        Integer[][] b = new Integer[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                r[i][j] = 0;
+                g[i][j] = 0;
+                b[i][j] = 0;
+            }
+        }
+        return new ImageColor(r,g,b,height,width);
+    }
 }

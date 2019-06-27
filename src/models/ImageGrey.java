@@ -188,4 +188,15 @@ public class ImageGrey implements ImageInt{
     public void setImage(Integer[][] image) {
         this.image = image;
     }
+    
+    public static ImageGrey blankImage(int height, int width){
+        Integer[][] r = new Integer[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                r[i][j] = 0;
+            }
+        }
+        return new ImageGrey(r,height,width);
+    }
+
 }

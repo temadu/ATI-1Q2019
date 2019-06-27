@@ -1,5 +1,8 @@
 package utils;
 
+import GUI.ImageColorViewer;
+import GUI.ImageGreyViewer;
+import javafx.stage.FileChooser;
 import models.ImageColor;
 import models.ImageGrey;
 
@@ -238,5 +241,37 @@ public class IOManager {
         return new ImageColor(red, green, blue, picHeight, picWidth);
     }
 
+    public static ImageColor loadImageColor(String filePath) throws IOException {
+        String extension = filePath;
 
+        int i = extension.lastIndexOf('.');
+        if (i > 0) {
+            extension = extension.substring(i+1);
+        }
+
+        if(extension.toLowerCase().equals("ppm")){
+            return IOManager.loadPPM(filePath);
+        }else if(extension.toLowerCase().equals("jpg") || extension.toLowerCase().equals("jpeg") || extension.toLowerCase().equals("png")){
+            return IOManager.loadJPG(filePath);
+        }else{
+            return null;
+        }
+    }
+
+    public static ImageGrey loadImageGrey(String filePath) throws IOException {
+        String extension = filePath;
+
+        int i = extension.lastIndexOf('.');
+        if (i > 0) {
+            extension = extension.substring(i+1);
+        }
+
+        if(extension.toLowerCase().equals("pgm")){
+            return IOManager.loadPGM(filePath);
+        }else if(extension.toLowerCase().equals("raw")){
+            return IOManager.loadRAW(filePath);
+        }else{
+            return null;
+        }
+    }
 }

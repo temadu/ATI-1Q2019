@@ -75,7 +75,20 @@ public class ATIApp extends Application {
         stage.show();
     }
     public static void main(String args[]) {
+        setupOpenCVLibs();
         launch(args);
+    }
+
+    private static void setupOpenCVLibs(){
+        File lib = null;
+        if (System.getProperty("os.name").toUpperCase().contains("WINDOWS")) {
+            if (System.getProperty("sun.arch.data.model").endsWith("64")) {
+                lib = new File("lib//opencv//x64//" + System.mapLibraryName("opencv_java2413"));
+            } else {
+                lib = new File("lib//opencv//x86//" + System.mapLibraryName("opencv_java2413"));
+            }
+        }
+        System.load(lib.getAbsolutePath());
     }
 
     private MenuBar generateMenuBar(Stage stage){
@@ -140,7 +153,7 @@ public class ATIApp extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("./images"));
         fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw","*.jpg","*.jpeg")
+                new FileChooser.ExtensionFilter("Image files", "*.pgm","*.ppm","*.raw","*.jpg","*.jpeg", "*.png")
         );
         File file = fileChooser.showOpenDialog(stage);
 
@@ -163,7 +176,7 @@ public class ATIApp extends Application {
                 this.addImageViewer(new ImageColorViewer(openedImage, this.windowIndex));
 
 //            this.stage.close();
-            }else if(extension.toLowerCase().equals("jpg") || extension.toLowerCase().equals("jpeg")){
+            }else if(extension.toLowerCase().equals("jpg") || extension.toLowerCase().equals("jpeg") || extension.toLowerCase().equals("png")){
                 ImageColor openedImage;
                 try {
                     openedImage = IOManager.loadJPG(file.getPath());
@@ -214,6 +227,11 @@ public class ATIApp extends Application {
     }
 
     public void addImageViewer(ImageViewer imageViewer){
+//        imageViewer.imageView.setPreserveRatio(true);
+//        imageViewer.imageView.fitHeightProperty().bind(this.imageViews.heightProperty());
+//        imageViewer.imageView.maxHeight(1000);
+//        imageViewer.imageView.fitWidthProperty().bind(this.imageViews.widthProperty());
+//        imageViewer.imageView.setPreserveRatio(true);
         this.images.add(imageViewer);
         this.imageViews.getChildren().add(imageViewer.getPane());
     }

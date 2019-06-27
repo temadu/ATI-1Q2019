@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -19,17 +20,20 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import models.ImageColor;
 import models.ImageInt;
+import test.SiftFunctions;
 import tp1.Functions;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 public class ImageColorTransformer {
 
     ImageInt originalImage;
     ImageInt secondImage;
     ImageInt outputImage;
+    List<ImageInt> outputImages;
     int windowIndex;
 
     public ImageColorTransformer(int windowIndex) {
@@ -2721,6 +2725,130 @@ public class ImageColorTransformer {
 
         stage.setTitle("Multiply image by scalar");
         stage.show();
+    }
+
+    public void siftDetector(ImageColor originalImage){
+        this.originalImage = originalImage;
+
+        Stage stage = new Stage();
+
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+//        grid.setHgap(10);
+//        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+
+        Text scenetitle = new Text("Detect Images");
+        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+        grid.add(scenetitle, 0, 0, 2, 1);
+
+        Button chooseImageBtn = new Button("Scene Image");
+        chooseImageBtn.setOnAction(e->{
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File("./images/TP4"));
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Image files", "*.ppm","*.jpg","*.jpeg", "*.png")
+            );
+            File file = fileChooser.showOpenDialog(stage);
+
+            try {
+                if(this.secondImage != null)
+                    grid.getChildren().remove(secondImage.getView());
+                this.secondImage = IOManager.loadImageColor(file.getPath());
+                this.secondImage.getView().setFitHeight(500);
+                this.secondImage.getView().setPreserveRatio(true);
+                grid.add(this.secondImage.getView(),1,3);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                return;
+            }
+        });
+        grid.add(chooseImageBtn, 0, 1);
+
+        Label thresholdLabel = new Label("Threshold:");
+        TextField thresholdField = new TextField();
+        thresholdField.setMaxWidth(60);
+        thresholdField.setText("0.7");
+        grid.add(thresholdField, 1, 1);
+        thresholdField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
+            if (!newValue.matches("\\d{0,2}([\\.]\\d{0,5})?")) {
+                thresholdField.setText(oldValue);
+            }
+        });
+
+        HBox threshBox = new HBox();
+        threshBox.getChildren().addAll(thresholdLabel,thresholdField);
+        grid.add(threshBox,1,1);
+
+
+        Label firstImageLabel = new Label("Object Image:");
+        firstImageLabel.setAlignment(Pos.CENTER);
+        grid.add(firstImageLabel, 0, 2);
+        ImageView originalImageView = new ImageView(originalImage.getRenderer());
+        originalImageView.setFitHeight(500);
+        originalImageView.setPreserveRatio(true);
+        grid.add(originalImageView, 0, 3);
+        grid.add(new Label("Second Image:"), 1, 2);
+
+        Button calculateBtn = new Button("Detect");
+        HBox hbcBtn = new HBox(10);
+        hbcBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hbcBtn.getChildren().add(calculateBtn);
+        calculateBtn.setOnAction((e) -> {
+            if(originalImage != null && secondImage !=null && thresholdField.getText() != ""){
+                if(outputImages != null && outputImages.size() > 0){
+                    for (ImageInt image: outputImages) {
+                        grid.getChildren().remove(image.getView());
+                    }
+                }
+                this.outputImages = new SiftFunctions(originalImage).siftDetector(secondImage, Float.parseFloat(thresholdField.getText()));
+                this.outputImages.get(0).getView().setFitHeight(500);
+                this.outputImages.get(0).getView().setPreserveRatio(true);
+                grid.add(this.outputImages.get(0).getView(),0,4);
+                if(this.outputImages.size()>1){
+                    this.outputImages.get(1).getView().setFitHeight(500);
+                    this.outputImages.get(1).getView().setPreserveRatio(true);
+                    grid.add(this.outputImages.get(1).getView(),1,4);
+                    this.outputImages.get(2).getView().setFitHeight(500);
+//                    this.outputImages.get(2).getView().fitWidthProperty().bind(grid.widthProperty());
+                    this.outputImages.get(2).getView().setPreserveRatio(true);
+                    grid.add(this.outputImages.get(2).getView(),0,5, 2,1);
+                    this.outputImages.get(3).getView().setFitHeight(500);
+                    this.outputImages.get(3).getView().setPreserveRatio(true);
+                    grid.add(this.outputImages.get(3).getView(),0,6);
+                }
+            }
+
+        });
+        grid.add(hbcBtn, 2,1);
+
+        Button outputBtn = new Button("Output Images");
+        HBox hboBtn = new HBox(10);
+        hboBtn.setAlignment(Pos.BOTTOM_RIGHT);
+        hboBtn.getChildren().add(outputBtn);
+
+        outputBtn.setOnAction((e) -> {
+            if(outputImages != null && outputImages.size() > 0){
+                for (ImageInt image: outputImages) {
+                    ATIApp.WINDOWS.get(windowIndex).addImageViewer(new ImageColorViewer((ImageColor)image,windowIndex));
+                }
+                stage.close();
+            }
+
+        });
+
+        VBox main = new VBox();
+        main.getChildren().addAll(grid,hboBtn);
+        ScrollPane scroller = new ScrollPane();
+        scroller.setContent(main);
+
+        Scene scene = new Scene(scroller);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+
+        stage.setTitle("SIFT Detector");
+        stage.show();
+
     }
 
 
