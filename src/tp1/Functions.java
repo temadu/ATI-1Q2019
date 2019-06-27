@@ -290,6 +290,11 @@ public class Functions {
         return new ImageGrey(res, image.getHeight(), image.getWidth());
     }
 
+    public ImageGrey doubleThresholdization(int max, int min) {
+        Integer[][] res = Arrays.stream(((ImageGrey)image).getImage()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > max && p < min ? 0 : 255).toArray(Integer[]::new)).toArray(Integer[][]::new);
+        return new ImageGrey(res, image.getHeight(), image.getWidth());
+    }
+
     public ImageColor thresholdizationColor(int r, int g, int b) {
         Integer[][] red = Arrays.stream(((ImageColor)image).getRed()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > r ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
         Integer[][] green = Arrays.stream(((ImageColor)image).getGreen()).parallel().map(a -> Arrays.stream(a).parallel().map(p -> p > g ? 255 : 0).toArray(Integer[]::new)).toArray(Integer[][]::new);
