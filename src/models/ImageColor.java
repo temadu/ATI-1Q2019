@@ -198,4 +198,14 @@ public class ImageColor implements ImageInt{
         }
         return new ImageColor(r,g,b,height,width);
     }
+
+    public ImageGrey toGrayscale(){
+        Integer[][] ret = new Integer[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                ret[i][j] = (red[i][j] + green[i][j] + blue[i][j])/3;
+            }
+        }
+        return new ImageGrey(ret,height,width);
+    }
 }

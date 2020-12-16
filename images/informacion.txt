@@ -7,3 +7,5 @@ BARCO.RAW    290       207
 LENA.RAW     256       256
 GIRL2.RAW    256       256
 FRACTAL.RAW  200       200
+smallCut.raw      15       14
+smallCut2.raw      17       13

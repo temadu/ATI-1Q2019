@@ -56,7 +56,9 @@ public class ImageColorViewer extends ImageViewer{
         rangeCompressor.setOnAction(e -> new ImageColorTransformer(this.windowIndex).dynamicRangeCompression(this.image));
         MenuItem negative = new MenuItem("Negate");
         negative.setOnAction(e -> new ImageColorTransformer(this.windowIndex).negative(this.image));
-        basicOps.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative);
+        MenuItem greyscale = new MenuItem("Greyscale");
+        greyscale.setOnAction(e -> new ImageColorTransformer(this.windowIndex).greyscale(this.image));
+        basicOps.getItems().addAll( painter, cutter, sum, substract, multiply, gamma, rangeCompressor, negative, greyscale);
 
         final Menu thresholdOps = new Menu("Thresholds");
         MenuItem threshold = new MenuItem("Basic Thresholding");
@@ -93,6 +95,7 @@ public class ImageColorViewer extends ImageViewer{
         bilateralFilter.setOnAction(e -> new ImageColorTransformer(this.windowIndex).bilateralFilter(this.image));
         filterOps.getItems().addAll(meanFilter,medianFilter,weightedMedianFilter,laplacianFilter,gaussFilter,bilateralFilter);
 
+        final Menu edgeDetectionOps = new Menu("Edge detection");
         MenuItem prewitt = new MenuItem("Prewitt");
         prewitt.setOnAction(e -> new ImageColorTransformer(this.windowIndex).prewitt(this.image));
         MenuItem sobel = new MenuItem("Sobel");
@@ -106,6 +109,8 @@ public class ImageColorViewer extends ImageViewer{
         laplaceEvaluated.setOnAction(e -> new ImageColorTransformer(this.windowIndex).laplaceEvaluated(this.image));
         MenuItem laplacianOfGaussianMaskEvaluated = new MenuItem("Laplacian Of Gaussian Filter");
         laplacianOfGaussianMaskEvaluated.setOnAction(e -> new ImageColorTransformer(this.windowIndex).laplacianOfGaussianEvaluated(this.image));
+        edgeDetectionOps.getItems().addAll(prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated);
+
 
         MenuItem anisotropic = new MenuItem("Anisotropic Diffusion");
         anisotropic.setOnAction(e -> new ImageColorTransformer(this.windowIndex).anisotropic(this.image));
@@ -121,11 +126,12 @@ public class ImageColorViewer extends ImageViewer{
         contour.setOnAction(e -> new ImageColorTransformer(this.windowIndex).contourTracing(this.image));
         MenuItem siftDetector = new MenuItem("SIFT Detector");
         siftDetector.setOnAction(e -> new ImageColorTransformer(this.windowIndex).siftDetector(this.image));
+        MenuItem harris = new MenuItem("Harris");
+        harris.setOnAction(e -> new ImageColorTransformer(this.windowIndex).harrisMethod(this.image));
 
 
-        transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
-                prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic,canny,susan, houghLines, contour, siftDetector);
+        transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps, edgeDetectionOps,
+                isotropic, anisotropic,canny,susan, houghLines, contour, harris, siftDetector);
         this.menu = new ContextMenu(save, remove, transformMenu);
         this.imageView.setOnContextMenuRequested(event -> this.menu.show(this.imageView, event.getScreenX(), event.getScreenY()));
     }

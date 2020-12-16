@@ -164,7 +164,7 @@ public class SiftFunctions {
         Mat objectMat = SiftFunctions.ImageIntToMat(this.image);
         Mat sceneMat = SiftFunctions.ImageIntToMat(sceneImage);
 
-        Scalar keypointsColor = new Scalar(0, 0, 255); //red
+        Scalar keypointsColor = new Scalar(0, 255, 0); //red
         Scalar matchestColor = new Scalar(0, 255, 0); //green
 
 
@@ -198,7 +198,7 @@ public class SiftFunctions {
         ret.add(MatToImageInt(scenekeypointsImage));
 
         List<MatOfDMatch> matches = new LinkedList<MatOfDMatch>();
-        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.FLANNBASED);
+        DescriptorMatcher descriptorMatcher = DescriptorMatcher.create(DescriptorMatcher.BRUTEFORCE);
         System.out.println("Matching object and scene images...");
         descriptorMatcher.knnMatch(objectDescriptors, sceneDescriptors, matches, 2);
 

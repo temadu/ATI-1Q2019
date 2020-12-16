@@ -67,6 +67,7 @@ public class ImageGreyViewer extends ImageViewer {
         contrast.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).greyContrast(this.image));
         basicOps.getItems().addAll( painter, cutter, drawSquare, drawCircle, sum, substract, multiply, gamma, rangeCompressor, negative, histogramEqualization, contrast);
 
+        final Menu edgeDetectionOps = new Menu("Edge detection");
         MenuItem prewitt = new MenuItem("Prewitt");
         prewitt.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).prewitt(this.image));
         MenuItem sobel = new MenuItem("Sobel");
@@ -81,6 +82,7 @@ public class ImageGreyViewer extends ImageViewer {
         laplaceEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplaceEvaluated(this.image));
         MenuItem laplacianOfGaussianMaskEvaluated = new MenuItem("Laplacian Of Gaussian Filter");
         laplacianOfGaussianMaskEvaluated.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).laplacianOfGaussianEvaluated(this.image));
+        edgeDetectionOps.getItems().addAll(prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated);
 
 
         final Menu thresholdOps = new Menu("Thresholds");
@@ -141,10 +143,11 @@ public class ImageGreyViewer extends ImageViewer {
 
         MenuItem harris = new MenuItem("Harris");
         harris.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).harrisMethod(this.image));
+        MenuItem siftDetector = new MenuItem("SIFT Detector");
+        siftDetector.setOnAction(e -> new ImageGreyTransformer(this.windowIndex).siftDetector(this.image));
 
-        transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps,
-                prewitt, sobel, kirsh, mask5a, laplaceEvaluated, laplacianOfGaussianMaskEvaluated,
-                isotropic, anisotropic, canny,susan, houghLines, houghCircles,contour, harris);
+        transformMenu.getItems().addAll(basicOps, thresholdOps, noiseOps, filterOps, edgeDetectionOps,
+                isotropic, anisotropic, canny,susan, houghLines, houghCircles,contour, harris, siftDetector);
 
 
 //        final Menu showMenu = new Menu("Show");

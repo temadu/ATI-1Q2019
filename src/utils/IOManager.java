@@ -254,7 +254,7 @@ public class IOManager {
         }else if(extension.toLowerCase().equals("jpg") || extension.toLowerCase().equals("jpeg") || extension.toLowerCase().equals("png")){
             return IOManager.loadJPG(filePath);
         }else{
-            return null;
+            return IOManager.loadJPG(filePath);
         }
     }
 
